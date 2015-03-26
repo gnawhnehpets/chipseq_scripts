@@ -43,7 +43,6 @@ deleting file
 4. git commit -m 'message'
 5. git push -u origin master
 
-
 github help
 ==============
 echo "# test" >> README.md
