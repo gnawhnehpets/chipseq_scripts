@@ -25,33 +25,23 @@
 source("/amber2/scratch/baylin/shwang/Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R")
 options(bitmapType='cairo') 
 bin.size=10 #10bp or 200bp
-# coverage_files_dir = "/amber2/scratch/baylin/Hari/Michelle/BED_Files/new/Coverage_200bp_bin"
 #1
 genelist.name <- "stable.10M"
-#plot_results_dir = "/amber2/scratch/baylin/shwang/Michelle/BED_Files/plots/coverage_200bp_bin/10M_intermediate"
-#genes <- read.table("/amber2/scratch/baylin/Hari/Michelle/MethylationData/methylatedGeneLists/age_intermediate_methylated_genes_at_10months_new_annotation.txt", header=FALSE)
-            
 plot_results_dir = paste0("/amber2/scratch/baylin/shwang/Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/normalizedBED_",bin.size,"bp_bin/outputdir/stable.10M/")
 genes <- read.table("/amber2/scratch/baylin/shwang/Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_annotation.txt")
 
 #2
 genelist.name <- "intermediate.10M"
-#plot_results_dir = "/amber2/scratch/baylin/shwang/Michelle/BED_Files/plots/coverage_200bp_bin/10M_stable"
-#genes <- read.table("/amber2/scratch/baylin/Hari/Michelle/MethylationData/methylatedGeneLists/age_stable_methylated_genes_at_10months_new_annotation.txt", header=FALSE)# 
 plot_results_dir = "/amber2/scratch/baylin/shwang/michelle/BED_files/Coverage_TSS_200bp_bin/normalizedBED_200bp_bin/outputdir/intermediate.10M/"
 genes <- read.table("/amber2/scratch/baylin/shwang/michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_annotation.txt")
 
 #3
 genelist.name <- "stable.10M.new"
-#plot_results_dir = "/amber2/scratch/baylin/shwang/Michelle/BED_Files/plots/coverage_200bp_bin/15M_intermediate"
-#genes <- read.table("/amber2/scratch/baylin/Hari/Michelle/MethylationData/methylatedGeneLists/age_intermediate_methylated_genes_at_15months_new_annotation.txt", header=FALSE)
 plot_results_dir = "/amber2/scratch/baylin/shwang/michelle/BED_files/Coverage_TSS_200bp_bin/normalizedBED_200bp_bin/outputdir/stable.10M.new/"
 genes <- read.table("/amber2/scratch/baylin/shwang/michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_cutoff.txt")
 
 #4
 genelist.name <- "intermediate.10M.new"
-# plot_results_dir = "/amber2/scratch/baylin/shwang/Michelle/BED_Files/plots/coverage_200bp_bin/15M_stable"
-#genes <- read.table("/amber2/scratch/baylin/Hari/Michelle/MethylationData/methylatedGeneLists/age_stable_methylated_genes_at_15months_new_annotation.txt", header=FALSE)
 plot_results_dir = "/amber2/scratch/baylin/shwang/michelle/BED_files/Coverage_TSS_200bp_bin/normalizedBED_200bp_bin/outputdir/intermediate.10M.new/"
 genes <- read.table("/amber2/scratch/baylin/shwang/michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_cutoff.txt")
 
