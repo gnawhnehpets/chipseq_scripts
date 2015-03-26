@@ -92,6 +92,7 @@ chipCoverage.TSSAverageList <- list() # holds the ChIP average values object for
 inputCoverage.TSSAverageList <- list() # holds the Input average values object for genes in genelist.info
 g=1 #for troubleshooting
 bin
+#********************CHECK chipseq-functions_original_newfunctions
 chipCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=chip.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
 inputCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=input.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
 ## Calculate average ChIP coverage
