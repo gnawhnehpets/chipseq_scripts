@@ -2,34 +2,39 @@
 #/amber2/scratch/baylin/shwang/
 #/Volumes/onc-analysis$/users/stephenhwang/
 
-bin.size=10
-source("/amber2/scratch/baylin/shwang/Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R")
+dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
+bin.size=200
+source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 options(bitmapType='cairo') 
-# coverage_files_dir = "/amber2/scratch/baylin/shwang/Michelle/normalizedBED"
+# coverage_files_dir = dir,"Michelle/normalizedBED"
 
-coverage_files_dir = paste0("/amber2/scratch/baylin/shwang/Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/")
-# plot_results_dir = "/amber2/scratch/baylin/shwang/Michelle/BED_Files/plots/normalized/15M_stable"
-plot_results_dir = paste0("/amber2/scratch/baylin/shwang/Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/outputdir/")
+coverage_files_dir = paste0(dir,"Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/")
+# plot_results_dir = dir,"Michelle/BED_Files/plots/normalized/15M_stable"
+plot_results_dir = paste0(dir,"Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/outputdir/")
 setwd(plot_results_dir)
-
+getwd()
 ######################################################################################################
 
 #10M stable
 genes.name <- "stable.10M"
-genes <- read.table("/amber2/scratch/baylin/shwang/Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_annotation.txt", header=FALSE)
+genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_annotation.txt"), header=FALSE)
 
 #10M intermediate
 genes.name <- "intermediate.10M"
-genes <- read.table("/amber2/scratch/baylin/shwang/Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_annotation.txt", header=FALSE)
+genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_annotation.txt"), header=FALSE)
 
 # stricter .4 cutoff
 #10M stable
 genes.name <- "new_stable.10M"
-genes <- read.table("/amber2/scratch/baylin/shwang/Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_cutoff.txt", header=FALSE)
+genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_cutoff.txt"), header=FALSE)
 
 #10M intermediate
 genes.name <- "new_intermediate.10M"
-genes <- read.table("/amber2/scratch/baylin/shwang/Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_cutoff.txt", header=FALSE)
+genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_cutoff.txt"), header=FALSE)
+
+#highly.expressed
+genes.name <- "highly.expressed"
+genes <- read.table(paste0(dir,"Michelle/MethylationData/otherGenelists/list of high expression genes.txt"))
 
 ######################################################################################################
 
@@ -61,7 +66,7 @@ RegAroundTSS=10000
 bin=bin.size
 chr.prefix.chromosome=T
 plot.Directory=plot_results_dir
-#plot.Directory="/amber2/scratch/baylin/shwang/Michelle/BED_Files/plots"
+#plot.Directory=dir,"Michelle/BED_Files/plots"
 
 
 library(gplots, lib.loc=lib.path)
@@ -108,11 +113,6 @@ inputCoverage.TSSAverageList[[g]] <- inputCoverage.TSSAverage
 names(inputCoverage.TSSAverageList)[g] <- paste(i, names(genelist.info)[g], sep="-")
 
 # Plot coverage (raw seq reads and ratio to input of seq reads) as heatmap plot
-## Create plot name for raw heatmaps
-heat_plot_raw <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_raw.jpeg", sep="-"))
-## Create plot name for RATIO heatmaps
-heat_plot_RATIO <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_RATIO.jpeg", sep="-"))
-
 # Generate matices for heatmaps
 x.trnposed <- t(chipCoverage.TSS)
 ratioToInp.x.trnposed <- t(chipCoverage.TSS/inputCoverage.TSSAverage) #ratio of seq reads to average of input for this set of genes
@@ -124,10 +124,20 @@ numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x
 numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(ratioToInp.x.trnposed, na.rm=T)[2]))
 
 # get annotation_c10d_h3k4
-jpeg("test_heatmap.x10bp.jpeg", height=600, width=900, quality=100)
+jpeg(paste0(genes.name,"_heatmap.",bin.size,"bp_h3k4.test.jpeg"), height=600, width=900, quality=100)
 # heatmap.x <- heatmap.2(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
-heatmap.x <- heatmap.3(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
+heatmap.x <- heatmap.3(x.trnposed, 
+                       Rowv=T, 
+                       Colv=F, 
+                       scale="none", 
+                       col=numberOfColors.x.trnposed, 
+                       trace="none", 
+                       dendrogram="row", 
+                       cexRow=1, 
+                       main="Heatmap of raw seq reads", na.rm=TRUE)
 dev.off()
+
+
 # heatmap.x <- heatmap.3(x.trnposed)
 names(heatmap.x)
 heatmap.x$rowDendrogram
@@ -200,12 +210,6 @@ names(inputCoverage.TSSAverageList)[g] <- paste(i, names(genelist.info)[g], sep=
 
 # Plot coverage (raw seq reads and ratio to input of seq reads) as heatmap plot
 ## Create plot name for raw heatmaps
-heat_plot_raw <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_raw.jpeg", sep="-"))
-#heat_plot_raw <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "x_raw.jpeg", sep="-"))
-## Create plot name for RATIO heatmaps
-heat_plot_RATIO <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_RATIO.jpeg", sep="-"))
-#heat_plot_RATIO <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "x_RATIO.jpeg", sep="-"))
-
 # Generate matices for heatmaps
 x.trnposed <- t(chipCoverage.TSS)
 ratioToInp.x.trnposed <- t(chipCoverage.TSS/inputCoverage.TSSAverage) #ratio of seq reads to average of input for this set of genes
@@ -216,7 +220,7 @@ numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x
 numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(ratioToInp.x.trnposed, na.rm=T)[2]))
 
 # get annotation_c10d_h3k27
-jpeg("test_heatmap.x27.jpeg", height=600, width=900, quality=100)
+jpeg(paste0(genes.name,"_heatmap.",bin.size,"bp_h3k27.test.jpeg"), height=600, width=900, quality=100)
 heatmap.x <- heatmap.2(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
 dev.off()
 names(heatmap.x)
@@ -280,4 +284,5 @@ dev.off()
 
 
 # save(c10d.10M.ann.bar, file=paste0("c10d_",names(genes),"_",bin,"bp_ann.bar.Rdata"))
+paste0("c10d_",genes.name,"_",bin,"bp_ann.bar.Rdata")
 save(c10d.10M.ann.bar, file=paste0("c10d_",genes.name,"_",bin,"bp_ann.bar.Rdata"))

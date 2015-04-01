@@ -5,7 +5,7 @@
 # RAW READS: BARPLOT 
 getwd()
 # setwd("/Volumes/onc-analysis$/users/shwang26/michelle/BED_files/Coverage_TSS_200bp_bin/unnormalizedBED_200bp_bin/")
-bin.size=200
+bin.size=10
 setwd(paste0("/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/normalizedBED_",bin.size,"bp_bin/"))
 txt <- read.delim("bed_stat.txt", header=FALSE)
 txt
@@ -24,8 +24,9 @@ mod_dat <- dat/1000000
 colnames(mod_dat) <- "reads"
 
 jpeg(paste0("readcount_",bin.size,"bp_barplot.jpeg"), height=600, width=900)
-custom.ylim=c(range(mod_dat)[2]/1.01, range(mod_dat)[2])
+# custom.ylim=c(range(mod_dat)[2]/1.01, range(mod_dat)[2])
+custom.ylim=c(0, range(mod_dat)[2])
 par(mar=c(10,5,5,2))
-barplot(t(mod_dat), beside=F, las=2, main=paste0("read counts (normalized_",bin.size,"bp_bin)\nnumber of lines=", num.of.lines), ylab= "# of reads (in million bp)", ylim=custom.ylim, xpd=FALSE)
+barplot(t(mod_dat), beside=F, las=2, main=paste0("read counts (normalized_",bin.size,"bp_bin)\nnumber of ",bin.size,"bp bin=", num.of.lines), ylab= "# of reads (in million bp)", ylim=custom.ylim, xpd=FALSE)
 dev.off()
 
