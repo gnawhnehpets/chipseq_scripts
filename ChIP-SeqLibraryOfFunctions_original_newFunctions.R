@@ -9,9 +9,9 @@ options(bitmapType='cairo')
 ################# Functions for ChIP-seq analyses ################
 ##################################################################
 ##################################################################
-# dir="Z:/users/shwang26/"
-# dir="/amber2/scratch/baylin/shwang/"
-dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
+# system.dir="Z:/users/shwang26/"
+# system.dir="/amber2/scratch/baylin/shwang/"
+system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
 ##################################################################
 # For coverageBed, a BED file called windows.bed is required to estimate the coverage data in defined windows (eg. 200bp across the genome, or defined intervals around TSS, etc) across the genome. For example:
 ## chr1 0 200
@@ -438,25 +438,8 @@ fun.genelist.info_allGenes_biomaRt <- function(version, hg19UCSCGeneAnnotations=
 
 
 # Function for plotting coverage data around the TSS as average values and RATIO to input as cartesian plots and heatmaps
-fun.average_heat.plots <- function(genelist.info, 
-                                   coverage_files, 
-                                   input_coverage_file, 
-                                   coverage_files.dir, 
-                                   RegAroundTSS, 
-                                   bin, 
-                                   chr.prefix.chromosome, 
-                                   plot.Directory, 
-                                   whichgenelist="stable.10M",
-                                   logHeatmap=F, 
-                                   colRangeHeatmap="white-black", 
-                                   version,
-                                   h3k4.max=1500,
-                                   h3k27.max=250,
-                                   dnmt.max=50,
-                                   ezh2.max=120,
-                                   inp.max=50,
-                                   h3.max=50
-                                   ){
+
+fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage_file, coverage_files.dir, RegAroundTSS, bin, chr.prefix.chromosome, plot.Directory, whichgenelist="stable.10M", logHeatmap=F, colRangeHeatmap="white-black", version, h3k4.max=1500, h3k27.max=250, dnmt.max=50, ezh2.max=120, inp.max=50, h3.max=50){
      # Plots the coverage data as raw reads and ratio plots around the TSS as average plot and heatmap; genelist.info is a list of dataframes containing the required info for the genes of interest (the objects in this list should have a name so that the plots can take these names); coverage_files is a vector of file names of the ChIP-seq coverage data; input_coverage_file is the file name of the input coverage file; coverage_files.dir is the directory in which the converage files data are stored; RegAroundTSS is the total region upstream and downstream from TSS for which coverage data will be obtained and plotted (for eg. RegAroundTSS of 10000 will get coverage data 5000 bp up and downstream from the TSS). It should be a multiple of the bin size; bin is the window sizes in which the coverage of ChIP-seq data is summarized; chr.prefix.chromosome is to be passed on to fun.GetGeneCoverage, and takes values T or F for whether or not a "chr" prefix needs to be added to the chromosome values in genelist.info (see fun.GetGeneCoverage for details). plot.Directory is a character vector assigning the directory in which the plots should be stored. logHeatmap is T or F indicating whether or not heatmap should be plotted for log values; colRangeHeatmap is either "white-black" or "red-black", to indicate the color palette to use for the heatmaps, defaults to "white-black".
      library(gplots, lib.loc=lib.path)
      
@@ -465,23 +448,23 @@ fun.average_heat.plots <- function(genelist.info,
      custom.annotation <- vector()
      
      if(whichgenelist=="stable.10M"){
-          load(paste0(dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
      if(whichgenelist=="intermediate.10M"){
-          load(paste0(dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
      if(whichgenelist=="stable.10M.new"){
-          load(paste0(dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_new_stable.10M_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_new_stable.10M_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
      if(whichgenelist=="intermediate.10M.new"){
-          load(paste0(dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_new_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_new_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
      if(whichgenelist=="highly.expressed"){
-          load(paste0(dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_highly.expressed_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_highly.expressed_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
      # dim(c10d.10M.ann.bar)
@@ -575,31 +558,7 @@ fun.average_heat.plots <- function(genelist.info,
                     # JPEG plots because pdf sizes are too huge
                     ## Raw heatmap
                     
-                    # set breaks depending on range of counts
-#                     if(grepl("H3K4", gsub("_R1.*", "", i))){
-#                          print("hit: H3K4")
-#                          breaks=seq(0, 1500, by=20) #75 values
-#                     }
-#                     else if(grepl("H3K27", gsub("_R1.*", "", i))){
-#                          print("hit: H3K27")
-#                          breaks=seq(0, 250, by=2) #125 values
-#                     }
-#                     else if(grepl("DNMT1", gsub("_R1.*", "", i))){
-#                          print("hit: DNMT1")
-#                          breaks=seq(0, 50, by=.5) #100 values
-#                     }
-#                     else if(grepl("EZH2", gsub("_R1.*", "", i))){
-#                          print("hit: EZH2")
-#                          breaks=seq(0, 120, by=1.5) #80 values
-#                     }
-#                     else if(grepl("Input", gsub("_R1.*", "", i))){
-#                          print("hit: Input")
-#                          breaks=seq(0, 50, by=1) #50 values
-#                     }
-#                     else if(grepl("H3_", gsub("R1.*", "", i))){ #H3
-#                          print("hit: H3")
-#                          breaks=seq(0, 50, by=.5) #100 values
-#                     }
+                    # set break increment depending on range of counts
                     h3k4.increment <- h3k4.max/100
                     h3k27.increment <- h3k27.max/100
                     dnmt.increment <- dnmt.max/100
@@ -607,6 +566,7 @@ fun.average_heat.plots <- function(genelist.info,
                     inp.increment <- inp.max/100
                     h3.increment <- h3.max/100
                     
+                    # set breaks according to sample type
                     if(grepl("H3K4", gsub("_R1.*", "", i))){
                          print("hit: H3K4")
                          breaks=seq(0, h3k4.max, by=h3k4.increment) #75 values
@@ -638,7 +598,6 @@ fun.average_heat.plots <- function(genelist.info,
                     heatmap.3(x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
                     #         heatmap.3(x.trnposed, Rowv=T, Colv=F, col=numberOfColors.x.trnposed, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", cexRow=0.2, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE)
                     dev.off()
-                    
                     
                     ## Ratio heatmap
                     print("ratio heatmap")
@@ -1624,55 +1583,12 @@ fun.ReadBam.QC_Plots <- function(bam.files, bam.files_path, chr.to.analyze=NULL,
 ##################################################################
 #save.image("/Users/harieaswaran/Work Related Files/Cluster scripts/ChIP-SeqAnalysisScripts/R_Scripts/LibraryOfFunctions_RData/ChIP-SeqLibraryOfFunctions.RData")
 
-heatmap.3 <- function(x,
-                      Rowv = TRUE, Colv = if (symm) "Rowv" else TRUE,
-                      distfun = dist,
-                      hclustfun = hclust,
-                      dendrogram = c("both","row", "column", "none"),
-                      symm = FALSE,
-                      scale = c("none","row", "column"),
-                      na.rm = TRUE,
-                      revC = identical(Colv,"Rowv"),
-                      add.expr,
-                      breaks,
-                      symbreaks = max(x < 0, na.rm = TRUE) || scale != "none",
-                      col = "heat.colors",
-                      colsep,
-                      rowsep,
-                      sepcolor = "white",
-                      sepwidth = c(0.05, 0.05),
-                      cellnote,
-                      notecex = 1,
-                      notecol = "cyan",
-                      na.color = par("bg"),
-                      trace = c("none", "column","row", "both"),
-                      tracecol = "cyan",
-                      hline = median(breaks),
-                      vline = median(breaks),
-                      linecol = tracecol,
-                      margins = c(5,5),
-                      ColSideColors,
-                      RowSideColors,
-                      side.height.fraction=0.3,
-                      cexRow = 0.2 + 1/log10(nr),
-                      cexCol = 0.2 + 1/log10(nc),
-                      labRow = NULL,
-                      labCol = NULL,
-                      key = TRUE,
-                      keysize = 1.5,
-                      density.info = c("none", "histogram", "density"),
-                      denscol = tracecol,
-                      symkey = max(x < 0, na.rm = TRUE) || symbreaks,
-                      densadj = 0.25,
-                      main = NULL,
-                      xlab = NULL,
-                      ylab = NULL,
-                      lmat = NULL,
-                      lhei = NULL,
-                      lwid = NULL,
-                      NumColSideColors = 1,
-                      NumRowSideColors = 1,
-                      KeyValueName="Value",...){
+##################################################################
+##################################################################
+# Venn diagram & barplot functions
+##################################################################
+##################################################################
+heatmap.3 <- function(x, Rowv = TRUE, Colv = if (symm) "Rowv" else TRUE, distfun = dist, hclustfun = hclust, dendrogram = c("both","row", "column", "none"), symm = FALSE, scale = c("none","row", "column"), na.rm = TRUE, revC = identical(Colv,"Rowv"), add.expr, breaks, symbreaks = max(x < 0, na.rm = TRUE) || scale != "none", col = "heat.colors", colsep, rowsep, sepcolor = "white", sepwidth = c(0.05, 0.05), cellnote, notecex = 1, notecol = "cyan", na.color = par("bg"), trace = c("none", "column","row", "both"), tracecol = "cyan", hline = median(breaks), vline = median(breaks), linecol = tracecol, margins = c(5,5), ColSideColors, RowSideColors, side.height.fraction=0.3, cexRow = 0.2 + 1/log10(nr), cexCol = 0.2 + 1/log10(nc), labRow = NULL, labCol = NULL, key = TRUE, keysize = 1.5, density.info = c("none", "histogram", "density"), denscol = tracecol, symkey = max(x < 0, na.rm = TRUE) || symbreaks, densadj = 0.25, main = NULL, xlab = NULL, ylab = NULL, lmat = NULL, lhei = NULL, lwid = NULL, NumColSideColors = 1, NumRowSideColors = 1, KeyValueName="Value",...){
      
      invalid <- function (x) {
           if (missing(x) || is.null(x) || length(x) == 0)
@@ -2104,7 +2020,7 @@ generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outp
      }
      class(datalist[[5]])
      datalist
-     int <- as.numeric(unlist(read.delim(paste0(dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int.txt"), sep="\t", header=FALSE)))
+     int <- as.numeric(unlist(read.delim(paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int.txt"), sep="\t", header=FALSE)))
      length(int)
      int
 
@@ -2120,7 +2036,9 @@ generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outp
      plot.col <- vector()
      plot.lty <- vector()
      sample.name <- vector()
-     custom.color <- c("gray0", "gray45", "gray80", "goldenrod4", "darkorange", "goldenrod2")
+#      custom.color <- c("gray0", "gray45", "gray80", "goldenrod4", "darkorange", "goldenrod2")
+#      custom.color <- c("gray0", "gray45", "gray80", "red3", "orangered", "lightpink3")
+     custom.color <- c("gray0", "gray45", "gray80", "red3", "tomato", "lightpink3")
      for(u in 1:length(datalist)){
           sample.name <- c(sample.name, colnames(datalist[[u]]))
           # Start loop average plot
@@ -2139,4 +2057,498 @@ generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outp
 #      legend("left", fill=c(1:length(datalist)), legend=sample.name, border="white", box.col="white", cex=2)
      legend("left", fill=custom.color, legend=sample.name, border="white", box.col="white", cex=2)
      dev.off()
+}
+
+# this function will create side-by-side barplots with the sample-specific genesets
+fun.BarPlot <- function(set1, set2, set3, set4, set5, set6, set7, set1Name, set2Name, set3Name, set4Name, set5Name, set6Name, set7Name, barPlotName, plotDir){
+     library(VennDiagram)
+     one = unique(set1)
+     two = unique(set2)
+     three = unique(set3)
+     four = unique(set4)
+     five = unique(set5)
+     six = unique(set6)
+     seven = unique(set7)
+     
+     area1 = length(one)
+     area2 = length(two)
+     area3 = length(three)
+     area4 = length(four)
+     area5 = length(five)
+     area6 = length(six)
+     area7 = length(seven)
+     
+     n12 = length(intersect(one, two))
+     write.table(sort(intersect(one, two)), file=paste0(set1Name,"&",set2Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n13 = length(intersect(one, three))
+     write.table(sort(intersect(one, three)), file=paste0(set1Name,"&",set3Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n14 = length(intersect(one, four))
+     write.table(sort(intersect(one, four)), file=paste0(set1Name,"&",set4Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n15 = length(intersect(one, five))
+     write.table(sort(intersect(one, five)), file=paste0(set1Name,"&",set5Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n16 = length(intersect(one, six))
+     write.table(sort(intersect(one, six)), file=paste0(set1Name,"&",set6Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n17 = length(intersect(one, seven))
+     write.table(sort(intersect(one, seven)), file=paste0(set1Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n23 = length(intersect(two, three))
+     write.table(sort(intersect(two, three)), file=paste0(set2Name,"&",set3Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n24 = length(intersect(two, four))
+     write.table(sort(intersect(two, four)), file=paste0(set2Name,"&",set4Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n25 = length(intersect(two, five))
+     write.table(sort(intersect(two, five)), file=paste0(set2Name,"&",set5Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n26 = length(intersect(two, six))
+     write.table(sort(intersect(two, six)), file=paste0(set2Name,"&",set6Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n27 = length(intersect(two, seven))
+     write.table(sort(intersect(two, seven)), file=paste0(set2Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n34 = length(intersect(three, four))
+     write.table(sort(intersect(three, four)), file=paste0(set3Name,"&",set4Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n35 = length(intersect(three, five))
+     write.table(sort(intersect(three, five)), file=paste0(set3Name,"&",set5Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n36 = length(intersect(three, six))
+     write.table(sort(intersect(three, six)), file=paste0(set3Name,"&",set6Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n37 = length(intersect(three, seven))
+     write.table(sort(intersect(three, seven)), file=paste0(set3Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n45 = length(intersect(four, five))
+     write.table(sort(intersect(four, five)), file=paste0(set4Name,"&",set5Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n46 = length(intersect(four, six))
+     write.table(sort(intersect(four, six)), file=paste0(set4Name,"&",set6Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n47 = length(intersect(four, seven))
+     write.table(sort(intersect(four, seven)), file=paste0(set4Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n56 = length(intersect(five, six))
+     write.table(sort(intersect(five, six)), file=paste0(set5Name,"&",set6Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n57 = length(intersect(five, seven))
+     write.table(sort(intersect(five, seven)), file=paste0(set5Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n67 = length(intersect(six, seven))
+     write.table(sort(intersect(six, seven)), file=paste0(set6Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     
+     #Barplot 
+     barPlotName=file.path( plotDir, paste(c(barPlotName, "pdf"), collapse=".") )
+     pdf(barPlotName, height = 5, width = 8)
+     #barplot( c(area1, area2, area3, area4), names.arg = c(set1Name, set2Name, set3Name, set4Name), col = c("orange", "red", "green", "blue") )
+     #      barplot( t(cbind(c(area1, area2, area3, area4), c(n15, n25, n35, n45))), names.arg = c(set1Name, set2Name, set3Name, set4Name), col = c("orange", "orange4", "red", "red4", "orange", "orange4", "red", "red4"), beside=T )
+     barplot( t(cbind(c(area1, area2, area6, area7, area3, area4), c(n15, n25, n56, n57, n35, n45))), names.arg = c(set1Name, set2Name, set6Name, set7Name, set3Name, set4Name), col = c("orange", "orange4", "red", "red4", "orange", "orange4", "red", "red4", "orange", "orange4", "red", "red4"), beside=T )
+     legend("topright", fill=c("grey", "grey40"), legend=c("ChIP-mod genes", "ChIP-mod&meth genes"))
+     dev.off()
+}
+
+# this function will find genes that are unique between each group; XX-all.unique.txt will compile these unique genes together
+fun.find.unique.genes.between.group <- function(x, y, group1, group2) {
+     uniquex <- setdiff(x,y)
+     uniquey <- setdiff(y,x)
+     all_unique <- sort(c(uniquex, uniquey))
+     write.table(sort(uniquex), file=paste0(group1,"&",group2,"-",group1,".unique.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(sort(uniquey), file=paste0(group1,"&",group2,"-",group2,".unique.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(sort(uniquey), file=paste0(group1,"&",group2,"-all.unique.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+}
+
+fun.allComparisons <- function(set1, set2, set3, set4, set5, set6, set7, set8, set9, set10, set11, set12, set13, set14, set15, set16, set17, set18, set19, set1Name, set2Name, set3Name, set4Name, set5Name, set6Name, set7Name, set8Name, set9Name, set10Name, set11Name, set12Name, set13Name, set14Name, set15Name, set16Name, set17Name, set18Name, set19Name, barPlotName, plotDir){
+     library(VennDiagram)
+     one = unique(set1)
+     two = unique(set2)
+     three = unique(set3)
+     four = unique(set4)
+     five = unique(set5)
+     six = unique(set6)
+     seven = unique(set7)
+     eight = unique(set8)
+     nine = unique(set9)
+     ten = unique(set10)
+     eleven = unique(set11)
+     twelve = unique(set12)
+     thirteen = unique(set13)
+     fourteen = unique(set14)
+     fifteen = unique(set15)
+     sixteen = unique(set16)
+     seventeen = unique(set17)
+     eighteen = unique(set18)
+     nineteen = unique(set19)
+     
+     area1 = length(one)
+     area2 = length(two)
+     area3 = length(three)
+     area4 = length(four)
+     area5 = length(five)
+     area6 = length(six)
+     area7 = length(seven)
+     area8 = length(eight)
+     area9 = length(nine)
+     area10 = length(ten)
+     area11 = length(eleven)
+     area12 = length(twelve)
+     area13 = length(thirteen)
+     area14 = length(fourteen)
+     area15 = length(fifteen)
+     area16 = length(sixteen)
+     area17 = length(seventeen)
+     area18 = length(eighteen)
+     area19 = length(nineteen)
+     n12 = length(intersect(one, two))
+     write.table(sort(intersect(one, two)), file=paste0(set1Name,"&",set2Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n13 = length(intersect(one, three))
+     write.table(sort(intersect(one, three)), file=paste0(set1Name,"&",set3Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n14 = length(intersect(one, four))
+     write.table(sort(intersect(one, four)), file=paste0(set1Name,"&",set4Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n15 = length(intersect(one, five))
+     write.table(sort(intersect(one, five)), file=paste0(set1Name,"&",set5Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n16 = length(intersect(one, six))
+     write.table(sort(intersect(one, six)), file=paste0(set1Name,"&",set6Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n17 = length(intersect(one, seven))
+     write.table(sort(intersect(one, seven)), file=paste0(set1Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n18 = length(intersect(one, eight))
+     write.table(sort(intersect(one, eight)), file=paste0(set1Name,"&",set8Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n19 = length(intersect(one, nine))
+     write.table(sort(intersect(one, nine)), file=paste0(set1Name,"&",set9Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n110 = length(intersect(one, ten))
+     write.table(sort(intersect(one, ten)), file=paste0(set1Name,"&",set10Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n111 = length(intersect(one, eleven))
+     write.table(sort(intersect(one, eleven)), file=paste0(set1Name,"&",set11Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n112 = length(intersect(one, twelve))
+     write.table(sort(intersect(one, twelve)), file=paste0(set1Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n113 = length(intersect(one, thirteen))
+     write.table(sort(intersect(one, thirteen)), file=paste0(set1Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n114 = length(intersect(one, fourteen))
+     write.table(sort(intersect(one, fourteen)), file=paste0(set1Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n115 = length(intersect(one, fifteen))
+     write.table(sort(intersect(one, fifteen)), file=paste0(set1Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n116 = length(intersect(one, sixteen))
+     write.table(sort(intersect(one, sixteen)), file=paste0(set1Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n117 = length(intersect(one, seventeen))
+     write.table(sort(intersect(one, seventeen)), file=paste0(set1Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n118 = length(intersect(one, eighteen))
+     write.table(sort(intersect(one, eighteen)), file=paste0(set1Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n119 = length(intersect(one, nineteen))
+     write.table(sort(intersect(one, nineteen)), file=paste0(set1Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     
+     n23 = length(intersect(two, three))
+     write.table(sort(intersect(two, three)), file=paste0(set2Name,"&",set3Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n24 = length(intersect(two, four))
+     write.table(sort(intersect(two, four)), file=paste0(set2Name,"&",set4Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n25 = length(intersect(two, five))
+     write.table(sort(intersect(two, five)), file=paste0(set2Name,"&",set5Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n26 = length(intersect(two, six))
+     write.table(sort(intersect(two, six)), file=paste0(set2Name,"&",set6Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n27 = length(intersect(two, seven))
+     write.table(sort(intersect(two, seven)), file=paste0(set2Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n28 = length(intersect(two, eight))
+     write.table(sort(intersect(two, eight)), file=paste0(set2Name,"&",set8Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n29 = length(intersect(two, nine))
+     write.table(sort(intersect(two, nine)), file=paste0(set2Name,"&",set9Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n210 = length(intersect(two, ten))
+     write.table(sort(intersect(two, ten)), file=paste0(set2Name,"&",set10Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n211 = length(intersect(two, eleven))
+     write.table(sort(intersect(two, eleven)), file=paste0(set2Name,"&",set11Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n212 = length(intersect(two, twelve))
+     write.table(sort(intersect(two, twelve)), file=paste0(set2Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n213 = length(intersect(two, thirteen))
+     write.table(sort(intersect(two, thirteen)), file=paste0(set2Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n214 = length(intersect(two, fourteen))
+     write.table(sort(intersect(two, fourteen)), file=paste0(set2Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n215 = length(intersect(two, fifteen))
+     write.table(sort(intersect(two, fifteen)), file=paste0(set2Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n216 = length(intersect(two, sixteen))
+     write.table(sort(intersect(two, sixteen)), file=paste0(set2Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n217 = length(intersect(two, seventeen))
+     write.table(sort(intersect(two, seventeen)), file=paste0(set2Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n218 = length(intersect(two, eighteen))
+     write.table(sort(intersect(two, eighteen)), file=paste0(set2Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n219 = length(intersect(two, nineteen))
+     write.table(sort(intersect(two, nineteen)), file=paste0(set2Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n34 = length(intersect(three, four))
+     write.table(sort(intersect(three, four)), file=paste0(set3Name,"&",set4Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n35 = length(intersect(three, five))
+     write.table(sort(intersect(three, five)), file=paste0(set3Name,"&",set5Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n36 = length(intersect(three, six))
+     write.table(sort(intersect(three, six)), file=paste0(set3Name,"&",set6Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n37 = length(intersect(three, seven))
+     write.table(sort(intersect(three, seven)), file=paste0(set3Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n38 = length(intersect(three, eight))
+     write.table(sort(intersect(three, eight)), file=paste0(set3Name,"&",set8Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n39 = length(intersect(three, nine))
+     write.table(sort(intersect(three, nine)), file=paste0(set3Name,"&",set9Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n310 = length(intersect(three, ten))
+     write.table(sort(intersect(three, ten)), file=paste0(set3Name,"&",set10Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n311 = length(intersect(three, eleven))
+     write.table(sort(intersect(three, eleven)), file=paste0(set3Name,"&",set11Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n312 = length(intersect(three, twelve))
+     write.table(sort(intersect(three, twelve)), file=paste0(set3Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n313 = length(intersect(three, thirteen))
+     write.table(sort(intersect(three, thirteen)), file=paste0(set3Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n314 = length(intersect(three, fourteen))
+     write.table(sort(intersect(three, fourteen)), file=paste0(set3Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n315 = length(intersect(three, fifteen))
+     write.table(sort(intersect(three, fifteen)), file=paste0(set3Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n316 = length(intersect(three, sixteen))
+     write.table(sort(intersect(three, sixteen)), file=paste0(set3Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n317 = length(intersect(three, seventeen))
+     write.table(sort(intersect(three, seventeen)), file=paste0(set3Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n318 = length(intersect(three, eighteen))
+     write.table(sort(intersect(three, eighteen)), file=paste0(set3Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n319 = length(intersect(three, nineteen))
+     write.table(sort(intersect(three, nineteen)), file=paste0(set3Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n45 = length(intersect(four, five))
+     write.table(sort(intersect(four, five)), file=paste0(set4Name,"&",set5Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n46 = length(intersect(four, six))
+     write.table(sort(intersect(four, six)), file=paste0(set4Name,"&",set6Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n47 = length(intersect(four, seven))
+     write.table(sort(intersect(four, seven)), file=paste0(set4Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n48 = length(intersect(four, eight))
+     write.table(sort(intersect(four, eight)), file=paste0(set4Name,"&",set8Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n49 = length(intersect(four, nine))
+     write.table(sort(intersect(four, nine)), file=paste0(set4Name,"&",set9Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n410 = length(intersect(four, ten))
+     write.table(sort(intersect(four, ten)), file=paste0(set4Name,"&",set10Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n411 = length(intersect(four, eleven))
+     write.table(sort(intersect(four, eleven)), file=paste0(set4Name,"&",set11Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n412 = length(intersect(four, twelve))
+     write.table(sort(intersect(four, twelve)), file=paste0(set4Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n413 = length(intersect(four, thirteen))
+     write.table(sort(intersect(four, thirteen)), file=paste0(set4Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n414 = length(intersect(four, fourteen))
+     write.table(sort(intersect(four, fourteen)), file=paste0(set4Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n415 = length(intersect(four, fifteen))
+     write.table(sort(intersect(four, fifteen)), file=paste0(set4Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n416 = length(intersect(four, sixteen))
+     write.table(sort(intersect(four, sixteen)), file=paste0(set4Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n417 = length(intersect(four, seventeen))
+     write.table(sort(intersect(four, seventeen)), file=paste0(set4Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n418 = length(intersect(four, eighteen))
+     write.table(sort(intersect(four, eighteen)), file=paste0(set4Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n419 = length(intersect(four, nineteen))
+     write.table(sort(intersect(four, nineteen)), file=paste0(set4Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n56 = length(intersect(five, six))
+     write.table(sort(intersect(five, six)), file=paste0(set5Name,"&",set6Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n57 = length(intersect(five, seven))
+     write.table(sort(intersect(five, seven)), file=paste0(set5Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n58 = length(intersect(five, eight))
+     write.table(sort(intersect(five, eight)), file=paste0(set5Name,"&",set8Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n59 = length(intersect(five, nine))
+     write.table(sort(intersect(five, nine)), file=paste0(set5Name,"&",set9Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n510 = length(intersect(five, ten))
+     write.table(sort(intersect(five, ten)), file=paste0(set5Name,"&",set10Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n511 = length(intersect(five, eleven))
+     write.table(sort(intersect(five, eleven)), file=paste0(set5Name,"&",set11Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n512 = length(intersect(five, twelve))
+     write.table(sort(intersect(five, twelve)), file=paste0(set5Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n513 = length(intersect(five, thirteen))
+     write.table(sort(intersect(five, thirteen)), file=paste0(set5Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n514 = length(intersect(five, fourteen))
+     write.table(sort(intersect(five, fourteen)), file=paste0(set5Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n515 = length(intersect(five, fifteen))
+     write.table(sort(intersect(five, fifteen)), file=paste0(set5Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n516 = length(intersect(five, sixteen))
+     write.table(sort(intersect(five, sixteen)), file=paste0(set5Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n517 = length(intersect(five, seventeen))
+     write.table(sort(intersect(five, seventeen)), file=paste0(set5Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n518 = length(intersect(five, eighteen))
+     write.table(sort(intersect(five, eighteen)), file=paste0(set5Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n519 = length(intersect(five, nineteen))
+     write.table(sort(intersect(five, nineteen)), file=paste0(set5Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n67 = length(intersect(six, seven))
+     write.table(sort(intersect(six, seven)), file=paste0(set6Name,"&",set7Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n68 = length(intersect(six, eight))
+     write.table(sort(intersect(six, eight)), file=paste0(set6Name,"&",set8Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n69 = length(intersect(six, nine))
+     write.table(sort(intersect(six, nine)), file=paste0(set6Name,"&",set9Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n610 = length(intersect(six, ten))
+     write.table(sort(intersect(six, ten)), file=paste0(set6Name,"&",set10Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n611 = length(intersect(six, eleven))
+     write.table(sort(intersect(six, eleven)), file=paste0(set6Name,"&",set11Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n612 = length(intersect(six, twelve))
+     write.table(sort(intersect(six, twelve)), file=paste0(set6Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n613 = length(intersect(six, thirteen))
+     write.table(sort(intersect(six, thirteen)), file=paste0(set6Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n614 = length(intersect(six, fourteen))
+     write.table(sort(intersect(six, fourteen)), file=paste0(set6Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n615 = length(intersect(six, fifteen))
+     write.table(sort(intersect(six, fifteen)), file=paste0(set6Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n616 = length(intersect(six, sixteen))
+     write.table(sort(intersect(six, sixteen)), file=paste0(set6Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n617 = length(intersect(six, seventeen))
+     write.table(sort(intersect(six, seventeen)), file=paste0(set6Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n618 = length(intersect(six, eighteen))
+     write.table(sort(intersect(six, eighteen)), file=paste0(set6Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n619 = length(intersect(six, nineteen))
+     write.table(sort(intersect(six, nineteen)), file=paste0(set6Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n78 = length(intersect(seven, eight))
+     write.table(sort(intersect(seven, eight)), file=paste0(set7Name,"&",set8Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n79 = length(intersect(seven, nine))
+     write.table(sort(intersect(seven, nine)), file=paste0(set7Name,"&",set9Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n710 = length(intersect(seven, ten))
+     write.table(sort(intersect(seven, ten)), file=paste0(set7Name,"&",set10Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n711 = length(intersect(seven, eleven))
+     write.table(sort(intersect(seven, eleven)), file=paste0(set7Name,"&",set11Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n712 = length(intersect(seven, twelve))
+     write.table(sort(intersect(seven, twelve)), file=paste0(set7Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n713 = length(intersect(seven, thirteen))
+     write.table(sort(intersect(seven, thirteen)), file=paste0(set7Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n714 = length(intersect(seven, fourteen))
+     write.table(sort(intersect(seven, fourteen)), file=paste0(set7Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n715 = length(intersect(seven, fifteen))
+     write.table(sort(intersect(seven, fifteen)), file=paste0(set7Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n716 = length(intersect(seven, sixteen))
+     write.table(sort(intersect(seven, sixteen)), file=paste0(set7Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n717 = length(intersect(seven, seventeen))
+     write.table(sort(intersect(seven, seventeen)), file=paste0(set7Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n718 = length(intersect(seven, eighteen))
+     write.table(sort(intersect(seven, eighteen)), file=paste0(set7Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n719 = length(intersect(seven, nineteen))
+     write.table(sort(intersect(seven, nineteen)), file=paste0(set7Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n89 = length(intersect(eight, nine))
+     write.table(sort(intersect(eight, nine)), file=paste0(set8Name,"&",set9Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n810 = length(intersect(eight, ten))
+     write.table(sort(intersect(eight, ten)), file=paste0(set8Name,"&",set10Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n811 = length(intersect(eight, eleven))
+     write.table(sort(intersect(eight, eleven)), file=paste0(set8Name,"&",set11Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n812 = length(intersect(eight, twelve))
+     write.table(sort(intersect(eight, twelve)), file=paste0(set8Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n813 = length(intersect(eight, thirteen))
+     write.table(sort(intersect(eight, thirteen)), file=paste0(set8Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n814 = length(intersect(eight, seventeen))
+     write.table(sort(intersect(eight, seventeen)), file=paste0(set8Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n815 = length(intersect(eight, fifteen))
+     write.table(sort(intersect(eight, fifteen)), file=paste0(set8Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n816 = length(intersect(eight, seventeen))
+     write.table(sort(intersect(eight, seventeen)), file=paste0(set8Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n817 = length(intersect(eight, seventeen))
+     write.table(sort(intersect(eight, seventeen)), file=paste0(set8Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n818 = length(intersect(eight, eighteen))
+     write.table(sort(intersect(eight, eighteen)), file=paste0(set8Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n819 = length(intersect(eight, nineteen))
+     write.table(sort(intersect(eight, nineteen)), file=paste0(set8Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n910 = length(intersect(nine, ten))
+     write.table(sort(intersect(nine, ten)), file=paste0(set9Name,"&",set10Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n911 = length(intersect(nine, eleven))
+     write.table(sort(intersect(nine, eleven)), file=paste0(set9Name,"&",set11Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n912 = length(intersect(nine, twelve))
+     write.table(sort(intersect(nine, twelve)), file=paste0(set9Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n913 = length(intersect(nine, thirteen))
+     write.table(sort(intersect(nine, thirteen)), file=paste0(set9Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n914 = length(intersect(nine, seventeen))
+     write.table(sort(intersect(nine, seventeen)), file=paste0(set9Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n915 = length(intersect(nine, fifteen))
+     write.table(sort(intersect(nine, fifteen)), file=paste0(set9Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n916 = length(intersect(nine, seventeen))
+     write.table(sort(intersect(nine, seventeen)), file=paste0(set9Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n917 = length(intersect(nine, seventeen))
+     write.table(sort(intersect(nine, seventeen)), file=paste0(set9Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n918 = length(intersect(nine, eighteen))
+     write.table(sort(intersect(nine, eighteen)), file=paste0(set9Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n919 = length(intersect(nine, nineteen))
+     write.table(sort(intersect(nine, nineteen)), file=paste0(set9Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n1011 = length(intersect(ten, eleven))
+     write.table(sort(intersect(ten, eleven)), file=paste0(set10Name,"&",set11Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1012 = length(intersect(ten, twelve))
+     write.table(sort(intersect(ten, twelve)), file=paste0(set10Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1013 = length(intersect(ten, thirteen))
+     write.table(sort(intersect(ten, thirteen)), file=paste0(set10Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1014 = length(intersect(ten, seventeen))
+     write.table(sort(intersect(ten, seventeen)), file=paste0(set10Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1015 = length(intersect(ten, fifteen))
+     write.table(sort(intersect(ten, fifteen)), file=paste0(set10Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1016 = length(intersect(ten, seventeen))
+     write.table(sort(intersect(ten, seventeen)), file=paste0(set10Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1017 = length(intersect(ten, seventeen))
+     write.table(sort(intersect(ten, seventeen)), file=paste0(set10Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1018 = length(intersect(ten, eighteen))
+     write.table(sort(intersect(ten, eighteen)), file=paste0(set10Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1019 = length(intersect(ten, nineteen))
+     write.table(sort(intersect(ten, nineteen)), file=paste0(set10Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n1112 = length(intersect(eleven, twelve))
+     write.table(sort(intersect(eleven, twelve)), file=paste0(set11Name,"&",set12Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1113 = length(intersect(eleven, thirteen))
+     write.table(sort(intersect(eleven, thirteen)), file=paste0(set11Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1114 = length(intersect(eleven, seventeen))
+     write.table(sort(intersect(eleven, seventeen)), file=paste0(set11Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1115 = length(intersect(eleven, fifteen))
+     write.table(sort(intersect(eleven, fifteen)), file=paste0(set11Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1116 = length(intersect(eleven, seventeen))
+     write.table(sort(intersect(eleven, seventeen)), file=paste0(set11Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1117 = length(intersect(eleven, seventeen))
+     write.table(sort(intersect(eleven, seventeen)), file=paste0(set11Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1118 = length(intersect(eleven, eighteen))
+     write.table(sort(intersect(eleven, eighteen)), file=paste0(set11Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1119 = length(intersect(eleven, nineteen))
+     write.table(sort(intersect(eleven, nineteen)), file=paste0(set11Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n1213 = length(intersect(twelve, thirteen))
+     write.table(sort(intersect(twelve, thirteen)), file=paste0(set12Name,"&",set13Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1214 = length(intersect(twelve, seventeen))
+     write.table(sort(intersect(twelve, seventeen)), file=paste0(set12Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1215 = length(intersect(twelve, fifteen))
+     write.table(sort(intersect(twelve, fifteen)), file=paste0(set12Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1216 = length(intersect(twelve, seventeen))
+     write.table(sort(intersect(twelve, seventeen)), file=paste0(set12Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1217 = length(intersect(twelve, seventeen))
+     write.table(sort(intersect(twelve, seventeen)), file=paste0(set12Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1218 = length(intersect(twelve, eighteen))
+     write.table(sort(intersect(twelve, eighteen)), file=paste0(set12Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1219 = length(intersect(twelve, nineteen))
+     write.table(sort(intersect(twelve, nineteen)), file=paste0(set12Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n1314 = length(intersect(thirteen, seventeen))
+     write.table(sort(intersect(thirteen, seventeen)), file=paste0(set13Name,"&",set14Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1315 = length(intersect(thirteen, fifteen))
+     write.table(sort(intersect(thirteen, fifteen)), file=paste0(set13Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1316 = length(intersect(thirteen, seventeen))
+     write.table(sort(intersect(thirteen, seventeen)), file=paste0(set13Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1317 = length(intersect(thirteen, seventeen))
+     write.table(sort(intersect(thirteen, seventeen)), file=paste0(set13Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1318 = length(intersect(thirteen, eighteen))
+     write.table(sort(intersect(thirteen, eighteen)), file=paste0(set13Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1319 = length(intersect(thirteen, nineteen))
+     write.table(sort(intersect(thirteen, nineteen)), file=paste0(set13Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n1415 = length(intersect(fourteen, fifteen))
+     write.table(sort(intersect(fourteen, fifteen)), file=paste0(set14Name,"&",set15Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1416 = length(intersect(fourteen, seventeen))
+     write.table(sort(intersect(fourteen, seventeen)), file=paste0(set14Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1417 = length(intersect(fourteen, seventeen))
+     write.table(sort(intersect(fourteen, seventeen)), file=paste0(set14Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1418 = length(intersect(fourteen, eighteen))
+     write.table(sort(intersect(fourteen, eighteen)), file=paste0(set14Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1419 = length(intersect(fourteen, nineteen))
+     write.table(sort(intersect(fourteen, nineteen)), file=paste0(set14Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n1516 = length(intersect(fifteen, seventeen))
+     write.table(sort(intersect(fifteen, seventeen)), file=paste0(set15Name,"&",set16Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1517 = length(intersect(fifteen, seventeen))
+     write.table(sort(intersect(fifteen, seventeen)), file=paste0(set15Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1518 = length(intersect(fifteen, eighteen))
+     write.table(sort(intersect(fifteen, eighteen)), file=paste0(set15Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1519 = length(intersect(fifteen, nineteen))
+     write.table(sort(intersect(fifteen, nineteen)), file=paste0(set15Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n1617 = length(intersect(sixteen, seventeen))
+     write.table(sort(intersect(sixteen, seventeen)), file=paste0(set16Name,"&",set17Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1618 = length(intersect(sixteen, eighteen))
+     write.table(sort(intersect(sixteen, eighteen)), file=paste0(set16Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1619 = length(intersect(sixteen, nineteen))
+     write.table(sort(intersect(sixteen, nineteen)), file=paste0(set16Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n1718 = length(intersect(seventeen, eighteen))
+     write.table(sort(intersect(seventeen, eighteen)), file=paste0(set17Name,"&",set18Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     n1719 = length(intersect(seventeen, nineteen))
+     write.table(sort(intersect(seventeen, nineteen)), file=paste0(set17Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     n1819 = length(intersect(eighteen, nineteen))
+     write.table(sort(intersect(eighteen, nineteen)), file=paste0(set18Name,"&",set19Name,".txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)          
+     
+     fun.find.unique.genes.between.group(one, two, set1Name, set2Name)
+     fun.find.unique.genes.between.group(three, four, set3Name, set4Name)
+     fun.find.unique.genes.between.group(six, seven, set6Name, set7Name)
+     fun.find.unique.genes.between.group(eight, nine, set8Name, set9Name)
+     fun.find.unique.genes.between.group(ten, eleven, set10Name, set11Name)
+     fun.find.unique.genes.between.group(twelve, thirteen, set12Name, set13Name)
+     fun.find.unique.genes.between.group(fourteen, fifteen, set14Name, set15Name)
+     fun.find.unique.genes.between.group(sixteen, seventeen, set16Name, set17Name)
+     fun.find.unique.genes.between.group(eighteen, nineteen, set18Name, set19Name)
 }
