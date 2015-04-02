@@ -2,16 +2,20 @@
 #/amber2/scratch/baylin/shwang/
 #/Volumes/onc-analysis$/users/stephenhwang/
 
-source("/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R")
+dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
+source(paste0(dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 
+bin.size=200
+whichgenelist="highly.expressed" # CHANGE DEPENDING ON GENELIST USED
 
 sample.type=c("DNMT1", "EZH2", "H3", "H3K4", "H3K27", "INPUT")
-whichgenelist="intermediate.10M.new" # CHANGE DEPENDING ON GENELIST USED
 for(i in sample.type){
-     generate_combined_avg_plots(sample.name=i, name.of.genelist=whichgenelist)
+     output.dir <- paste0(dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/normalizedBED_",bin.size,"bp_bin/outputdir/", whichgenelist, "/", i, "/")
+     generate_combined_avg_plots(sample.name=i, name.of.genelist=whichgenelist, bin=bin.size, outputDirectory=output.dir)
      print(i)
 }
 dir(directory)
+
 # generate_combined_avg_plots <- function(sample.name, name.of.genelist){
 #      directory = paste0("/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/michelle/BED_files/Coverage_TSS_200bp_bin/normalizedBED_200bp_bin/outputdir/", name.of.genelist, "/", sample.name, "/")
 #      directory
