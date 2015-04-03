@@ -3,7 +3,8 @@
 #/Volumes/onc-analysis$/users/stephenhwang/
 
 dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
-bin.size=200
+dir<-"/amber2/scratch/baylin/shwang/"
+bin.size=10
 source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 options(bitmapType='cairo') 
 # coverage_files_dir = dir,"Michelle/normalizedBED"
@@ -124,9 +125,13 @@ numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x
 numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(ratioToInp.x.trnposed, na.rm=T)[2]))
 
 # get annotation_c10d_h3k4
+dim(x.trnposed)
+# trnposed200 <- x.trnposed
+dim(x.trnposed[complete.cases(x.trnposed),])
+head(x.trnposed)
 jpeg(paste0(genes.name,"_heatmap.",bin.size,"bp_h3k4.test.jpeg"), height=600, width=900, quality=100)
 # heatmap.x <- heatmap.2(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
-heatmap.x <- heatmap.3(x.trnposed, 
+heatmap.x <- heatmap.3(x.trnposed[complete.cases(x.trnposed),], 
                        Rowv=T, 
                        Colv=F, 
                        scale="none", 
@@ -173,13 +178,19 @@ row.annotation.color <- t(as.matrix(row.annotation.color))
 dim(row.annotation.color)
 colnames(row.annotation.color) <- names(dendrogram.order)
 rownames(row.annotation.color) <- "C10D_H3K4"
-dim(row.annotation.color)
-head(row.annotation.color)
-h3k4.annotation <- row.annotation.color
-x.trnposed_c10d.h3k4 <- x.trnposed
+# dim(row.annotation.color)
+# head(row.annotation.color)
+if(bin==200){
+     h3k4.annotation <- row.annotation.color
+}
+if(bin==10){
+     h3k4.annotation <- t(row.annotation.color)
+}
+x.trnposed_c10d.h3k4 <- x.trnposed[complete.cases(x.trnposed),]
 
 #CHECK
-heatmap.3(x.trnposed_c10d.h3k4, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, RowSideColors=h3k4.annotation, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
+
+heatmap.3(x.trnposed_c10d.h3k4[complete.cases(x.trnposed_c10d.h3k4),], Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, RowSideColors=h3k4.annotation, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
 
 #####################################################################################################
 #####################################################################################################
@@ -221,7 +232,7 @@ numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("white", "black"))(ro
 
 # get annotation_c10d_h3k27
 jpeg(paste0(genes.name,"_heatmap.",bin.size,"bp_h3k27.test.jpeg"), height=600, width=900, quality=100)
-heatmap.x <- heatmap.2(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
+heatmap.x <- heatmap.2(x.trnposed[complete.cases(x.trnposed),], Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
 dev.off()
 names(heatmap.x)
 heatmap.x$rowDendrogram
@@ -259,10 +270,10 @@ row.annotation.color <- t(as.matrix(row.annotation.color))
 dim(row.annotation.color)
 colnames(row.annotation.color) <- names(dendrogram.order)
 rownames(row.annotation.color) <- "C10D_H3K27"
-dim(row.annotation.color)
-head(row.annotation.color)
+# dim(row.annotation.color)
+# head(row.annotation.color)
 h3k27.annotation <- row.annotation.color
-x.trnposed_c10d.h3k27 <- x.trnposed
+x.trnposed_c10d.h3k27 <- x.trnposed[complete.cases(x.trnposed),]
 
 #CHECK
 heatmap.3(x.trnposed_c10d.h3k27, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, RowSideColors=h3k27.annotation, trace="none", dendrogram="row", cexRow=.2, main="Heatmap of raw seq reads", na.rm=TRUE)

@@ -22,22 +22,20 @@
 # source(paste0(system.dir, "Michelle/ChIP-SeqLibraryOfFunctions/ChIP-SeqLibraryOfFunctions_originalcompletecases2.R"))
 # source(paste0(system.dir, "Michelle/ChIP-SeqLibraryOfFunctions/ChIP-SeqLibraryOfFunctions_original.R"))
 
-system.dir='/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/'
+# system.dir='/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/'
 # dir='Z:/users/shwang26/'
-# dir='/amber2/scratch/baylin/shwang/'
+system.dir='/amber2/scratch/baylin/shwang/'
 source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 options(bitmapType='cairo') 
-bin.size=200 #10bp or 200bp
+bin.size=10 #10bp or 200bp
 
 # genelists
-# genelist.name <- "stable.10M"
+genelist.name <- "stable.10M"
 # genelist.name <- "intermediate.10M"
-genelist.name <- "intermediate.10M.new"
 # genelist.name <- "intermediate.10M.new"
 # genelist.name <- "highly.expressed"
 # genelist.name <- "all"
 # genelist.name <- ""
-
 whichdata <- "normalized"
 
 if(genelist.name=="all"){
@@ -108,7 +106,6 @@ if(genelist.name=="all"){
 # Location of normalized BED files
 # Create directory if !exist
 dir.create(plot_results_dir)
-# coverage_files_dir <- paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/normalizedBED_",bin.size,"bp_bin/")
 coverage_files_dir <- paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/")
 coverage_files_dir
 
@@ -136,13 +133,13 @@ if(version=="hg19-UCSC"){
      datlist[[1]] <- as.data.frame(dat)
      goi <- datlist
 }
-if(version==NULL){
-     version="hg19"
-     print ("warning: need to designate a gene name to the 'genelist.name' object")
-     datlist <- list()
-     datlist[[1]] <- as.data.frame(genelist.name)
-     goi <- datlist
-}
+# if(version==NULL){
+#      version="hg19"
+#      print ("warning: need to designate a gene name to the 'genelist.name' object")
+#      datlist <- list()
+#      datlist[[1]] <- as.data.frame(genelist.name)
+#      goi <- datlist
+# }
 
 #Retain one entry per gene (hgnc_symbol)
 goi <- lapply(c(1:length(goi)), FUN=function(i){

@@ -28,8 +28,8 @@ system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/sh
 ## This needs to be explicitly stated after migrating cluster to JHPCE. Until this is resolved, use this path.
 ##################################################################
 .libPaths()
-lib.path <- "/home/steve/R/i686-pc-linux-gnu-library/3.1"
 # lib.path <- "/jhpce/shared/community/compiler/gcc/4.4.7/R/3.0.x/lib64/R/site-library"
+lib.path <- "/home/steve/R/i686-pc-linux-gnu-library/3.1"
 # lib.path <- "/Library/Frameworks/R.framework/Versions/3.1/Resources/library"
 # lib.path <- "C:/Users/steve/Documents/R/win-library/3.1"
 # lib.path <- "C:/Program Files/R/R-3.1.2/library" #remote desktop
