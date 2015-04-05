@@ -539,7 +539,11 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     
                     # Generate matices for heatmaps
                     x.trnposed <- t(chipCoverage.TSS)
+                    # remove NA values to account for missing values in 10bp bin
+                    x.trnposed <- x.trnposed[complete.cases(x.trnposed),]
                     ratioToInp.x.trnposed <- t(chipCoverage.TSS/inputCoverage.TSSAverage) #ratio of seq reads to average of input for this set of genes
+                    # remove NA values to account for missing values in 10bp bin
+                    ratioToInp.x.trnposed <- ratioToInp.x.trnposed[complete.cases(ratioToInp.x.trnposed),]
                     if(logHeatmap == T){
                          x.trnposed <- log2(x.trnposed)
                          ratioToInp.x.trnposed <- log2(ratioToInp.x.trnposed)
