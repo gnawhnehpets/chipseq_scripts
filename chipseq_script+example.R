@@ -30,7 +30,8 @@ options(bitmapType='cairo')
 bin.size=10 #10bp or 200bp
 
 # genelists
-genelist.name <- "stable.10M"
+# genelist.name <- "stable.10M"
+genelist.name <- "stable.10M.new"
 # genelist.name <- "intermediate.10M"
 # genelist.name <- "intermediate.10M.new"
 # genelist.name <- "highly.expressed"
