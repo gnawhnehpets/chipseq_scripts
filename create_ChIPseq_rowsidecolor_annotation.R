@@ -128,7 +128,7 @@ numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("white", "black"))(ro
 dim(x.trnposed)
 # trnposed200 <- x.trnposed
 dim(x.trnposed[complete.cases(x.trnposed),])
-head(x.trnposed)
+dim(x.trnposed)
 jpeg(paste0(genes.name,"_heatmap.",bin.size,"bp_h3k4.test.jpeg"), height=600, width=900, quality=100)
 # heatmap.x <- heatmap.2(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
 heatmap.x <- heatmap.3(x.trnposed[complete.cases(x.trnposed),], 
@@ -180,12 +180,7 @@ colnames(row.annotation.color) <- names(dendrogram.order)
 rownames(row.annotation.color) <- "C10D_H3K4"
 # dim(row.annotation.color)
 # head(row.annotation.color)
-if(bin==200){
-     h3k4.annotation <- row.annotation.color
-}
-if(bin==10){
-     h3k4.annotation <- t(row.annotation.color)
-}
+h3k4.annotation <- row.annotation.color
 x.trnposed_c10d.h3k4 <- x.trnposed[complete.cases(x.trnposed),]
 
 #CHECK
