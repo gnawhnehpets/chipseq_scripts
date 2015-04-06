@@ -710,7 +710,9 @@ fun.Plot_RatioToInput <- function(files.path, RegAroundTSS, bin, plot.0to20.81to
      }
      length(int)
      
-     write.table(int, file=paste0(plot.Directory, "/int.txt"), row.names=FALSE, col.names=FALSE, sep="\t")
+#      write.table(int, file=paste0(plot.Directory, "/int_200bp.txt"), row.names=FALSE, col.names=FALSE, sep="\t")
+     write.table(int, file=paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_",bin,"bp-2.txt"), row.names=FALSE, col.names=FALSE, sep="\t")
+     
      
      # Are the target *.txt files in one folder? 
      ## If TRUE, TargetFilesInOneFolder=T, if FALSE TargetFilesInOneFolder=F
@@ -2024,7 +2026,12 @@ generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outp
      }
      class(datalist[[5]])
      datalist
-     int <- as.numeric(unlist(read.delim(paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int.txt"), sep="\t", header=FALSE)))
+     if(bin==200){
+          int <- as.numeric(unlist(read.delim(paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_200bp.txt"), sep="\t", header=FALSE)))
+     }
+     if(bin==10){
+          int <- as.numeric(unlist(read.delim(paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_10bp.txt"), sep="\t", header=FALSE)))
+     }
      length(int)
      int
 
