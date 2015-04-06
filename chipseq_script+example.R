@@ -27,7 +27,7 @@
 system.dir='/amber2/scratch/baylin/shwang/'
 source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 options(bitmapType='cairo') 
-bin.size=10 #10bp or 200bp
+bin.size=200 #10bp or 200bp
 
 # genelists
 # genelist.name <- "stable.10M"
@@ -35,12 +35,14 @@ genelist.name <- "stable.10M.new"
 # genelist.name <- "intermediate.10M"
 # genelist.name <- "intermediate.10M.new"
 # genelist.name <- "highly.expressed"
-# genelist.name <- "all"
+genelist.name <- "all"
 # genelist.name <- ""
 whichdata <- "normalized"
 
 if(genelist.name=="all"){
      print("all genes requested")
+     plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/",genelist.name,"/")
+     plot_results_dir
      version="hg19-UCSC"
 }else{
      version="hg19"
@@ -101,6 +103,10 @@ if(genelist.name=="all"){
           inp.maxbreak=50
           h3.maxbreak=50
      }
+     # Read in genelist
+     genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
+     genes <- list(unlist(genes))
+     names(genes) <- genelist.name
 }
 
 #####################################################################################################################
@@ -110,10 +116,10 @@ dir.create(plot_results_dir)
 coverage_files_dir <- paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/")
 coverage_files_dir
 
-# Read in genelist
-genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
-genes <- list(unlist(genes))
-names(genes) <- genelist.name
+# # Read in genelist
+# genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
+# genes <- list(unlist(genes))
+# names(genes) <- genelist.name
 
 ############################################################
 #Get info about genes of interest from biomaRt
@@ -147,7 +153,7 @@ goi <- lapply(c(1:length(goi)), FUN=function(i){
      x <- goi[[i]]
      return(x[!(duplicated(x[,"Gene"])), ])
 })
-names(goi) <- names(genes)
+names(goi) <- genelist.name
 head(goi[[1]])
 dim(goi[[1]]) #
 
