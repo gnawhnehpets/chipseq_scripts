@@ -4,7 +4,7 @@
 
 dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
 dir<-"/amber2/scratch/baylin/shwang/"
-bin.size=10
+bin.size=200
 source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 options(bitmapType='cairo') 
 # coverage_files_dir = dir,"Michelle/normalizedBED"
@@ -26,11 +26,11 @@ genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new
 
 # stricter .4 cutoff
 #10M stable
-genes.name <- "new_stable.10M"
+genes.name <- "stable.10M.new"
 genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_cutoff.txt"), header=FALSE)
 
 #10M intermediate
-genes.name <- "new_intermediate.10M"
+genes.name <- "intermediate.10M.new"
 genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_cutoff.txt"), header=FALSE)
 
 #highly.expressed
@@ -119,6 +119,7 @@ x.trnposed <- t(chipCoverage.TSS)
 ratioToInp.x.trnposed <- t(chipCoverage.TSS/inputCoverage.TSSAverage) #ratio of seq reads to average of input for this set of genes
 
 colnames(x.trnposed) <- colnames(ratioToInp.x.trnposed) <- int
+write.table(int, file=paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_",bin,"bp-2.txt"), row.names=FALSE, col.names=FALSE, sep="\t")
 #rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$hgnc_symbol
 rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$Gene
 numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x.trnposed, na.rm=T)[2]))
