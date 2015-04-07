@@ -9,9 +9,12 @@ options(bitmapType='cairo')
 ################# Functions for ChIP-seq analyses ################
 ##################################################################
 ##################################################################
-# system.dir="Z:/users/shwang26/"
 # system.dir="/amber2/scratch/baylin/shwang/"
 system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
+# system.dir="Z:/users/shwang26/"
+# system.dir="Y:/users/shwang26/"
+
+
 ##################################################################
 # For coverageBed, a BED file called windows.bed is required to estimate the coverage data in defined windows (eg. 200bp across the genome, or defined intervals around TSS, etc) across the genome. For example:
 ## chr1 0 200
@@ -30,7 +33,6 @@ system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/sh
 .libPaths()
 # lib.path <- "/jhpce/shared/community/compiler/gcc/4.4.7/R/3.0.x/lib64/R/site-library"
 lib.path <- "/home/steve/R/i686-pc-linux-gnu-library/3.1"
-# lib.path <- "/Library/Frameworks/R.framework/Versions/3.1/Resources/library"
 # lib.path <- "C:/Users/steve/Documents/R/win-library/3.1"
 # lib.path <- "C:/Program Files/R/R-3.1.2/library" #remote desktop
 
@@ -439,7 +441,10 @@ fun.genelist.info_allGenes_biomaRt <- function(version, hg19UCSCGeneAnnotations=
 
 # Function for plotting coverage data around the TSS as average values and RATIO to input as cartesian plots and heatmaps
 
-fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage_file, coverage_files.dir, RegAroundTSS, bin, chr.prefix.chromosome, plot.Directory, whichgenelist="stable.10M", logHeatmap=F, colRangeHeatmap="white-black", version, h3k4.max=1500, h3k27.max=250, dnmt.max=50, ezh2.max=120, inp.max=50, h3.max=50){
+fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage_file, coverage_files.dir, RegAroundTSS, bin, chr.prefix.chromosome, plot.Directory, whichgenelist="stable.10M", logHeatmap=F, colRangeHeatmap="white-black", version, 
+                                   h3k4.max=1500, h3k27.max=250, dnmt.max=50, ezh2.max=120, inp.max=50, h3.max=50, 
+                                   h3k4.rat.max=250, h3k27.rat.max=40, dnmt.rat.max=7, ezh2.rat.max=30, inp.rat.max=7, h3.rat.max=7
+                                   ){
      # Plots the coverage data as raw reads and ratio plots around the TSS as average plot and heatmap; genelist.info is a list of dataframes containing the required info for the genes of interest (the objects in this list should have a name so that the plots can take these names); coverage_files is a vector of file names of the ChIP-seq coverage data; input_coverage_file is the file name of the input coverage file; coverage_files.dir is the directory in which the converage files data are stored; RegAroundTSS is the total region upstream and downstream from TSS for which coverage data will be obtained and plotted (for eg. RegAroundTSS of 10000 will get coverage data 5000 bp up and downstream from the TSS). It should be a multiple of the bin size; bin is the window sizes in which the coverage of ChIP-seq data is summarized; chr.prefix.chromosome is to be passed on to fun.GetGeneCoverage, and takes values T or F for whether or not a "chr" prefix needs to be added to the chromosome values in genelist.info (see fun.GetGeneCoverage for details). plot.Directory is a character vector assigning the directory in which the plots should be stored. logHeatmap is T or F indicating whether or not heatmap should be plotted for log values; colRangeHeatmap is either "white-black" or "red-black", to indicate the color palette to use for the heatmaps, defaults to "white-black".
      library(gplots, lib.loc=lib.path)
      
@@ -447,23 +452,29 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
      dir.create(plot.Directory)
      custom.annotation <- vector()
      
+     # load custom annotation bar (created from create_ChIPseq_rowsidecolor_annotation.R)
      if(whichgenelist=="stable.10M"){
+          print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M_",bin,"bp_ann.bar.Rdata"))
           load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
      if(whichgenelist=="intermediate.10M"){
+          print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
           load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
      if(whichgenelist=="stable.10M.new"){
-          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_new_stable.10M_",bin,"bp_ann.bar.Rdata"))
+          print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.new_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.new_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
      if(whichgenelist=="intermediate.10M.new"){
-          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_new_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
+          print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.new_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.new_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
      if(whichgenelist=="highly.expressed"){
+          print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_highly.expressed_",bin,"bp_ann.bar.Rdata"))
           load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_highly.expressed_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
@@ -551,6 +562,7 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     
                     colnames(x.trnposed) <- colnames(ratioToInp.x.trnposed) <- int
                     rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$hgnc_symbol
+                    
                     if(colRangeHeatmap == "red-black"){
                          numberOfColors.x.trnposed <- colorRampPalette(c("red", "black"))(round(range(x.trnposed, na.rm=T)[2]))
                          numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("red", "black"))(round(range(ratioToInp.x.trnposed, na.rm=T)[2]))
@@ -569,44 +581,56 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     ezh2.increment <- ezh2.max/100
                     inp.increment <- inp.max/100
                     h3.increment <- h3.max/100
-                    
+                    h3k4.rat.increment <- h3k4.rat.max/100
+                    h3k27.rat.increment <- h3k27.rat.max/100
+                    dnmt.rat.increment <- dnmt.rat.max/100
+                    ezh2.rat.increment <- ezh2.rat.max/100
+                    inp.rat.increment <- inp.rat.max/100
+                    h3.rat.increment <- h3.rat.max/100
                     # set breaks according to sample type
                     if(grepl("H3K4", gsub("_R1.*", "", i))){
                          print("hit: H3K4")
                          breaks=seq(0, h3k4.max, by=h3k4.increment) #75 values
+                         breaks2=seq(0, h3k4.rat.max, by=h3k4.rat.increment) #75 values
                     }
                     else if(grepl("H3K27", gsub("_R1.*", "", i))){
                          print("hit: H3K27")
                          breaks=seq(0, h3k27.max, by=h3k27.increment) #125 values
+                         breaks2=seq(0, h3k27.rat.max, by=h3k27.rat.increment) #125 values
                     }
                     else if(grepl("DNMT1", gsub("_R1.*", "", i))){
                          print("hit: DNMT1")
                          breaks=seq(0, dnmt.max, by=dnmt.increment) #100 values
+                         breaks2=seq(0, dnmt.rat.max, by=dnmt.rat.increment) #100 values
                     }
                     else if(grepl("EZH2", gsub("_R1.*", "", i))){
                          print("hit: EZH2")
                          breaks=seq(0, ezh2.max, by=ezh2.increment) #80 values
+                         breaks2=seq(0, ezh2.rat.max, by=ezh2.rat.increment) #80 values
                     }
                     else if(grepl("Input", gsub("_R1.*", "", i))){
                          print("hit: Input")
                          breaks=seq(0, inp.max, by=inp.increment) #50 values
+                         breaks2=seq(0, inp.rat.max, by=inp.rat.increment) #50 values
                     }
                     else if(grepl("H3_", gsub("R1.*", "", i))){ #H3
                          print("hit: H3")
                          breaks=seq(0, h3.max, by=h3.increment) #100 values
+                         breaks2=seq(0, h3.rat.max, by=h3.rat.increment) #100 values
                     }
-                    
+                    print(dim(x.trnposed))
                     mycol <- colorpanel(n=length(breaks)-1,low="gray100",mid="gray50",high="gray0")
                     print("raw heatmap")
                     jpeg(heat_plot_raw, height = 500, width = 800, quality=100)
                     heatmap.3(x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
-                    #         heatmap.3(x.trnposed, Rowv=T, Colv=F, col=numberOfColors.x.trnposed, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", cexRow=0.2, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE)
+#                       heatmap.3(x.trnposed, Rowv=T, Colv=F, col=numberOfColors.x.trnposed, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", cexRow=0.2, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE)
                     dev.off()
                     
                     ## Ratio heatmap
                     print("ratio heatmap")
                     jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
-                    heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.ratioToInp.x.trnposed, trace="none", RowSideColors=custom.annotation, dendrogram="row", cexRow=0.2, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+#                     heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.ratioToInp.x.trnposed, trace="none", RowSideColors=custom.annotation, dendrogram="row", cexRow=0.2, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                    heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
                     #         heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE)
                     dev.off()
                     
@@ -2047,25 +2071,20 @@ generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outp
      plot.col <- vector()
      plot.lty <- vector()
      sample.name <- vector()
-#      custom.color <- c("gray0", "gray45", "gray80", "goldenrod4", "darkorange", "goldenrod2")
-#      custom.color <- c("gray0", "gray45", "gray80", "red3", "orangered", "lightpink3")
      custom.color <- c("gray0", "gray45", "gray80", "red3", "tomato", "lightpink3")
      for(u in 1:length(datalist)){
           sample.name <- c(sample.name, colnames(datalist[[u]]))
           # Start loop average plot
           plot.col[u] <- u
           if(!any(datalist[[u]] %in% NA)){
-#                lines(int, datalist[[u]], lty=1, lwd=4, col=u)
                lines(int, datalist[[u]], lty=1, lwd=4, col=custom.color[u])
                plot.lty[u] <- 1
-#           } else{lines(int, rep(0, num.bins), lty=3, lwd=4, col=u)
           } else{lines(int, rep(0, num.bins), lty=3, lwd=4, col=custom.color[u])
                  text(x=int[1], y=0, labels=c("coverage data for atleast two genes not present"), adj=0, cex=0.8)
                  plot.lty[u] <- 3}
      } # end plotting average plot
      #PLOT2 (dummy plot)
      barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
-#      legend("left", fill=c(1:length(datalist)), legend=sample.name, border="white", box.col="white", cex=2)
      legend("left", fill=custom.color, legend=sample.name, border="white", box.col="white", cex=2)
      dev.off()
 }
