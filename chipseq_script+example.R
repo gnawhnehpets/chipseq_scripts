@@ -1,41 +1,19 @@
-#/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/
-#/amber2/scratch/baylin/shwang/
-#/Volumes/onc-analysis$/users/stephenhwang/
-
-# Notes
-# Untreated vs smoke-treated cells
-# Summary: create a model in lab for chronical smoking in lung cell lining
-#         tumor from this lining have genetic and epigenetic changes but do not understand well
-# initial analysis - genome wide
-# small bar - list of genes that are methylated; how many of those genes that are methylated are
-#         k4 marked at the time point
-#         basically
-# in culture, over 3months, across the genome, the genes take an increase in k27
-# from TSS, +/- 2500 bp
-#         that wide for k27
-#         k4 - wouldn't have that big of a window
-#              nucleosome starts around 2kbp from TSS
-# what changes here is bivalency; how did it change?
-#         genes with both marks is increasing
-
 # Read in chipseq functions and genelist annotations
-# source(paste0(system.dir, "Michelle/ChIP-SeqLibraryOfFunctions/ChIP-SeqLibraryOfFunctions_originalcompletecases2.R"))
-# source(paste0(system.dir, "Michelle/ChIP-SeqLibraryOfFunctions/ChIP-SeqLibraryOfFunctions_original.R"))
+system.dir='/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/'
+# system.dir='Z:/users/shwang26/'
+# system.dir='/amber2/scratch/baylin/shwang/'
 
-# system.dir='/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/'
-# dir='Z:/users/shwang26/'
-system.dir='/amber2/scratch/baylin/shwang/'
 source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 options(bitmapType='cairo') 
 bin.size=200 #10bp or 200bp
 
 # genelists
 # genelist.name <- "stable.10M"
-genelist.name <- "stable.10M.new"
+# genelist.name <- "stable.10M.new"
 # genelist.name <- "intermediate.10M"
 # genelist.name <- "intermediate.10M.new"
-# genelist.name <- "highly.expressed"
-genelist.name <- "all"
+genelist.name <- "highly.expressed"
+# genelist.name <- "all"
 # genelist.name <- ""
 whichdata <- "normalized"
 
@@ -50,59 +28,34 @@ if(genelist.name=="all"){
           print("stable.10M genelist selected")
           plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/stable.10M/")
           genes <- read.table(paste0(system.dir, "Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_annotation.txt"))
-          h3k4.maxbreak=1500
-          h3k27.maxbreak=250
-          dnmt.maxbreak=50
-          ezh2.maxbreak=120
-          inp.maxbreak=50
-          h3.maxbreak=50
-          
      }
      if(genelist.name=="intermediate.10M"){
           print("intermediate.10M genelist selected")
           plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/intermediate.10M/")
           genes <- read.table(paste0(system.dir, "Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_annotation.txt"))
-          h3k4.maxbreak=1500
-          h3k27.maxbreak=250
-          dnmt.maxbreak=50
-          ezh2.maxbreak=120
-          inp.maxbreak=50
-          h3.maxbreak=50
      }     
      if(genelist.name=="stable.10M.new"){
           print("stable.10M.new genelist selected")
           plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/stable.10M.new/")
           genes <- read.table(paste0(system.dir, "Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_cutoff.txt"))
-          h3k4.maxbreak=1500
-          h3k27.maxbreak=250
-          dnmt.maxbreak=50
-          ezh2.maxbreak=120
-          inp.maxbreak=50
-          h3.maxbreak=50
      }
      if(genelist.name=="intermediate.10M.new"){
           print("intermediate.10M.new genelist selected")
           plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/intermediate.10M.new/")
           genes <- read.table(paste0(system.dir, "Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_cutoff.txt"))
-          h3k4.maxbreak=1500
-          h3k27.maxbreak=250
-          dnmt.maxbreak=50
-          ezh2.maxbreak=120
-          inp.maxbreak=50
-          h3.maxbreak=50
      }
-     if(genelist.name==" highly.expressed"){
+     if(genelist.name=="highly.expressed"){
           print("highly.expressed genelist selected")
           plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/",genelist.name,"/")
           plot_results_dir
           genes <- read.table(paste0(system.dir, "Michelle/MethylationData/otherGenelists/list of high expression genes.txt"))
-          h3k4.maxbreak=1500
-          h3k27.maxbreak=250
-          dnmt.maxbreak=50
-          ezh2.maxbreak=120
-          inp.maxbreak=50
-          h3.maxbreak=50
      }
+     h3k4.maxbreak=1500
+     h3k27.maxbreak=250
+     dnmt.maxbreak=50
+     ezh2.maxbreak=120
+     inp.maxbreak=50
+     h3.maxbreak=50
      # Read in genelist
      genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
      genes <- list(unlist(genes))
