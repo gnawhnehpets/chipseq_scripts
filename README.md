@@ -2,10 +2,15 @@
 
 prerequisites - BED files normalized using scaling factor: (100000000/total read count)*read count per bin
 
-to do list
+######################
+# Normalization method
+######################
 
-1. clean up
+wc -l original.bed.files # equal to # of total reads
 
-2. clean   up
+TOTALRAWREADS=$(wc -l original.bed.file)
+SCALINGFACTOR=100000000/${TOTALRAWREADS}
 
-3. clean     up
+Multiply each binned values by the SCALINGFACTOR
+
+See normalizeBED3.sh script for automation
