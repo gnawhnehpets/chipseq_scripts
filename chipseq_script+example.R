@@ -110,21 +110,6 @@ names(goi) <- genelist.name
 head(goi[[1]])
 dim(goi[[1]]) #
 
-# EXAMPLE
-# options(bitmapType='cairo') 
-# coverage_files.dir = "/amber2/scratch/baylin/Hari/JHUSB01002/JHUSB01002_000_analysis/BED_Files/new/Coverage_TSS_10bp_bin"
-# coverage_files = c("JHUSB01002_002_K4_SS02.sorted.bam_FILTERED.bed_Coverage_TSS_10bp.bed", "JHUSB01002_003_K27_SS03.sorted.bam_FILTERED.bed_Coverage_TSS_10bp.bed", "JHUSB01002_004_2o_SS04.sorted.bam_FILTERED.bed_Coverage_TSS_10bp.bed", "JHUSB01002_005_H2AZ_SS05.sorted.bam_FILTERED.bed_Coverage_TSS_10bp.bed", "JHUSB01002_001_INP_SS01.sorted.bam_FILTERED.bed_Coverage_TSS_10bp.bed")
-# input_coverage_file = "JHUSB01002_001_INP_SS01.sorted.bam_FILTERED.bed_Coverage_TSS_10bp.bed"
-# fun.average_heat.plots(genelist.info=goi, 
-#                        coverage_files=coverage_files, 
-#                        input_coverage_file=input_coverage_file, 
-#                        coverage_files.dir=coverage_files.dir, 
-#                        RegAroundTSS=10000, 
-#                        bin=10, 
-#                        chr.prefix.chromosome=T, 
-#                        plot.Directory=dir,"Michelle/BED_Files/example/outputdir")
-# 
-
 ############################################################
 # Make plots
 ## Make plots using coverage data generated form filtered bam files
