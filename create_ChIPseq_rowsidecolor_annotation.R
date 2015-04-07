@@ -2,8 +2,10 @@
 #/amber2/scratch/baylin/shwang/
 #/Volumes/onc-analysis$/users/stephenhwang/
 
-dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
-dir<-"/amber2/scratch/baylin/shwang/"
+# dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
+dir <- "Z:/users/shwang26/"
+# dir<-"/amber2/scratch/baylin/shwang/"
+
 bin.size=200
 source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 options(bitmapType='cairo') 
@@ -12,6 +14,7 @@ options(bitmapType='cairo')
 coverage_files_dir = paste0(dir,"Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/")
 # plot_results_dir = dir,"Michelle/BED_Files/plots/normalized/15M_stable"
 plot_results_dir = paste0(dir,"Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/outputdir/")
+dir.create(plot_results_dir)
 setwd(plot_results_dir)
 getwd()
 ######################################################################################################
@@ -44,6 +47,7 @@ genes <- list(unlist(genes))
 names(genes) <- genes.name
 
 version = "hg19"
+# version = "hg19-UCSC"
 goi <- fun.genelist.info(goi.list=genes, genelist.names=names(genes), goi.list.type="hgnc_symbol", version=version)
 goi <- lapply(c(1:length(goi)), FUN=function(i){
   x <- goi[[i]]
@@ -51,6 +55,19 @@ goi <- lapply(c(1:length(goi)), FUN=function(i){
 })
 names(goi) <-names(genes)
 goi
+
+
+if(version=="hg19-UCSC"){
+     hg19ucsc <- fun.genelist.info_allGenes_biomaRt(version="hg19-UCSC", 
+                                                    hg19UCSCGeneAnnotations="hg19UCSCGeneAnnotaions.txt", 
+                                                    hg19UCSCGeneAnnotationsPath=paste0(system.dir, "/Michelle/Required_Files/Annotations/hg19Data/"))
+     dat <- cbind(hg19ucsc$Gene, hg19ucsc$Chromosome, hg19ucsc$TSS, hg19ucsc$TES, hg19ucsc$Strand, hg19ucsc$Gene)
+     colnames(dat) <- c("Gene", "Chromosome", "TSS", "TES", "Strand", "ExternalGeneID")
+     datlist <- list()
+     datlist[[1]] <- as.data.frame(dat)
+     goi <- datlist
+}
+
 
 # C10D
 coverage_files = dir(coverage_files_dir)[grep("C10D", dir(coverage_files_dir))[1:6]]
@@ -71,7 +88,7 @@ plot.Directory=plot_results_dir
 
 
 library(gplots, lib.loc=lib.path)
-dir.create(plot.Directory)
+
 if((RegAroundTSS/bin) %% 2 == 0){
   num.bins <- (RegAroundTSS/bin)+1
   int <- seq(from=-(RegAroundTSS/(bin*2)), to=(RegAroundTSS/(bin*2)), by=1)*bin
@@ -101,6 +118,7 @@ bin
 #********************CHECK chipseq-functions_original_newfunctions
 chipCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=chip.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
 inputCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=input.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
+
 ## Calculate average ChIP coverage
 chipCoverage.TSSAverage <- apply(chipCoverage.TSS, 1, mean, na.rm=T)
 chipCoverage.TSSAverageList[[g]] <- chipCoverage.TSSAverage
@@ -289,7 +307,9 @@ par(mar=c(10,5,5,5))
 heatmap.3(x.trnposed_c10d.h3k27, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, RowSideColors=c10d.10M.ann.bar , trace="none", dendrogram="row", cexRow=3, main="Heatmap of raw seq reads", na.rm=TRUE, cex=2)
 dev.off()
 
-
 # save(c10d.10M.ann.bar, file=paste0("c10d_",names(genes),"_",bin,"bp_ann.bar.Rdata"))
 paste0("c10d_",genes.name,"_",bin,"bp_ann.bar.Rdata")
 save(c10d.10M.ann.bar, file=paste0("c10d_",genes.name,"_",bin,"bp_ann.bar.Rdata"))
+
+heatmap.3(x.trnposed_c10d.h3k27, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, RowSideColors=c10d.10M.ann.bar, trace="none", dendrogram="row", cexRow=.2, main="Heatmap of raw seq reads", na.rm=TRUE)
+
