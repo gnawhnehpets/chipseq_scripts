@@ -16,14 +16,20 @@ system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/sh
 
 
 ##################################################################
-# For coverageBed, a BED file called windows.bed is required to estimate the coverage data in defined windows (eg. 200bp across the genome, or defined intervals around TSS, etc) across the genome. For example:
+# For coverageBed, a BED file called windows.bed is required to estimate the coverage data in 
+# defined windows (eg. 200bp across the genome, or defined intervals around TSS, etc) across 
+# the genome. For example:
 ## chr1 0 200
 ## chr1 200 400
 
-# Note that the coverage data cannot be estimated for every nucleotide position across the genome due to memory limitations even in the cluster.
-# Note that the coverage.data should have start-end columns of the form 0-200, 200-400, 400-600 (and not 0-199, 200-399, etc) for the >= and < operators to pick exactly the required number of bins (in functions fun.GetGeneCoverage and fun.GetGECoverage )
+# Note that the coverage data cannot be estimated for every nucleotide position across the genome 
+# due to memory limitations even in the cluster.
+# Note that the coverage.data should have start-end columns of the form 0-200, 200-400, 
+# 400-600 (and not 0-199, 200-399, etc) for the >= and < operators to pick exactly the required 
+# number of bins (in functions fun.GetGeneCoverage and fun.GetGECoverage )
 
-#Create such a file in R using hg18_chromInfo.txt, which creates the bins/windows in which the sequencing coverage has to be summarized
+#Create such a file in R using hg18_chromInfo.txt, which creates the bins/windows in which the 
+# sequencing coverage has to be summarized
 ##################################################################
 
 ##################################################################
@@ -131,14 +137,26 @@ fun.TSSwindows <- function(goi.list, RegAroundTSS, bin, allGenesTSSWindowsBedFil
 ############################################################
 #Required functions
 ############################################################
-#Function to retrieve coverage data for a histone modification within a defined region up and downstream from the TSS for each gene in a gene list
+# Function to retrieve coverage data for a histone modification within a defined region up and 
+# downstream from the TSS for each gene in a gene list
 fun.GetGeneCoverage <- function(genelist.info, coverage.data, bin=200, RegAroundTSS=10000, chr.prefix.chromosome=T, version){
-     # This function extracts the coverage data in a defined region around the TSS (RegAroundTSS); genelist.info is the dataframe consisting the required information ("Gene", "Chromosome", "TSS", "Strand") about the genes (typically obtained from biomaRt); coverage.data is the coverage data in bed format; bin is the window size in which the coverage data is binned (default is 200 bp); RegAroundTSS is the +/-region around the TSS for which the coverage in the defined bin size has to be extracted (default is 10000bp, i.e. +/-5000 bp around TSS); chr.prefix.chromosome takes values T or F for whether or not a "chr" prefix needs to be added to the chromosome values in genelist.info. This needs to be done if the genelist.info input is directly derived from biomaRt in which case the chromosomes are of the form 1,2,3..., which needs to be converted to chr1, chr2, chr3... . If the chromosome values are already of the latter value, then assign chr.prefix.chromosome=F
+    # This function extracts the coverage data in a defined region around the TSS (RegAroundTSS); 
+    # genelist.info is the dataframe consisting the required information ("Gene", "Chromosome", "TSS", "Strand") 
+    # about the genes (typically obtained from biomaRt); 
+    # coverage.data is the coverage data in bed format; bin is the window size in which the coverage data is binned (default is 200 bp)
+    # RegAroundTSS is the +/-region around the TSS for which the coverage in the defined bin size has to be extracted (default is 
+    # 10000bp, i.e. +/-5000 bp around TSS)
+    # chr.prefix.chromosome takes values T or F for whether or not a "chr" prefix needs to be added to the chromosome values in 
+    # genelist.info. This needs to be done if the genelist.info input is directly derived from biomaRt in which case the chromosomes 
+    # are of the form 1,2,3..., which needs to be converted to chr1, chr2, chr3... . If the chromosome values are already of the 
+    # latter value, then assign chr.prefix.chromosome=F
      
      # Define num.bins and window.bp:
      ## num.bins is the number of coverage bins around the TSS that that has to be obtained given the RegAroundTSS and bin.
-     ## window.bp is the length in basepairs used to calculate the upstream and downstream coordinates from the TSS within which the coverage data will be obtained.
-     ## If RegAroundTSS/bin is even, add 1 to num.bins to make it odd. This is done because the coverage is plotted for equal number of bins from a central bin. So the total number of bins has to be odd. (%% is the modulo function)  
+     ## window.bp is the length in basepairs used to calculate the upstream and downstream coordinates from the TSS within 
+     ## which the coverage data will be obtained.
+     ## If RegAroundTSS/bin is even, add 1 to num.bins to make it odd. This is done because the coverage is plotted for 
+     ## equal number of bins from a central bin. So the total number of bins has to be odd. (%% is the modulo function)  
      if((RegAroundTSS/bin) %% 2 == 0){
           num.bins <- (RegAroundTSS/bin)+1
      } else {
@@ -445,7 +463,20 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                                    h3k4.max=1500, h3k27.max=250, dnmt.max=50, ezh2.max=120, inp.max=50, h3.max=50, 
                                    h3k4.rat.max=250, h3k27.rat.max=40, dnmt.rat.max=7, ezh2.rat.max=30, inp.rat.max=7, h3.rat.max=7
                                    ){
-     # Plots the coverage data as raw reads and ratio plots around the TSS as average plot and heatmap; genelist.info is a list of dataframes containing the required info for the genes of interest (the objects in this list should have a name so that the plots can take these names); coverage_files is a vector of file names of the ChIP-seq coverage data; input_coverage_file is the file name of the input coverage file; coverage_files.dir is the directory in which the converage files data are stored; RegAroundTSS is the total region upstream and downstream from TSS for which coverage data will be obtained and plotted (for eg. RegAroundTSS of 10000 will get coverage data 5000 bp up and downstream from the TSS). It should be a multiple of the bin size; bin is the window sizes in which the coverage of ChIP-seq data is summarized; chr.prefix.chromosome is to be passed on to fun.GetGeneCoverage, and takes values T or F for whether or not a "chr" prefix needs to be added to the chromosome values in genelist.info (see fun.GetGeneCoverage for details). plot.Directory is a character vector assigning the directory in which the plots should be stored. logHeatmap is T or F indicating whether or not heatmap should be plotted for log values; colRangeHeatmap is either "white-black" or "red-black", to indicate the color palette to use for the heatmaps, defaults to "white-black".
+    # Plots the coverage data as raw reads and ratio plots around the TSS as average plot and heatmap
+    # genelist.info is a list of dataframes containing the required info for the genes of interest (the 
+    # objects in this list should have a name so that the plots can take these names); coverage_files is 
+    # a vector of file names of the ChIP-seq coverage data; input_coverage_file is the file name of the 
+    # input coverage file; coverage_files.dir is the directory in which the converage files data are 
+    # stored; RegAroundTSS is the total region upstream and downstream from TSS for which coverage data 
+    # will be obtained and plotted (for eg. RegAroundTSS of 10000 will get coverage data 5000 bp up and 
+    # downstream from the TSS). It should be a multiple of the bin size; bin is the window sizes in which 
+    # the coverage of ChIP-seq data is summarized; chr.prefix.chromosome is to be passed on to 
+    # fun.GetGeneCoverage, and takes values T or F for whether or not a "chr" prefix needs to be added to 
+    # the chromosome values in genelist.info (see fun.GetGeneCoverage for details). plot.Directory is a 
+    # character vector assigning the directory in which the plots should be stored. logHeatmap is T or F 
+    # indicating whether or not heatmap should be plotted for log values; colRangeHeatmap is either 
+    # "white-black" or "red-black", to indicate the color palette to use for the heatmaps, defaults to "white-black".
      library(gplots, lib.loc=lib.path)
      
      # Create directory for saving plots
@@ -478,6 +509,12 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_highly.expressed_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
+     if(whichgenelist=="viral.defense"){
+          print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_viral.defense_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_viral.defense_",bin,"bp_ann.bar.Rdata"))
+          custom.annotation <- c10d.10M.ann.bar
+     }
+     
      # dim(c10d.10M.ann.bar)
      # dim(custom.annotation)
      
@@ -536,8 +573,9 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     
                     ## Calculate average input coverage
                     inputCoverage.TSSAverage <- apply(inputCoverage.TSS, 1, mean, na.rm=T)
+                    inputCoverage.TSSAverage <- inputCoverage.TSSAverage[complete.cases(inputCoverage.TSSAverage),]
                     ## If any of the inputCoverage.TSSAverage vales is 0, replace it with the minimum value
-                    inputCoverage.TSSAverage <- replace(inputCoverage.TSSAverage, which(inputCoverage.TSSAverage == 0), min(inputCoverage.TSSAverage[which(inputCoverage.TSSAverage != 0)]))
+                    inputCoverage.TSSAverage <- replace(inputCoverage.TSSAverage, which(inputCoverage.TSSAverage == 0), min(inputCoverage.TSSAverage[which(inputCoverage.TSSAverage!=0)]))
                     inputCoverage.TSSAverageList[[g]] <- inputCoverage.TSSAverage
                     names(inputCoverage.TSSAverageList)[g] <- paste(i, names(genelist.info)[g], sep="-")
                     
@@ -2035,7 +2073,7 @@ heatmap.3 <- function(x, Rowv = TRUE, Colv = if (symm) "Rowv" else TRUE, distfun
 
 generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outputDirectory){
      directory = outputDirectory
-     directory
+     print(directory)
      files <- list.files(directory, pattern=".*R1.*.txt")
      files <- files[c(1,3,2,4,6,5)]
      files
@@ -2067,7 +2105,8 @@ generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outp
      layout(tmpmat, widths=c(.1,.1))
      #PLOT1
      par(mar=c(5,7,5,0))
-     plot(0~0, type="n", xlim=range(int), ylim=c(0,range(datalist, na.rm=T)[2]), xlab="Dist. from TSS", ylab="Seq Counts", cex.lab=1.8, cex.axis=1.8, cex.main=2, main=paste0("Combined Average Plot for ", sample.name, " timepoints (", name.of.genelist, ")"))
+     plot(0~0, type="n", xlim=range(int), ylim=c(0,range(datalist, na.rm=T)[2]), xlab="Dist. from TSS", ylab="Seq Counts", 
+          cex.lab=1.8, cex.axis=1.8, cex.main=2, main=paste0("Combined Average Plot for ", sample.name, " timepoints (", name.of.genelist, ")"))
      plot.col <- vector()
      plot.lty <- vector()
      sample.name <- vector()
@@ -2077,7 +2116,12 @@ generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outp
           # Start loop average plot
           plot.col[u] <- u
           if(!any(datalist[[u]] %in% NA)){
-               lines(int, datalist[[u]], lty=1, lwd=4, col=custom.color[u])
+               if(bin==200){
+                    lines(int, datalist[[u]], lty=1, lwd=4, col=custom.color[u])
+               }
+               if(bin==10){
+                    lines(int, datalist[[u]], lty=1, lwd=1, col=custom.color[u])
+               }
                plot.lty[u] <- 1
           } else{lines(int, rep(0, num.bins), lty=3, lwd=4, col=custom.color[u])
                  text(x=int[1], y=0, labels=c("coverage data for atleast two genes not present"), adj=0, cex=0.8)
