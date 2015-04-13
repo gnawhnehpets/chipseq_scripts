@@ -14,8 +14,8 @@
 system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
 source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 
-bin.size=10
-whichgenelist="stable.10M.new" # CHANGE DEPENDING ON GENELIST USED
+bin.size=200
+whichgenelist="age.dependent" # CHANGE DEPENDING ON GENELIST USED
 
 sample.type=c("DNMT1", "EZH2", "H3", "H3K4", "H3K27", "INPUT")
 for(i in sample.type){

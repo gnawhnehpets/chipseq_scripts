@@ -2,12 +2,14 @@
 #/amber2/scratch/baylin/shwang/
 #/Volumes/onc-analysis$/users/stephenhwang/
 
-# dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
-dir <- "Z:/users/shwang26/"
-# dir<-"/amber2/scratch/baylin/shwang/"
+Sys.time(); print(""); print("")
 
+dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
+# dir <- "Z:/users/shwang26/"
+# dir<-"/amber2/scratch/baylin/shwang/"
 bin.size=200
 source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
+# source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original.R"))
 options(bitmapType='cairo') 
 # coverage_files_dir = dir,"Michelle/normalizedBED"
 
@@ -17,47 +19,54 @@ plot_results_dir = paste0(dir,"Michelle/BED_files/Coverage_TSS_", bin.size, "bp_
 dir.create(plot_results_dir)
 setwd(plot_results_dir)
 getwd()
-######################################################################################################
+# genelist.name="age.dependent"
+genelist.name="intermediate.10M.new"
+genelist.name="all"
+if(genelist.name!="all"){
+     version="hg19"
+     if(genelist.name=="stable.10M"){
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_annotation.txt"), header=FALSE)
+     }
+     #10M intermediate
+     if(genelist.name=="intermediate.10M"){
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_annotation.txt"), header=FALSE)
+     }
+     # stricter .4 cutoff
+     #10M stable
+     if(genelist.name=="stable.10M.new"){
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_cutoff.txt"), header=FALSE)
+     }
+     #10M intermediate
+     if(genelist.name=="intermediate.10M.new"){
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_cutoff.txt"), header=FALSE)
+     }
+     #highly.expressed
+     if(genelist.name=="highly.expressed"){
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/otherGenelists/list of high expression genes.txt"))
+     }
+     
+     if(genelist.name=="viral.defense"){
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/otherGenelists/viraldefense.txt"))
+     }
+     if(genelist.name=="age.dependent"){
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/aging.dependent.methylated.genes_1M10M.txt"))
+     }
+     genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
+     genes <- list(unlist(genes))
+     names(genes) <- genelist.name
+     goi <- fun.genelist.info(goi.list=genes, genelist.names=names(genes), goi.list.type="hgnc_symbol", version=version)
+     goi <- lapply(c(1:length(goi)), FUN=function(i){
+          x <- goi[[i]]
+          return(x[!(duplicated(x[,"Gene"])), ])
+     })
+     names(goi) <-names(genes)
+     goi
+     goi[[1]]
+}
 
-#10M stable
-genes.name <- "stable.10M"
-genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_annotation.txt"), header=FALSE)
-
-#10M intermediate
-genes.name <- "intermediate.10M"
-genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_annotation.txt"), header=FALSE)
-
-# stricter .4 cutoff
-#10M stable
-genes.name <- "stable.10M.new"
-genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_cutoff.txt"), header=FALSE)
-
-#10M intermediate
-genes.name <- "intermediate.10M.new"
-genes <- read.table(paste0(dir,"Michelle/MethylationData/methylatedGeneLists/new/age_intermediate_methylated_genes_at_10months_new_cutoff.txt"), header=FALSE)
-
-#highly.expressed
-genes.name <- "highly.expressed"
-genes <- read.table(paste0(dir,"Michelle/MethylationData/otherGenelists/list of high expression genes.txt"))
-
-######################################################################################################
-
-genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
-genes <- list(unlist(genes))
-names(genes) <- genes.name
-
-version = "hg19"
 # version = "hg19-UCSC"
-goi <- fun.genelist.info(goi.list=genes, genelist.names=names(genes), goi.list.type="hgnc_symbol", version=version)
-goi <- lapply(c(1:length(goi)), FUN=function(i){
-  x <- goi[[i]]
-  return(x[!(duplicated(x[,"Gene"])), ])
-})
-names(goi) <-names(genes)
-goi
-
-
-if(version=="hg19-UCSC"){
+if(genelist.name=="all"){
+     version=="hg19-UCSC"
      hg19ucsc <- fun.genelist.info_allGenes_biomaRt(version="hg19-UCSC", 
                                                     hg19UCSCGeneAnnotations="hg19UCSCGeneAnnotaions.txt", 
                                                     hg19UCSCGeneAnnotationsPath=paste0(system.dir, "/Michelle/Required_Files/Annotations/hg19Data/"))
@@ -66,9 +75,12 @@ if(version=="hg19-UCSC"){
      datlist <- list()
      datlist[[1]] <- as.data.frame(dat)
      goi <- datlist
+     # goi[[1]][c(1:6),]
+#      sample(1:nrow(goi[[1]]), 500)
+     # nrow(goi[[1]])
+     goi[[1]] <- goi[[1]][sample(1:nrow(goi[[1]]), 500),]
 }
-
-
+dim(goi[[1]])
 # C10D
 coverage_files = dir(coverage_files_dir)[grep("C10D", dir(coverage_files_dir))[1:6]]
 input_coverage_file = coverage_files[6]
@@ -137,7 +149,7 @@ x.trnposed <- t(chipCoverage.TSS)
 ratioToInp.x.trnposed <- t(chipCoverage.TSS/inputCoverage.TSSAverage) #ratio of seq reads to average of input for this set of genes
 
 colnames(x.trnposed) <- colnames(ratioToInp.x.trnposed) <- int
-write.table(int, file=paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_",bin,"bp-2.txt"), row.names=FALSE, col.names=FALSE, sep="\t")
+#write.table(int, file=paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_",bin,"bp-2.txt"), row.names=FALSE, col.names=FALSE, sep="\t")
 #rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$hgnc_symbol
 rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$Gene
 numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x.trnposed, na.rm=T)[2]))
@@ -148,7 +160,7 @@ dim(x.trnposed)
 # trnposed200 <- x.trnposed
 dim(x.trnposed[complete.cases(x.trnposed),])
 dim(x.trnposed)
-jpeg(paste0(genes.name,"_heatmap.",bin.size,"bp_h3k4.test.jpeg"), height=600, width=900, quality=100)
+jpeg(paste0(genelist.name,"_heatmap.",bin.size,"bp_h3k4.test.jpeg"), height=600, width=900, quality=100)
 # heatmap.x <- heatmap.2(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
 heatmap.x <- heatmap.3(x.trnposed[complete.cases(x.trnposed),], 
                        Rowv=T, 
@@ -245,7 +257,7 @@ numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x
 numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(ratioToInp.x.trnposed, na.rm=T)[2]))
 
 # get annotation_c10d_h3k27
-jpeg(paste0(genes.name,"_heatmap.",bin.size,"bp_h3k27.test.jpeg"), height=600, width=900, quality=100)
+jpeg(paste0(genelist.name,"_heatmap.",bin.size,"bp_h3k27.test.jpeg"), height=600, width=900, quality=100)
 heatmap.x <- heatmap.2(x.trnposed[complete.cases(x.trnposed),], Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
 dev.off()
 names(heatmap.x)
@@ -308,8 +320,8 @@ heatmap.3(x.trnposed_c10d.h3k27, Rowv=T, Colv=F, scale="none", col=numberOfColor
 dev.off()
 
 # save(c10d.10M.ann.bar, file=paste0("c10d_",names(genes),"_",bin,"bp_ann.bar.Rdata"))
-paste0("c10d_",genes.name,"_",bin,"bp_ann.bar.Rdata")
-save(c10d.10M.ann.bar, file=paste0("c10d_",genes.name,"_",bin,"bp_ann.bar.Rdata"))
+paste0("c10d_",genelist.name,"_",bin,"bp_ann.bar.Rdata")
+save(c10d.10M.ann.bar, file=paste0("c10d_",genelist.name,"_",bin,"bp_ann.bar.Rdata"))
 
 heatmap.3(x.trnposed_c10d.h3k27, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, RowSideColors=c10d.10M.ann.bar, trace="none", dendrogram="row", cexRow=.2, main="Heatmap of raw seq reads", na.rm=TRUE)
 

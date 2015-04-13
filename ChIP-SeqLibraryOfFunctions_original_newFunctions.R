@@ -168,6 +168,12 @@ fun.GetGeneCoverage <- function(genelist.info, coverage.data, bin=200, RegAround
      # split coverage data by chromosomes
      # then get coverage around each chromosome for each gene
      chr <- paste("chr", c(1:22, "X", "Y"), sep="")
+     if(version=="hg19-UCSC"){
+       if(chr.prefix.chromosome==F){
+         genelist.info$Chromosome <- paste("chr", genelist.info$Chromosome, sep="") #this needs to be done because the dataframe fed as genelist.info to this function, normally obtained using biomaRt, contains only numeric value as chromsome numbers (eg. 22) while the ChIP-seq coverage data contains chromsosomes of the form chr22.
+       }
+     }
+     
      if(version=="hg19"){
           if(chr.prefix.chromosome==F){
                genelist.info$Chromosome <- paste("chr", genelist.info$Chromosome, sep="") #this needs to be done because the dataframe fed as genelist.info to this function, normally obtained using biomaRt, contains only numeric value as chromsome numbers (eg. 22) while the ChIP-seq coverage data contains chromsosomes of the form chr22.
@@ -514,9 +520,11 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_viral.defense_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
-     
-     # dim(c10d.10M.ann.bar)
-     # dim(custom.annotation)
+     if(whichgenelist=="age.dependent"){
+          print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_age.dependent_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_age.dependent_",bin,"bp_ann.bar.Rdata"))
+          custom.annotation <- c10d.10M.ann.bar
+     }
      
      custom.annotation
      # Define num.bins and int: 
@@ -531,7 +539,7 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           num.bins <- (RegAroundTSS/bin)
           int <-  seq(from=-((num.bins-1)/2), to= (num.bins-1)/2, by=1)*bin
      }
-     
+     print(paste0("int: ", int))
      # Read the input coverage file
      if(exists("input_coverage_file"))
      {
@@ -573,7 +581,6 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     
                     ## Calculate average input coverage
                     inputCoverage.TSSAverage <- apply(inputCoverage.TSS, 1, mean, na.rm=T)
-                    inputCoverage.TSSAverage <- inputCoverage.TSSAverage[complete.cases(inputCoverage.TSSAverage),]
                     ## If any of the inputCoverage.TSSAverage vales is 0, replace it with the minimum value
                     inputCoverage.TSSAverage <- replace(inputCoverage.TSSAverage, which(inputCoverage.TSSAverage == 0), min(inputCoverage.TSSAverage[which(inputCoverage.TSSAverage!=0)]))
                     inputCoverage.TSSAverageList[[g]] <- inputCoverage.TSSAverage
@@ -677,7 +684,7 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     chipCoverage.TSSAverageList[[g]] <- rep(NA, num.bins)
                     inputCoverage.TSSAverageList[[g]] <- rep(NA, num.bins)
                     
-                    print(paste(names(genelist.info)[g], "coverage data for atleast two genes not present", sep="-"))
+                    print(paste(names(genelist.info)[g], "coverage data for atleast two genes not present", sep="-")) # ERROR .SUB.ALL
                     #Plot dummy heat_plot describing why heatmap is not being plotted
                     heat_plot <- paste(names(genelist.info)[g], "heat_plot.pdf", sep="-")
                     heat_plot <- paste(i, heat_plot, sep="-")
@@ -714,7 +721,7 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           ## Get ylim for the RATIO plot
           ratioYLim = matrix(nrow=length(chipCoverage.TSSAverageList), ncol=2)
           for(u in 1:length(chipCoverage.TSSAverageList)){
-               ratioYLim[u,] = range(chipCoverage.TSSAverageList[[u]]/inputCoverage.TSSAverageList[[u]])
+               ratioYLim[u,] = range(chipCoverage.TSSAverageList[[u]]/inputCoverage.TSSAverageList[[u]], na.rm=TRUE)
           }
           ratioYLim = c(0, range(ratioYLim)[2])
           plot(0~0, type="n", xlim=range(int), ylim=ratioYLim, xlab="Dist. from TSS", ylab="Ratio to Input\nof Seq. counts", cex.lab=1, cex.axis=2, main="Ratio to Input Plot")
