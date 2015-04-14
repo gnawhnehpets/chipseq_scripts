@@ -20,8 +20,8 @@ dir.create(plot_results_dir)
 setwd(plot_results_dir)
 getwd()
 # genelist.name="age.dependent"
-genelist.name="intermediate.10M.new"
-genelist.name="all"
+genelist.name="stable.10M.newdata"
+# genelist.name="all"
 if(genelist.name!="all"){
      version="hg19"
      if(genelist.name=="stable.10M"){
@@ -50,6 +50,10 @@ if(genelist.name!="all"){
      }
      if(genelist.name=="age.dependent"){
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/aging.dependent.methylated.genes_1M10M.txt"))
+     }
+     if(genelist.name=="stable.10M.newdata"){
+          print("stable.10M.newdata genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_10M_stable.genelist_new.data.txt"))
      }
      genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
      genes <- list(unlist(genes))
@@ -80,6 +84,7 @@ if(genelist.name=="all"){
      # nrow(goi[[1]])
      goi[[1]] <- goi[[1]][sample(1:nrow(goi[[1]]), 500),]
 }
+
 dim(goi[[1]])
 # C10D
 coverage_files = dir(coverage_files_dir)[grep("C10D", dir(coverage_files_dir))[1:6]]
