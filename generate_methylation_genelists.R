@@ -249,7 +249,7 @@ get.genelist <- function(x, system.di=system.dir, probe.to.gen=probe.to.gene, su
                gene <- probe.to.gen$gene[probe.to.gen$probe==probe.id]
                if(length(gene) == 1) { x$Gene[j] <- as.character(gene) }
           }
-          write.table(x, paste(system.di, "/Michelle/MethylationData/methylatedGeneLists/", subdi,"/", typ, "_", genelist.nam, ".csv",sep=""), quote=F, row.names=T) #row.names set to T to get the probe ids.
+          write.table(x, paste(system.di, "/Michelle/MethylationData/methylatedGeneLists/", subdi,"/", typ, "_", genelist.nam, ".csv",sep=""), quote=F, row.names=T, col.names=NA, sep="\t") #row.names set to T to get the probe ids.
      }     
      tmp <- as.matrix(sort(unique(unlist(strsplit(x$Gene, ";")))))
      write.table(tmp, paste(system.di, "/Michelle/MethylationData/methylatedGeneLists/", subdi,"/", typ, "_", genelist.nam, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
