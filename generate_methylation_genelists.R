@@ -1,3 +1,10 @@
+##########
+# Purpose:
+##########
+
+# To generate genelists from raw idat files
+# This particular script is specific to Michelle's untreated vs CSC-treated lung cells at 4 timepoints (1M, 6M, 10M, 15M)
+
 #Load libraries
 # source("http://www.bioconductor.org/biocLite.R")
 # biocLite("IlluminaHumanMethylation450kmanifest")
