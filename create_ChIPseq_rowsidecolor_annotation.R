@@ -20,7 +20,7 @@ dir.create(plot_results_dir)
 setwd(plot_results_dir)
 getwd()
 # genelist.name="age.dependent"
-genelist.name="stable.10M.newdata"
+genelist.name="stable.1M.newdata"
 # genelist.name="all"
 if(genelist.name!="all"){
      version="hg19"
@@ -51,9 +51,21 @@ if(genelist.name!="all"){
      if(genelist.name=="age.dependent"){
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/aging.dependent.methylated.genes_1M10M.txt"))
      }
+     if(genelist.name=="stable.1M.newdata"){
+          print("stable.1M.newdata genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.1M.newdata_genelist.txt"))
+     }
+     if(genelist.name=="stable.6M.newdata"){
+          print("stable.6M.newdata genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.6M.newdata_genelist.txt"))
+     }
      if(genelist.name=="stable.10M.newdata"){
           print("stable.10M.newdata genelist selected")
-          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_10M_stable.genelist_new.data.txt"))
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.10M.newdata_genelist.txt"))
+     }
+     if(genelist.name=="stable.15M.newdata"){
+          print("stable.15M.newdata genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.15M.newdata_genelist.txt"))
      }
      genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
      genes <- list(unlist(genes))
