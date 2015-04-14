@@ -525,6 +525,16 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_age.dependent_",bin,"bp_ann.bar.Rdata"))
           custom.annotation <- c10d.10M.ann.bar
      }
+     if(whichgenelist=="stable.10M.newdata"){
+          print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.newdata_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.newdata_",bin,"bp_ann.bar.Rdata"))
+          custom.annotation <- c10d.10M.ann.bar
+     }
+     if(whichgenelist=="intermediate.10M.newdata"){
+          print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.newdata_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.newdata_",bin,"bp_ann.bar.Rdata"))
+          custom.annotation <- c10d.10M.ann.bar
+     }
      
      custom.annotation
      # Define num.bins and int: 
