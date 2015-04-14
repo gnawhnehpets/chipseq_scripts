@@ -78,8 +78,8 @@ source(paste0( system.dir, "/Michelle/Rscripts/methylation450k_functions.R"))
 # load(file=paste0(system.dir, "/Michelle/Robjects/michelle_new-annotation.RData"))
 
 # transition
-subdir <- "10M"
-timepoint="10M"
+subdir <- "combined"
+timepoint="combined"
 type <- "TSS"
 
 head(beta.tab)
@@ -94,48 +94,185 @@ colnames(tss)
 rownames(tss) <- rownames(beta.tab_CpGI.PlusMinus1500_TSS)
 rownames(tss)
 cbind(tss$c1, tss$csc1)
+#####
+# 1M
+#####
 
 #Get CpG island probes within +/-1500 bp from TSS that get methylated/demethylated by more than 20% (age/proliferation dependent methylation), and then the probes that further get methylated/demethyalted upon CSC exposure.
 #Get CpG island probes that get methylated specifically upon further exposure 
 #abs() <= 0.05 will pick probes that do not undergo much changes in methylation upon culturing/ageing.
-#mine
-stable.hypermethylation <- tss[which(abs(tss$c10-tss$c1)<=.05 & (tss$csc10-tss$c10)>=.2),] 
-#ash
-# stable.hypermethylation <- tss[which(abs(tss$c10-tss$c1)<=.05 & (tss$csc10-tss$c10)>=.2),] 
-stable.hypomethylation <- tss[which(abs(tss$c10-tss$c1)<=.05 & (tss$csc10-tss$c10)<=-.2),] 
+#treatment specific (de)methylation
+genelist.name="treatment.specific.hypermethylation_stable.1M.newdata"
+stable.1M.treatment.hypermethylation <- tss[which((tss$csc1-tss$c1)>=.2),]  #stable.1M.newdata
+stable.1M.treatment.hypermethylation.genelist <- get.genelist(stable.1M.treatment.hypermethylation)
+dim(stable.1M.treatment.hypermethylation)
+genelist.name="treatment.specific.hypomethylation_stable.1M.newdata"
+stable.1M.treatment.hypomethylation <- tss[which((tss$csc1-tss$c1)<=-.2),]  #stable.1M.newdata 
+stable.1M.treatment.hypomethylation.genelist <- get.genelist(stable.1M.treatment.hypomethylation)
+dim(stable.1M.treatment.hypomethylation)
 
-head(stable.hypermethylation)
-dim(stable.hypomethylation)
+
+#####
+# 6M
+#####
+
+#Get CpG island probes within +/-1500 bp from TSS that get methylated/demethylated by more than 20% (age/proliferation dependent methylation), and then the probes that further get methylated/demethyalted upon CSC exposure.
+#Get CpG island probes that get methylated specifically upon further exposure 
+#abs() <= 0.05 will pick probes that do not undergo much changes in methylation upon culturing/ageing.
+#treatment specific (de)methylation
+genelist.name="treatment.specific.hypermethylation_stable.6M.newdata"
+stable.6M.treatment.hypermethylation <- tss[which(abs(tss$c6-tss$c1)<=.05 & (tss$csc6-tss$c6)>=.2),]  #stable.6M.newdata
+stable.6M.treatment.hypermethylation.genelist <- get.genelist(stable.6M.treatment.hypermethylation)
+dim(stable.6M.treatment.hypermethylation)
+genelist.name="treatment.specific.hypomethylation_stable.6M.newdata"
+stable.6M.treatment.hypomethylation <- tss[which(abs(tss$c6-tss$c1)<=.05 & (tss$csc6-tss$c6)<=-.2),]  #stable.6M.newdata 
+stable.6M.treatment.hypomethylation.genelist <- get.genelist(stable.6M.treatment.hypomethylation)
+dim(stable.6M.treatment.hypomethylation)
 
 #Get probes that range in methylation between +/-0.05 to +/-0.2 during aging/proliferation but are methylated/demethylated >= 0.2 
-#mine
-intermediate.hypermethylation <- tss[which(abs(tss$c10-tss$c1)>=.05 & abs(tss$c10-tss$c1)<=.2 & (tss$csc10-tss$c10)>=.2),] 
-#ash
-# intermediate.hypermethylation <- tss[which(abs(tss$c10-tss$c6)>=.05 & abs(tss$c10-tss$c6)<=.2 & (tss$csc10-tss$c10)>=.2),] 
-intermediate.hypomethylation <- tss[which(abs(tss$c10-tss$c1)>=.05 & abs(tss$c10-tss$c1)<=.2 & (tss$csc10-tss$c10)<=-.2),] 
+genelist.name="treatment.specific.hypermethylation_intermediate.6M.newdata"
+intermediate.6M.treatment.hypermethylation <- tss[which(abs(tss$c6-tss$c1)>=.05 & abs(tss$c6-tss$c1)<=.2 & (tss$csc6-tss$c6)>=.2),]  #stable.6M.newdata
+intermediate.6M.treatment.hypermethylation.genelist <- get.genelist(intermediate.6M.treatment.hypermethylation)
+dim(intermediate.6M.treatment.hypermethylation.genelist)
+genelist.name="treatment.specific.hypomethylation_intermediate.6M.newdata"
+intermediate.6M.treatment.hypomethylation <- tss[which(abs(tss$c6-tss$c1)>=.05 & abs(tss$c6-tss$c1)<=.2 & (tss$csc6-tss$c6)<=-.2),]  #stable.6M.newdata
+intermediate.6M.treatment.hypomethylation.genelist <- get.genelist(intermediate.6M.treatment.hypomethylation)
+dim(intermediate.6M.treatment.hypomethylation)
 
-head(probe.to.gene)
-# create directory to which genelist files will be saved to
+#Get probes that are methylated/demethylated by age and then further methylated/demethylated by further treatment
+#probes that show age specific (de)methylation, no treatment specific changes, but further (de)methylation in further treatment with no changes in age (de)methylayion
+genelist.name="age.csc.further.hypermethylation_stable.6M.newdata"
+stable.6M.further.hypermethylation <- tss[which((tss$c6-tss$c1)>=.2 & abs(tss$csc6-tss$csc1)<=.05 & (tss$csc10-tss$csc6)>=.2),] #stable.6M.newdata.further.meth
+stable.6M.further.hypermethylation.genelist <- get.genelist(stable.6M.further.hypermethylation)
+dim(stable.6M.further.hypermethylation)
+genelist.name="age.csc.further.hypomethylation_stable.6M.newdata"
+stable.6M.further.hypomethylation <- tss[which((tss$c6-tss$c1)<=-.2 & abs(tss$csc6-tss$csc1)<=.05 & (tss$csc10-tss$csc6)<=-.2),] #stable.6M.newdata.further.meth
+stable.6M.further.hypomethylation.genelist <- get.genelist(stable.6M.further.hypomethylation)
+dim(stable.6M.further.hypomethylation)
+genelist.name="age.csc.further.hypermethylation_intermediate.6M.newdata"
+intermediate.6M.further.hypermethylation <- tss[which((tss$c6-tss$c1)>=.2 & abs(tss$csc6-tss$csc1)>=.05 & abs(tss$csc6-tss$csc1)<=.2 & (tss$csc10-tss$csc6)>=.2),] #intermediate.6M.newdata.further.meth
+intermediate.6M.further.hypermethylation.genelist <- get.genelist(intermediate.6M.further.hypermethylation)
+dim(intermediate.6M.further.hypermethylation)
+genelist.name="age.csc.further.hypomethylation_intermediate.6M.newdata"
+intermediate.6M.further.hypomethylation <- tss[which((tss$c6-tss$c1)<=-.2 & abs(tss$csc6-tss$csc1)>=.05 & abs(tss$csc6-tss$csc1)<=.2 & (tss$csc10-tss$csc6)<=-.2),] #intermediate.6M.newdata.further.meth
+intermediate.6M.further.hypomethylation.genelist <- get.genelist(intermediate.6M.further.hypomethylation)
+dim(intermediate.6M.further.hypomethylation)
+
+#####
+# 10M
+#####
+
+#Get CpG island probes within +/-1500 bp from TSS that get methylated/demethylated by more than 20% (age/proliferation dependent methylation), and then the probes that further get methylated/demethyalted upon CSC exposure.
+#Get CpG island probes that get methylated specifically upon further exposure 
+#abs() <= 0.05 will pick probes that do not undergo much changes in methylation upon culturing/ageing.
+#treatment specific (de)methylation
+genelist.name="treatment.specific.hypermethylation_stable.10M.newdata"
+stable.10M.treatment.hypermethylation <- tss[which(abs(tss$c10-tss$c1)<=.05 & (tss$csc10-tss$c10)>=.2),]  #stable.10M.newdata
+stable.10M.treatment.hypermethylation.genelist <- get.genelist(stable.10M.treatment.hypermethylation)
+dim(stable.10M.treatment.hypermethylation)
+genelist.name="treatment.specific.hypomethylation_stable.10M.newdata"
+stable.10M.treatment.hypomethylation <- tss[which(abs(tss$c10-tss$c1)<=.05 & (tss$csc10-tss$c10)<=-.2),]  #stable.10M.newdata 
+stable.10M.treatment.hypomethylation.genelist <- get.genelist(stable.10M.treatment.hypomethylation)
+dim(stable.10M.treatment.hypomethylation)
+
+#Get probes that range in methylation between +/-0.05 to +/-0.2 during aging/proliferation but are methylated/demethylated >= 0.2 
+genelist.name="treatment.specific.hypermethylation_intermediate.10M.newdata"
+intermediate.10M.treatment.hypermethylation <- tss[which(abs(tss$c10-tss$c1)>=.05 & abs(tss$c10-tss$c1)<=.2 & (tss$csc10-tss$c10)>=.2),]  #stable.10M.newdata
+intermediate.10M.treatment.hypermethylation.genelist <- get.genelist(intermediate.10M.treatment.hypermethylation)
+dim(intermediate.10M.treatment.hypermethylation.genelist)
+genelist.name="treatment.specific.hypomethylation_intermediate.10M.newdata"
+intermediate.10M.treatment.hypomethylation <- tss[which(abs(tss$c10-tss$c1)>=.05 & abs(tss$c10-tss$c1)<=.2 & (tss$csc10-tss$c10)<=-.2),]  #stable.10M.newdata
+intermediate.10M.treatment.hypomethylation.genelist <- get.genelist(intermediate.10M.treatment.hypomethylation)
+dim(intermediate.10M.treatment.hypomethylation)
+
+#Get probes that are methylated/demethylated by age and then further methylated/demethylated by further treatment
+#probes that show age specific (de)methylation, no treatment specific changes, but further (de)methylation in further treatment with no changes in age (de)methylayion
+genelist.name="age.csc.further.hypermethylation_stable.10M.newdata"
+stable.10M.further.hypermethylation <- tss[which((tss$c10-tss$c1)>=.2 & abs(tss$csc10-tss$csc1)<=.05 & (tss$csc15-tss$csc10)>=.2),] #stable.10M.newdata.further.meth
+stable.10M.further.hypermethylation.genelist <- get.genelist(stable.10M.further.hypermethylation)
+dim(stable.10M.further.hypermethylation)
+genelist.name="age.csc.further.hypomethylation_stable.10M.newdata"
+stable.10M.further.hypomethylation <- tss[which((tss$c10-tss$c1)<=-.2 & abs(tss$csc10-tss$csc1)<=.05 & (tss$csc15-tss$csc10)<=-.2),] #stable.10M.newdata.further.meth
+stable.10M.further.hypomethylation.genelist <- get.genelist(stable.10M.further.hypomethylation)
+dim(stable.10M.further.hypomethylation)
+genelist.name="age.csc.further.hypermethylation_intermediate.10M.newdata"
+intermediate.10M.further.hypermethylation <- tss[which((tss$c10-tss$c1)>=.2 & abs(tss$csc10-tss$csc1)>=.05 & abs(tss$csc10-tss$csc1)<=.2 & (tss$csc15-tss$csc10)>=.2),] #intermediate.10M.newdata.further.meth
+intermediate.10M.further.hypermethylation.genelist <- get.genelist(intermediate.10M.further.hypermethylation)
+dim(intermediate.10M.further.hypermethylation)
+genelist.name="age.csc.further.hypomethylation_intermediate.10M.newdata"
+intermediate.10M.further.hypomethylation <- tss[which((tss$c10-tss$c1)<=-.2 & abs(tss$csc10-tss$csc1)>=.05 & abs(tss$csc10-tss$csc1)<=.2 & (tss$csc15-tss$csc10)<=-.2),] #intermediate.10M.newdata.further.meth
+intermediate.10M.further.hypomethylation.genelist <- get.genelist(intermediate.10M.further.hypomethylation)
+dim(intermediate.10M.further.hypomethylation)
+
+
+#####
+# 15M
+#####
+
+#Get CpG island probes within +/-1500 bp from TSS that get methylated/demethylated by more than 20% (age/proliferation dependent methylation), and then the probes that further get methylated/demethyalted upon CSC exposure.
+#Get CpG island probes that get methylated specifically upon further exposure 
+#abs() <= 0.05 will pick probes that do not undergo much changes in methylation upon culturing/ageing.
+#treatment specific (de)methylation
+genelist.name="treatment.specific.hypermethylation_stable.15M.newdata"
+stable.15M.treatment.hypermethylation <- tss[which(abs(tss$c15-tss$c1)<=.05 & (tss$csc15-tss$c15)>=.2),]  #stable.15M.newdata
+stable.15M.treatment.hypermethylation.genelist <- get.genelist(stable.15M.treatment.hypermethylation)
+dim(stable.15M.treatment.hypermethylation)
+genelist.name="treatment.specific.hypomethylation_stable.15M.newdata"
+stable.15M.treatment.hypomethylation <- tss[which(abs(tss$c15-tss$c1)<=.05 & (tss$csc15-tss$c15)<=-.2),]  #stable.15M.newdata 
+stable.15M.treatment.hypomethylation.genelist <- get.genelist(stable.15M.treatment.hypomethylation)
+dim(stable.15M.treatment.hypomethylation)
+
+#Get probes that range in methylation between +/-0.05 to +/-0.2 during aging/proliferation but are methylated/demethylated >= 0.2 
+genelist.name="treatment.specific.hypermethylation_intermediate.15M.newdata"
+intermediate.15M.treatment.hypermethylation <- tss[which(abs(tss$c15-tss$c1)>=.05 & abs(tss$c15-tss$c1)<=.2 & (tss$csc15-tss$c15)>=.2),]  #stable.15M.newdata
+intermediate.15M.treatment.hypermethylation.genelist <- get.genelist(intermediate.15M.treatment.hypermethylation)
+dim(intermediate.15M.treatment.hypermethylation.genelist)
+genelist.name="treatment.specific.hypomethylation_intermediate.15M.newdata"
+intermediate.15M.treatment.hypomethylation <- tss[which(abs(tss$c15-tss$c1)>=.05 & abs(tss$c15-tss$c1)<=.2 & (tss$csc15-tss$c15)<=-.2),]  #stable.15M.newdata
+intermediate.15M.treatment.hypomethylation.genelist <- get.genelist(intermediate.15M.treatment.hypomethylation)
+dim(intermediate.15M.treatment.hypomethylation)
+
 dir.create(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/",subdir,"/"))
-# generate beta table with probe and gene annotation
-if (length(rownames(stable.hypermethylation)) > 0) {
-  stable.hypermethylation <- cbind.data.frame(stable.hypermethylation, "Gene"=rep(NA, times=nrow(stable.hypermethylation)))
-  for(j in 1:nrow(stable.hypermethylation)) {
-    probe.id <- rownames(stable.hypermethylation)[j]
-    gene <- probe.to.gene$gene[probe.to.gene$probe==probe.id]
-    if(length(gene) == 1) { stable.hypermethylation$Gene[j] <- as.character(gene) }
-  }
-  write.table(stable.hypermethylation, paste(system.dir, "/Michelle/MethylationData/methylatedGeneLists/", subdir,"/", type, "_", timepoint, "_age.stable.hypermethylation.csv",sep=""), quote=F, row.names=T) #row.names set to T to get the probe ids.
+
+get.genelist <- function(x, system.di=system.dir, probe.to.gen=probe.to.gene, subdi=subdir, typ=type, genelist.nam=genelist.name){
+     if (length(rownames(x)) > 0) {
+          x <- cbind.data.frame(x, "Gene"=rep(NA, times=nrow(x)))
+          for(j in 1:nrow(x)) {
+               probe.id <- rownames(x)[j]
+               gene <- probe.to.gen$gene[probe.to.gen$probe==probe.id]
+               if(length(gene) == 1) { x$Gene[j] <- as.character(gene) }
+          }
+          write.table(x, paste(system.di, "/Michelle/MethylationData/methylatedGeneLists/", subdi,"/", typ, "_", genelist.nam, ".csv",sep=""), quote=F, row.names=T) #row.names set to T to get the probe ids.
+     }     
+     tmp <- as.matrix(sort(unique(unlist(strsplit(x$Gene, ";")))))
+     write.table(tmp, paste(system.di, "/Michelle/MethylationData/methylatedGeneLists/", subdi,"/", typ, "_", genelist.nam, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+     return(tmp)
 }
-if (length(rownames(intermediate.hypermethylation)) > 0) {
-  intermediate.hypermethylation <- cbind.data.frame(intermediate.hypermethylation, "Gene"=rep(NA, times=nrow(intermediate.hypermethylation)))
-  for(j in 1:nrow(intermediate.hypermethylation)) {
-    probe.id <- rownames(intermediate.hypermethylation)[j]
-    gene <- probe.to.gene$gene[probe.to.gene$probe==probe.id]
-    if(length(gene) == 1) { intermediate.hypermethylation$Gene[j] <- as.character(gene) }
-  }
-  write.table(intermediate.hypermethylation, paste(system.dir, "/Michelle/MethylationData/methylatedGeneLists/", subdir,"/", type, "_", timepoint, "_age.intermediate.hypermethylation.csv",sep=""), quote=F, row.names=T) #row.names set to T to get the probe ids.
-}
+# # change dat
+# stable.dat <- stable.10M.treatment.hypermethylation
+# intermediate.dat <- intermediate.10M.treatment.hypermethylation
+# # create directory to which genelist files will be saved to
+# 
+# # generate beta table with probe and gene annotation
+# if (length(rownames(stable.dat)) > 0) {
+#   stable.dat <- cbind.data.frame(stable.dat, "Gene"=rep(NA, times=nrow(stable.dat)))
+#   for(j in 1:nrow(stable.dat)) {
+#     probe.id <- rownames(stable.dat)[j]
+#     gene <- probe.to.gene$gene[probe.to.gene$probe==probe.id]
+#     if(length(gene) == 1) { stable.dat$Gene[j] <- as.character(gene) }
+#   }
+#   write.table(stable.dat, paste(system.dir, "/Michelle/MethylationData/methylatedGeneLists/", subdir,"/", type, "_", genelist.name, ".csv",sep=""), quote=F, row.names=T) #row.names set to T to get the probe ids.
+# }
+# 
+# if (length(rownames(intermediate.dat)) > 0) {
+#   intermediate.dat <- cbind.data.frame(intermediate.dat, "Gene"=rep(NA, times=nrow(intermediate.dat)))
+#   for(j in 1:nrow(intermediate.dat)) {
+#     probe.id <- rownames(intermediate.dat)[j]
+#     gene <- probe.to.gene$gene[probe.to.gene$probe==probe.id]
+#     if(length(gene) == 1) { intermediate.dat$Gene[j] <- as.character(gene) }
+#   }
+#   write.table(intermediate.dat, paste(system.dir, "/Michelle/MethylationData/methylatedGeneLists/", subdir,"/", type, "_", timepoint, "_age.intermediate.dat.csv",sep=""), quote=F, row.names=T) #row.names set to T to get the probe ids.
+# }
 
 # original stable.10M genelist
 ten.stable.original <- as.matrix(read.table(paste0( system.dir, "/Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_annotation.txt")))
@@ -146,12 +283,12 @@ ten.intermediate.original <- as.matrix(read.table(paste0( system.dir, "/Michelle
 ten.intermediate.original <- sort(unique(unlist(strsplit(ten.intermediate.original, ";"))))
 ten.intermediate.original
 
-# Find common genes between old and new stable genelists
-ten.stable.new <- stable.hypermethylation$Gene
+# Find common genes between old and new stable genelists - 10month only
+ten.stable.new <- stable.dat$Gene
 ten.stable.new <- sort(unique(unlist(strsplit(ten.stable.new, ";"))))
 # save the new stable genelist
 write.table(ten.stable.new, file=paste(system.dir, "/Michelle/MethylationData/methylatedGeneLists/", subdir,"/", type, "_", timepoint, "_stable.genelist_new.data.txt",sep=""), quote=F, row.names=F, col.names=FALSE) #row.names set to T to get the probe ids.
-stable.csc10csc1 <- as.matrix(intersect(ten.stable.original, ten.stable.new))
+stable.csc15csc1 <- as.matrix(intersect(ten.stable.original, ten.stable.new))
 colnames(stable.csc10csc1) <- "# common between old and new"
 write.table(stable.csc10csc1, file=paste(system.dir, "/Michelle/MethylationData/methylatedGeneLists/", subdir,"/", type, "_", timepoint, "_common.stable.txt",sep=""), quote=F, row.names=F, col.names=FALSE) #row.names set to T to get the probe ids.
 length(stable.csc10csc1)
@@ -164,7 +301,7 @@ unique.stable.new <- setdiff(ten.stable.new, ten.stable.original)
 write.table(unique.stable.new, paste(system.dir, "/Michelle/MethylationData/methylatedGeneLists/", subdir,"/", type, "_", timepoint, "_unique.stable.new.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
 
 # Find common genes between old and new intermediate genelists
-ten.intermediate.new <- intermediate.hypermethylation$Gene
+ten.intermediate.new <- intermediate.dat$Gene
 ten.intermediate.new <- sort(unique(unlist(strsplit(ten.intermediate.new, ";"))))
 # save the new intermediate genelist
 write.table(ten.intermediate.new, file=paste(system.dir, "/Michelle/MethylationData/methylatedGeneLists/", subdir,"/", type, "_", timepoint, "_intermediate.genelist_new.data.txt",sep=""), quote=F, row.names=F, col.names=FALSE) #row.names set to T to get the probe ids.
