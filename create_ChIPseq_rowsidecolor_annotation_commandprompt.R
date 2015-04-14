@@ -6,7 +6,7 @@
 ########
 # Usage:
 ########
-# Rscript create_ChIPseq_rowsidecolor_annotation_commandprompt.R "stable.10M" 200
+# Rscript create_ChIPseq_rowsidecolor_annotation_commandprompt.R stable.10M 200
 
 Sys.time(); print(""); print("")
 
