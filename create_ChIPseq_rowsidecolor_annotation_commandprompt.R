@@ -20,13 +20,11 @@ print(paste0("bin: ", bin.size))
 dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
 # dir <- "Z:/users/shwang26/"
 # dir<-"/amber2/scratch/baylin/shwang/"
-source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
-# source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original.R"))
-options(bitmapType='cairo') 
-# coverage_files_dir = dir,"Michelle/normalizedBED"
 
+source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
+
+options(bitmapType='cairo') 
 coverage_files_dir = paste0(dir,"Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/")
-# plot_results_dir = dir,"Michelle/BED_Files/plots/normalized/15M_stable"
 plot_results_dir = paste0(dir,"Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/outputdir/")
 dir.create(plot_results_dir)
 setwd(plot_results_dir)
