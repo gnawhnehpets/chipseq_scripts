@@ -10,14 +10,15 @@
 
 Sys.time(); print(""); print("")
 
+# Read in arguments
 args <- commandArgs(trailingOnly=TRUE)
 genelist.name <- as.character(args[1])
 bin.size <- as.numeric(args[2]) #10bp or 200bp
 print(paste0("genelist: ", genelist.name))
 print(paste0("bin: ", bin.size))
 
-
 dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
+
 # dir <- "Z:/users/shwang26/"
 # dir<-"/amber2/scratch/baylin/shwang/"
 
@@ -30,7 +31,6 @@ dir.create(plot_results_dir)
 setwd(plot_results_dir)
 getwd()
 
-# genelist.name="all"
 if(genelist.name!="all"){
      version="hg19"
      if(genelist.name=="stable.10M"){
@@ -89,7 +89,6 @@ if(genelist.name!="all"){
      goi[[1]]
 }
 
-# version = "hg19-UCSC"
 if(genelist.name=="all"){
      version=="hg19-UCSC"
      hg19ucsc <- fun.genelist.info_allGenes_biomaRt(version="hg19-UCSC", 
