@@ -12,21 +12,21 @@
 # system.dir="Z:/users/shwang26/"
 
 args <- commandArgs(trailingOnly=TRUE)
-genelist.name <- as.character(args[1])
+whichgenelist <- as.character(args[1])
 bin.size <- as.numeric(args[2]) #10bp or 200bp
-print(paste0("genelist: ", genelist.name))
+print(paste0("genelist: ", whichgenelist))
 print(paste0("bin: ", bin.size))
 
 system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
-source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
+source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_newFunctions.R"))
 
-bin.size=200
-whichgenelist="stable.10M.newdata" # CHANGE DEPENDING ON GENELIST USED
+# bin.size=200
+# whichgenelist="stable.10M.newdata" # CHANGE DEPENDING ON GENELIST USED
 
 sample.type=c("DNMT1", "EZH2", "H3", "H3K4", "H3K27", "INPUT")
 for(i in sample.type){
      output.dir <- paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/normalizedBED_",bin.size,"bp_bin/outputdir/", whichgenelist, "/", i, "/")
+     print(output.dir)
      generate_combined_avg_plots(sample.name=i, name.of.genelist=whichgenelist, bin=bin.size, outputDirectory=output.dir)
      print(i)
 }
-dir(directory)
