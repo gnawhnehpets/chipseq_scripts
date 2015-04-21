@@ -45,15 +45,3 @@ find . -name "*H3K27*.txt" -exec cp {} ./H3K27/ \;
 
 find . -name "*Input*raw.jpeg" -exec cp {} ./Input/ \;
 find . -name "*Input*.txt" -exec cp {} ./Input/ \;
-
-#for f in ${FILES}
-#do
-#    echo "FILE: $f"
-#    TOTALRAWREADS=$(wc -l < $f | grep -o "[0-9]\+")
-#    echo "total_raw_reads: ${TOTALRAWREADS}"
-#    SCALINGFACTOR=`awk 'BEGIN{printf("%0.4f", 100000000 / '$TOTALRAWREADS')}'`
-#    echo "scaling_factor:  ${SCALINGFACTOR}"
-#    echo "INPUT: ../unnormalizedBED_200bp_bin/"${f/*bin\//}"_Coverage_200bp.bed"
-#    echo "OUTPUT: "${f/*bin\//}"_Coverage_200bp_normalized_bash.BED"
-#     awk -v SF="$SCALINGFACTOR" '{print($1"\t"$2"\t"$3"\t"int($4*SF))}' ../unnormalizedBED_200bp_bin/"${f/*bin\//}"_Coverage_200bp.bed > ${f/*bin\//}"_200bp_normalized_bash.BED" 
-#done
