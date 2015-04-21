@@ -18,10 +18,12 @@ print(paste0("genelist: ", genelist.name))
 print(paste0("bin: ", bin.size))
 
 dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
-
 # dir <- "Z:/users/shwang26/"
 # dir<-"/amber2/scratch/baylin/shwang/"
-
+# bin.size=200
+# genelist.name="all"
+# genelist.name="stable.10M.newdata"
+# genelist.name="rep1.age.specific.10M.new"
 source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 
 options(bitmapType='cairo') 
@@ -76,6 +78,14 @@ if(genelist.name!="all"){
           print("stable.15M.newdata genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.15M.newdata_genelist.txt"))
      }
+     if(genelist.name=="rep1.trt.specific.10M.new"){
+          print(paste0(genelist.name, " selected"))     
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_10M_rep1_genelist.txt"))
+     }
+     if(genelist.name=="rep1.age.specific.10M.new"){
+          print(paste0(genelist.name, " selected"))     
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation_10M_rep1_genelist.txt"))
+     }
      genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
      genes <- list(unlist(genes))
      names(genes) <- genelist.name
@@ -86,11 +96,12 @@ if(genelist.name!="all"){
      })
      names(goi) <-names(genes)
      goi
-     goi[[1]]
+     dim(goi[[1]])
 }
 
 if(genelist.name=="all"){
-     version=="hg19-UCSC"
+     print("biomaRt ALL GENES genelist selected")
+     version="hg19-UCSC"
      hg19ucsc <- fun.genelist.info_allGenes_biomaRt(version="hg19-UCSC", 
                                                     hg19UCSCGeneAnnotations="hg19UCSCGeneAnnotaions.txt", 
                                                     hg19UCSCGeneAnnotationsPath=paste0(system.dir, "/Michelle/Required_Files/Annotations/hg19Data/"))
@@ -102,7 +113,7 @@ if(genelist.name=="all"){
      # goi[[1]][c(1:6),]
 #      sample(1:nrow(goi[[1]]), 500)
      # nrow(goi[[1]])
-     goi[[1]] <- goi[[1]][sample(1:nrow(goi[[1]]), 500),]
+     goi[[1]] <- goi[[1]][sample(1:nrow(goi[[1]]), 200),]
 }
 
 dim(goi[[1]])
@@ -121,8 +132,6 @@ RegAroundTSS=10000
 bin=bin.size
 chr.prefix.chromosome=T
 plot.Directory=plot_results_dir
-#plot.Directory=dir,"Michelle/BED_Files/plots"
-
 
 library(gplots, lib.loc=lib.path)
 
@@ -154,12 +163,14 @@ g=1 #for troubleshooting
 bin
 #********************CHECK chipseq-functions_original_newfunctions
 chipCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=chip.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
+head(chipCoverage.TSS)
 inputCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=input.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
-
 ## Calculate average ChIP coverage
+print("checkpoint1")
 chipCoverage.TSSAverage <- apply(chipCoverage.TSS, 1, mean, na.rm=T)
 chipCoverage.TSSAverageList[[g]] <- chipCoverage.TSSAverage
 names(chipCoverage.TSSAverageList)[g] <- paste(i, names(genelist.info)[g], sep="-")
+print("checkpoint2")
 #chipCoverage.TSSAverageList
 ## Calculate average input coverage
 inputCoverage.TSSAverage <- apply(inputCoverage.TSS, 1, mean, na.rm=T)
@@ -167,16 +178,27 @@ inputCoverage.TSSAverage <- apply(inputCoverage.TSS, 1, mean, na.rm=T)
 inputCoverage.TSSAverage <- replace(inputCoverage.TSSAverage, which(inputCoverage.TSSAverage == 0), min(inputCoverage.TSSAverage[which(inputCoverage.TSSAverage != 0)]))
 inputCoverage.TSSAverageList[[g]] <- inputCoverage.TSSAverage
 names(inputCoverage.TSSAverageList)[g] <- paste(i, names(genelist.info)[g], sep="-")
-
+print("checkpoint3")
 # Plot coverage (raw seq reads and ratio to input of seq reads) as heatmap plot
 # Generate matices for heatmaps
 x.trnposed <- t(chipCoverage.TSS)
 ratioToInp.x.trnposed <- t(chipCoverage.TSS/inputCoverage.TSSAverage) #ratio of seq reads to average of input for this set of genes
-
+dim(x.trnposed)
+head(x.trnposed)
+dim(ratioToInp.x.trnposed)
+int
 colnames(x.trnposed) <- colnames(ratioToInp.x.trnposed) <- int
+print("checkpoint4")
 #write.table(int, file=paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_",bin,"bp-2.txt"), row.names=FALSE, col.names=FALSE, sep="\t")
 #rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$hgnc_symbol
-rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$Gene
+dim(x.trnposed)
+head(x.trnposed)
+dim(ratioToInp.x.trnposed)
+head(ratioToInp.x.trnposed)
+
+as.numeric(x.trnposed[,1])
+
+# rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$Gene
 numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x.trnposed, na.rm=T)[2]))
 numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(ratioToInp.x.trnposed, na.rm=T)[2]))
 
@@ -185,28 +207,36 @@ dim(x.trnposed)
 # trnposed200 <- x.trnposed
 dim(x.trnposed[complete.cases(x.trnposed),])
 dim(x.trnposed)
+x.trnposed <- x.trnposed[complete.cases(x.trnposed),]
+print("checkpoint5")
+
 jpeg(paste0(genelist.name,"_heatmap.",bin.size,"bp_h3k4.test.jpeg"), height=600, width=900, quality=100)
 # heatmap.x <- heatmap.2(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
-heatmap.x <- heatmap.3(x.trnposed[complete.cases(x.trnposed),], 
+heatmap.x <- heatmap.3(x.trnposed, 
                        Rowv=T, 
                        Colv=F, 
                        scale="none", 
                        col=numberOfColors.x.trnposed, 
                        trace="none", 
                        dendrogram="row", 
-                       cexRow=1, 
+                       cexRow=.5, 
                        main="Heatmap of raw seq reads", na.rm=TRUE)
 dev.off()
-
+print("checkpoint6")
 
 # heatmap.x <- heatmap.3(x.trnposed)
-names(heatmap.x)
-heatmap.x$rowDendrogram
-heatmap.x$rowInd
-hm <- as.hclust(heatmap.x$rowDendrogram)
-#names(hm)
-#hm$order
+# names(heatmap.x)
+# class(heatmap.x$rowDendrogram)
+# heatmap.x$rowInd
+# hm <- as.hclust(as.dendrogram(heatmap.x$rowDendrogram))
+# length(as.dendrogram(heatmap.x$rowDendrogram))
+# heatmap.x$rowDendrogram
+# class(heatmap.x$rowDendrogram)
+
+hm <- as.hclust(as.dendrogram(heatmap.x$rowDendrogram))
+print("checkpoint7")
 cut <- cutree(hm, k=4)
+print("checkpoint8")
 #dendrogram.order <- cut[hm$order]
 dendrogram.order <- cut
 length(dendrogram.order)
@@ -350,3 +380,12 @@ save(c10d.10M.ann.bar, file=paste0("c10d_",genelist.name,"_",bin,"bp_ann.bar.Rda
 
 heatmap.3(x.trnposed_c10d.h3k27, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, RowSideColors=c10d.10M.ann.bar, trace="none", dendrogram="row", cexRow=.2, main="Heatmap of raw seq reads", na.rm=TRUE)
 
+
+# names <- c("apple", "bear", "cat", "dog")
+# x <- sapply(1:4, FUN=function(y){
+#      mat <- matrix(rnorm(10, mean=0, sd=2))
+#      colnames(mat) <- names[y]
+#      print(colnames(mat))
+#      return(mat)
+#  })
+# x
