@@ -1,3 +1,14 @@
+##########
+# Purpose:
+##########
+# To generate visualization tools for chip-seq peak calls data based on genelists
+
+########
+# Usage:
+########
+
+# Rscript chipseq_script_commandprompt.R stable.10M.newdata normalized 200 FALSE
+
 # Read in chipseq functions and genelist annotations
 print(Sys.time())
 system.dir='/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/'
@@ -7,22 +18,16 @@ system.dir='/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/sh
 source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
 options(bitmapType='cairo') 
 
-########
-# Usage:
-########
-
-# Rscript chipseq_script_commandprompt.R stable.10M.newdata normalized 200
-
-
-
 # Read in arguments
 args <- commandArgs(trailingOnly=TRUE)
 genelist.name <- as.character(args[1])
 whichdata <- as.character(args[2])
 bin.size <- as.numeric(args[3]) #10bp or 200bp
+which.rowsideann <- as.character(args[4]) #FALSE or TRUE to rowside.ann
 print(paste0("genelist: ", genelist.name))
 print(paste0("norm?: ", whichdata))
 print(paste0("bin: ", bin.size))
+print(paste0("rowside.ann?: ", which.rowsideann))
 
 # Set arguments
 # bin.size=200 #10bp or 200bp
@@ -39,7 +44,6 @@ print(paste0("bin: ", bin.size))
 # genelist.name <- "intermediate.10M.newdata"
 # genelist.name <- ""
 #whichdata <- "normalized"
-
 
 if(genelist.name=="all"){
      print("all genes requested")
@@ -92,32 +96,42 @@ if(genelist.name=="all"){
           print("stable.15M.newdata genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.15M.newdata_genelist.txt"))
      }
+     if(genelist.name=="rep1.trt.specific.10M.new"){
+          print("rep1.trt.specific.10M.new genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_10M_rep1_genelist.txt"))
+     }
+     if(genelist.name=="rep1.age.specific.10M.new"){
+          print("rep1.age.specific.10M.new genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation_10M_rep1_genelist.txt"))
+     }
+     
      plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/",genelist.name,"/")
      plot_results_dir
      
-     
-     if(bin.size==200){
-       h3k4.maxbreak=1500
-       h3k27.maxbreak=250
-       dnmt.maxbreak=50
-       ezh2.maxbreak=120
-       inp.maxbreak=50
-       h3.maxbreak=50
-     }
-     if(bin.size==10){
-       h3k4.maxbreak=350
-       h3k27.maxbreak=70
-       dnmt.maxbreak=25
-       ezh2.maxbreak=50
-       inp.maxbreak=50
-       h3.maxbreak=25
-     }
      # Read in genelist
      genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
      genes <- list(unlist(genes))
      names(genes) <- genelist.name
+     genes
 }
-genes
+
+if(bin.size==200){
+     h3k4.maxbreak=1500
+     h3k27.maxbreak=250
+     dnmt.maxbreak=50
+     ezh2.maxbreak=120
+     inp.maxbreak=50
+     h3.maxbreak=50
+}
+if(bin.size==10){
+     h3k4.maxbreak=350
+     h3k27.maxbreak=70
+     dnmt.maxbreak=25
+     ezh2.maxbreak=50
+     inp.maxbreak=50
+     h3.maxbreak=25
+}
+
 #####################################################################################################################
 # Location of normalized BED files
 # Create directory if !exist
@@ -143,6 +157,7 @@ if(version=="hg19-UCSC"){
      datlist <- list()
      datlist[[1]] <- as.data.frame(dat)
      goi <- datlist
+     goi[[1]] <- goi[[1]][sample(1:nrow(goi[[1]]), 200),]
 }
 
 #Retain one entry per gene (hgnc_symbol)
@@ -178,7 +193,7 @@ coverage_files <- dir(coverage_files_dir)[grep("C10D", dir(coverage_files_dir))[
 coverage_files
 input_coverage_file = coverage_files[6]
 input_coverage_file
-fun.average_heat.plots(genelist.info=goi, coverage_files=coverage_files, input_coverage_file=input_coverage_file, coverage_files.dir=coverage_files_dir, RegAroundTSS=10000, bin=bin.size, chr.prefix.chromosome=T, plot.Directory=paste0(plot_results_dir, "C10D"), version=version, whichgenelist=genelist.name, h3k4.max=h3k4.maxbreak, h3k27.max=h3k27.maxbreak, dnmt.max=dnmt.maxbreak, ezh2.max=ezh2.maxbreak, inp.max=inp.maxbreak, h3.max=h3.maxbreak)
+fun.average_heat.plots(genelist.info=goi, coverage_files=coverage_files, input_coverage_file=input_coverage_file, coverage_files.dir=coverage_files_dir, RegAroundTSS=10000, bin=bin.size, chr.prefix.chromosome=T, plot.Directory=paste0(plot_results_dir, "C10D"), version=version, whichgenelist=genelist.name, h3k4.max=h3k4.maxbreak, h3k27.max=h3k27.maxbreak, dnmt.max=dnmt.maxbreak, ezh2.max=ezh2.maxbreak, inp.max=inp.maxbreak, h3.max=h3.maxbreak, rowside.ann=which.rowside.ann)
 
 # CSC10D
 coverage_files = dir(coverage_files_dir)[grep("C10D", dir(coverage_files_dir))[7:12]]
