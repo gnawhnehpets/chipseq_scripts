@@ -14,8 +14,10 @@ Sys.time(); print(""); print("")
 args <- commandArgs(trailingOnly=TRUE)
 genelist.name <- as.character(args[1])
 bin.size <- as.numeric(args[2]) #10bp or 200bp
+which.rowsideann <- as.character(args[3]) #TRUE or FALSE for rowside.annotation
 print(paste0("genelist: ", genelist.name))
 print(paste0("bin: ", bin.size))
+print(paste0("rowsideann?: ", which.rowsideann))
 
 dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
 # dir <- "Z:/users/shwang26/"
@@ -24,7 +26,7 @@ dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26
 # genelist.name="all"
 # genelist.name="stable.10M.newdata"
 # genelist.name="rep1.age.specific.10M.new"
-source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
+source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_newFunctions.R"))
 
 options(bitmapType='cairo') 
 coverage_files_dir = paste0(dir,"Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/")
@@ -192,11 +194,12 @@ print("checkpoint4")
 #write.table(int, file=paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_",bin,"bp-2.txt"), row.names=FALSE, col.names=FALSE, sep="\t")
 #rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$hgnc_symbol
 dim(x.trnposed)
-head(x.trnposed)
 dim(ratioToInp.x.trnposed)
+head(x.trnposed)
 head(ratioToInp.x.trnposed)
 
-as.numeric(x.trnposed[,1])
+head(x.trnposed)
+head(ratioToInp.x.trnposed)
 
 # rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$Gene
 numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x.trnposed, na.rm=T)[2]))
@@ -210,18 +213,37 @@ dim(x.trnposed)
 x.trnposed <- x.trnposed[complete.cases(x.trnposed),]
 print("checkpoint5")
 
-jpeg(paste0(genelist.name,"_heatmap.",bin.size,"bp_h3k4.test.jpeg"), height=600, width=900, quality=100)
-# heatmap.x <- heatmap.2(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
-heatmap.x <- heatmap.3(x.trnposed, 
-                       Rowv=T, 
-                       Colv=F, 
-                       scale="none", 
-                       col=numberOfColors.x.trnposed, 
-                       trace="none", 
-                       dendrogram="row", 
-                       cexRow=.5, 
-                       main="Heatmap of raw seq reads", na.rm=TRUE)
-dev.off()
+# x.trnposed.sum <- x.trnposed[rev(order(rowSums(x.trnposed))),]
+x.trnposed.sum <- x.trnposed[order(rowSums(x.trnposed)),]
+order(rowSums(x.trnposed))
+
+
+if(which.rowsideann==FALSE){
+     jpeg(paste0(genelist.name,"_heatmap.",bin.size,"bp_h3k4.test_no.ann.jpeg", height=600, width=900, quality=100)
+     heatmap.x <- heatmap.3(x.trnposed.sum, 
+                            Rowv=F, 
+                            Colv=F, 
+                            scale="none",
+                            dendrogram="none",
+                            col=numberOfColors.x.trnposed, 
+                            trace="none",  
+                            cexRow=.5, 
+                            main="Heatmap of raw seq reads", na.rm=TRUE)
+     dev.off()
+}else{
+     jpeg(paste0(genelist.name,"_heatmap.",bin.size,"bp_h3k4.test.jpeg", height=600, width=900, quality=100)
+     # heatmap.x <- heatmap.2(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
+     heatmap.x <- heatmap.3(x.trnposed, 
+                            Rowv=T, 
+                            Colv=F, 
+                            scale="none", 
+                            col=numberOfColors.x.trnposed, 
+                            trace="none", 
+                            dendrogram="row", 
+                            cexRow=.5, 
+                            main="Heatmap of raw seq reads", na.rm=TRUE)
+     dev.off()
+}
 print("checkpoint6")
 
 # heatmap.x <- heatmap.3(x.trnposed)
