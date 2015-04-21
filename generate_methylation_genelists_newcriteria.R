@@ -115,11 +115,11 @@ cbind(tss$c1, tss$csc1)
 #Get CpG island probes that get methylated specifically upon further exposure 
 #abs() <= 0.05 will pick probes that do not undergo much changes in methylation upon culturing/ageing.
 #treatment specific (de)methylation
-genelist.name="treatment.specific.hypermethylation_stable.1M.newdata"
+genelist.name="treatment.specific.hypermethylation_1M"
 stable.1M.treatment.hypermethylation <- tss[which((tss$csc1-tss$c1)>=.2),]  #stable.1M.newdata
 stable.1M.treatment.hypermethylation.genelist <- get.genelist(stable.1M.treatment.hypermethylation)
 dim(stable.1M.treatment.hypermethylation)
-genelist.name="treatment.specific.hypomethylation_stable.1M.newdata"
+genelist.name="treatment.specific.hypomethylation_1M"
 stable.1M.treatment.hypomethylation <- tss[which((tss$csc1-tss$c1)<=-.2),]  #stable.1M.newdata 
 stable.1M.treatment.hypomethylation.genelist <- get.genelist(stable.1M.treatment.hypomethylation)
 dim(stable.1M.treatment.hypomethylation)
