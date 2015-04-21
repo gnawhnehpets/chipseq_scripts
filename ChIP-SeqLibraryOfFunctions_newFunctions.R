@@ -646,7 +646,7 @@ fun.genelist.info_allGenes_biomaRt <- function(version, hg19UCSCGeneAnnotations=
 
 fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage_file, coverage_files.dir, RegAroundTSS, bin, chr.prefix.chromosome, plot.Directory, whichgenelist="stable.10M", logHeatmap=F, colRangeHeatmap="white-black", version, 
                                    h3k4.max=1500, h3k27.max=250, dnmt.max=50, ezh2.max=120, inp.max=50, h3.max=50, 
-                                   h3k4.rat.max=250, h3k27.rat.max=40, dnmt.rat.max=7, ezh2.rat.max=30, inp.rat.max=7, h3.rat.max=7, rowside.ann=FALSE
+                                   h3k4.rat.max=250, h3k27.rat.max=40, dnmt.rat.max=7, ezh2.rat.max=30, inp.rat.max=7, h3.rat.max=7, which.rowsideann=FALSE
                                    ){
     # Plots the coverage data as raw reads and ratio plots around the TSS as average plot and heatmap
     # genelist.info is a list of dataframes containing the required info for the genes of interest (the 
@@ -746,7 +746,6 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.trt.specific.10M.new_",bin,"bp_ann.bar.Rdata"))
                custom.annotation <- c10d.10M.ann.bar
           }
-          
      #      universal
      #      print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_",whichgenelist,"_",bin,"bp_ann.bar.Rdata"))
      #      load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_",whichgenelist,"_",bin,"bp_ann.bar.Rdata"))
@@ -814,12 +813,14 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     names(inputCoverage.TSSAverageList)[g] <- paste(i, names(genelist.info)[g], sep="-")
                     
                     # Plot coverage (raw seq reads and ratio to input of seq reads) as heatmap plot
-                    ## Create plot name for raw heatmaps
-                    heat_plot_raw <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_raw.jpeg", sep="-"))
-                    
-                    ## Create plot name for RATIO heatmaps
-                    heat_plot_RATIO <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_RATIO.jpeg", sep="-"))
-                    
+                    ## Create plot name for raw & ratio heatmaps
+                    if(which.rowsideann){
+                         heat_plot_raw <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_raw.jpeg", sep="-"))
+                         heat_plot_RATIO <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_RATIO.jpeg", sep="-"))
+                    }else{
+                         heat_plot_raw <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_raw_no.annotation.jpeg", sep="-"))
+                         heat_plot_RATIO <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_RATIO_no.annotation.jpeg", sep="-"))
+                    }
                     # Generate matices for heatmaps
                     x.trnposed <- t(chipCoverage.TSS)
                     # remove NA values to account for missing values in 10bp bin
@@ -842,6 +843,13 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     #numberOfColors.x.trnposed <- colorRampPalette(c("black", "white"))(round(range(x.trnposed, na.rm=T)[2]))
                     numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x.trnposed, na.rm=T)[2]))
                     numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(ratioToInp.x.trnposed, na.rm=T)[2]))
+
+                    #Sort rows by total read count, no clustering
+                    # x.trnposed.sum <- x.trnposed[rev(order(rowSums(x.trnposed))),]
+                    x.trnposed.sum <- x.trnposed[order(rowSums(x.trnposed)),]
+                    ratioToInp.x.trnposed.sum <- ratioToInp.x.trnposed[order(rowSums(ratioToInp.x.trnposed)),]
+                    order(rowSums(x.trnposed))
+                    order(rowSums(ratioToInp.x.trnposed))
                     
                     # JPEG plots because pdf sizes are too huge
                     ## Raw heatmap
@@ -890,30 +898,53 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                          breaks=seq(0, h3.max, by=h3.increment) #100 values
                          breaks2=seq(0, h3.rat.max, by=h3.rat.increment) #100 values
                     }
-                    print(dim(x.trnposed))
                     mycol <- colorpanel(n=length(breaks)-1,low="gray100",mid="gray50",high="gray0")
-                    print("raw heatmap")
-                    jpeg(heat_plot_raw, height = 500, width = 800, quality=100)
-                    if(which.rowsideann){
-                         heatmap.3(x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
-                    }else{
-                         heatmap.3(x.trnposed, Rowv=T, Colv=F, col=mycol, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                    print(dim(x.trnposed))
+                    print(dim(x.trnposed.sum))
+                    print(paste0("WHICH.ROWSIDEANN: ", which.rowsideann))
+                    if(which.rowsideann==FALSE){
+                         print("raw heatmap")
+                         jpeg(heat_plot_raw, height=500, width=800, quality=100)
+                         heatmap.3(x.trnposed.sum, Rowv=F, Colv=F, col=mycol, scale="none", trace="none", dendrogram="none", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                         dev.off()
+                         print("ratio heatmap")
+                         jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
+                         heatmap.3(ratioToInp.x.trnposed.sum, Rowv=F, Colv=F, col=mycol, scale="none", trace="none", dendrogram="none", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                         dev.off()
                     }
-#                       heatmap.3(x.trnposed, Rowv=T, Colv=F, col=numberOfColors.x.trnposed, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", cexRow=0.2, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE)
-                    dev.off()
+                    if(which.rowsideann==TRUE){
+                         print("raw heatmap")
+                         jpeg(heat_plot_raw, height=500, width=800, quality=100)
+                         heatmap.3(x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                         dev.off()
+                         print("ratio heatmap")
+                         jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
+                         heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                         dev.off()
+                    }
+                    
+                    
+#                     
+#                     jpeg(heat_plot_raw, height = 500, width = 800, quality=100)
+#                     if(which.rowsideann){
+#                          heatmap.3(x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+#                     }else{
+#                          heatmap.3(x.trnposed, Rowv=T, Colv=F, col=mycol, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+#                     }
+# #                       heatmap.3(x.trnposed, Rowv=T, Colv=F, col=numberOfColors.x.trnposed, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", cexRow=0.2, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE)
+#                     dev.off()
                     
                     ## Ratio heatmap
-                    print("ratio heatmap")
-                    
-                    jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
-#                     heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.ratioToInp.x.trnposed, trace="none", RowSideColors=custom.annotation, dendrogram="row", cexRow=0.2, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
-                    if(which.rowsideann){
-                         heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
-                    }else{
-                         heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, scale="none", trace="none", dendrogram="row", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
-                    }
-                    #         heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE)
-                    dev.off()
+#                     print("ratio heatmap")
+#                     jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
+# #                     heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.ratioToInp.x.trnposed, trace="none", RowSideColors=custom.annotation, dendrogram="row", cexRow=0.2, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+#                     if(which.rowsideann){
+#                          heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+#                     }else{
+#                          heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, scale="none", trace="none", dendrogram="row", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+#                     }
+#                     #         heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE)
+#                     dev.off()
                     
                } else {
                     # These vectors with NA created as a placeholder in the lists for the plot functions below to work smoothly. This is generated if coverage data for at least two genes is not present.
