@@ -458,8 +458,9 @@ fun.genelist.info <- function(goi.list, genelist.names, goi.list.type, version){
      if(version=="hg18"){
           print("version hg18")
           #listMarts(host="may2009.archive.ensembl.org", path="/biomart/martservice",archive=FALSE)
-          ensembl54 = useMart(host="may2009.archive.ensembl.org", biomart="ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl") #Get the hg18 version in biomart
           #listAttributes(ensembl54); #listFilters(ensembl54)
+#           ensembl54 = useMart(host="may2009.archive.ensembl.org", biomart="ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl") #Get the hg18 version in biomart
+          ensembl54 = useMart(host="www.ensembl.org", biomart="ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl") #Get the hg18 version in biomart
           x <- list()
           for(i in 1:length(goi.list)){
                genelist <- unique(goi.list[[i]])
@@ -669,87 +670,97 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
      custom.annotation <- vector()
      if(which.rowsideann){
           # load custom annotation bar (created from create_ChIPseq_rowsidecolor_annotation.R)
-          if(whichgenelist=="all"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_all_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_all_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          
-          if(whichgenelist=="stable.10M"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="intermediate.10M"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="stable.10M.new"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.new_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.new_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="intermediate.10M.new"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.new_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.new_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="highly.expressed"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_highly.expressed_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_highly.expressed_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="viral.defense"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_viral.defense_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_viral.defense_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="age.dependent"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_age.dependent_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_age.dependent_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="stable.1M.newdata"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.1M.newdata_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.1M.newdata_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="stable.6M.newdata"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.6M.newdata_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.6M.newdata_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="stable.10M.newdata"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.newdata_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.newdata_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="stable.15M.newdata"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.15M.newdata_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.15M.newdata_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          
-          if(whichgenelist=="intermediate.10M.newdata"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.newdata_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.newdata_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="rep1.age.specific.10M.new"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.age.specific.10M.new_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.age.specific.10M.new_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
-          if(whichgenelist=="rep1.trt.specific.10M.new"){
-               print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.trt.specific.10M.new_",bin,"bp_ann.bar.Rdata"))
-               load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.trt.specific.10M.new_",bin,"bp_ann.bar.Rdata"))
-               custom.annotation <- c10d.10M.ann.bar
-          }
+#           if(whichgenelist=="all"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_all_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_all_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           
+#           if(whichgenelist=="stable.10M"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="intermediate.10M"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="stable.10M.new"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="intermediate.10M.new"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="highly.expressed"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_highly.expressed_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_highly.expressed_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="viral.defense"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_viral.defense_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_viral.defense_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="age.dependent"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_age.dependent_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_age.dependent_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="stable.1M.newdata"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.1M.newdata_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.1M.newdata_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="stable.6M.newdata"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.6M.newdata_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.6M.newdata_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="stable.10M.newdata"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.newdata_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.10M.newdata_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="stable.15M.newdata"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.15M.newdata_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_stable.15M.newdata_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           
+#           if(whichgenelist=="intermediate.10M.newdata"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.newdata_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_intermediate.10M.newdata_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="rep1.age.specific.stable.10M.new"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.age.specific.stable.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.age.specific.stable.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="rep1.trt.specific.stable.10M.new"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.trt.specific.stable.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.trt.specific.stable.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="rep1.age.specific.10M.new"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.age.specific.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.age.specific.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
+#           if(whichgenelist=="rep1.trt.specific.10M.new"){
+#                print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.trt.specific.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_rep1.trt.specific.10M.new_",bin,"bp_ann.bar.Rdata"))
+#                custom.annotation <- c10d.10M.ann.bar
+#           }
      #      universal
-     #      print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_",whichgenelist,"_",bin,"bp_ann.bar.Rdata"))
-     #      load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_",whichgenelist,"_",bin,"bp_ann.bar.Rdata"))
-     #      custom.annotation <- c10d.10M.ann.bar
+          print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_",whichgenelist,"_",bin,"bp_ann.bar.Rdata"))
+          load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_",whichgenelist,"_",bin,"bp_ann.bar.Rdata"))
+          custom.annotation <- c10d.10M.ann.bar
           
           custom.annotation
      }
@@ -903,6 +914,12 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     print(dim(x.trnposed.sum))
                     print(paste0("WHICH.ROWSIDEANN: ", which.rowsideann))
                     if(which.rowsideann==FALSE){
+                         if(genelist.name=="all"){
+                              x.trnposed.sum <- x.trnposed.sum[c((nrow(x.trnposed.sum)/2):nrow(x.trnposed.sum)), ]     
+                              ratioToInp.x.trnposed.sum <- ratioToInp.x.trnposed.sum[c((nrow(ratioToInp.x.trnposed.sum)/2):nrow(ratioToInp.x.trnposed.sum)), ]     
+                         }
+                         print(paste0("# of rows x.trnposed: ", nrow(x.trnposed)))
+                         print(paste0("# of rows x.trnposed/2: ", nrow(x.trnposed)/2))
                          print("raw heatmap")
                          jpeg(heat_plot_raw, height=500, width=800, quality=100)
                          heatmap.3(x.trnposed.sum, Rowv=F, Colv=F, col=mycol, scale="none", trace="none", dendrogram="none", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
