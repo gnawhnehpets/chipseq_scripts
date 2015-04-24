@@ -24,14 +24,16 @@ dir<-"/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26
 # dir<-"/amber2/scratch/baylin/shwang/"
 # bin.size=200
 # genelist.name="all"
-# genelist.name="stable.10M.newdata"
 # genelist.name="rep1.age.specific.10M.new"
+# genelist.name="stable.10M.newdata"
+# bin.size=200
+# which.rowsideann=TRUE
 source(paste0(dir,"Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_newFunctions.R"))
 
 options(bitmapType='cairo') 
 coverage_files_dir = paste0(dir,"Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/")
 plot_results_dir = paste0(dir,"Michelle/BED_files/Coverage_TSS_", bin.size, "bp_bin/normalizedBED_", bin.size, "bp_bin/outputdir/")
-dir.create(plot_results_dir)
+dir.create(paste0(plot_results_dir,genelist.name))
 setwd(plot_results_dir)
 getwd()
 
@@ -80,14 +82,23 @@ if(genelist.name!="all"){
           print("stable.15M.newdata genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.15M.newdata_genelist.txt"))
      }
-     if(genelist.name=="rep1.trt.specific.10M.new"){
+     if(genelist.name=="rep1.trt.specific.stable.10M.new"){
           print(paste0(genelist.name, " selected"))     
-          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_10M_rep1_genelist.txt"))
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation.stable_10M_rep1_genelist.txt"))
      }
-     if(genelist.name=="rep1.age.specific.10M.new"){
+     if(genelist.name=="rep1.age.specific.stable.10M.new"){
           print(paste0(genelist.name, " selected"))     
-          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation_10M_rep1_genelist.txt"))
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation.stable_10M_rep1_genelist.txt"))
      }
+     if(genelist.name=="rep1.trt.specific.intermediate.10M.new"){
+          print(paste0(genelist.name, " selected"))     
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation.intermediate_10M_rep1_genelist.txt"))
+     }
+     if(genelist.name=="rep1.age.specific.intermediate.10M.new"){
+          print(paste0(genelist.name, " selected"))     
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation.intermediate_10M_rep1_genelist.txt"))
+     }
+     
      genes <- as.list(sort(unique(unlist(strsplit(unlist(as.matrix(genes)), ";")))))
      genes <- list(unlist(genes))
      names(genes) <- genelist.name
@@ -219,7 +230,7 @@ order(rowSums(x.trnposed))
 
 
 if(which.rowsideann==FALSE){
-     jpeg(paste0(genelist.name,"_heatmap.",bin.size,"bp_h3k4.test_no.ann.jpeg", height=600, width=900, quality=100)
+     jpeg(paste0(genelist.name,"_heatmap.",bin.size,"bp_h3k4.test_no.ann.jpeg", height=600, width=900, quality=100))
      heatmap.x <- heatmap.3(x.trnposed.sum, 
                             Rowv=F, 
                             Colv=F, 
@@ -231,7 +242,7 @@ if(which.rowsideann==FALSE){
                             main="Heatmap of raw seq reads", na.rm=TRUE)
      dev.off()
 }else{
-     jpeg(paste0(genelist.name,"_heatmap.",bin.size,"bp_h3k4.test.jpeg", height=600, width=900, quality=100)
+     jpeg(paste0(genelist.name,"_heatmap.",bin.size,"bp_h3k4.test.jpeg", height=600, width=900, quality=100))
      # heatmap.x <- heatmap.2(x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.x.trnposed, trace="none", dendrogram="row", cexRow=0.2, main="Heatmap of raw seq reads", na.rm=TRUE)
      heatmap.x <- heatmap.3(x.trnposed, 
                             Rowv=T, 
