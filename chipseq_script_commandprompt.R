@@ -31,8 +31,6 @@ print(paste0("bin: ", bin.size))
 print(paste0("rowside.ann?: ", which.rowside.ann))
 
 # Set arguments
-# bin.size=200 #10bp or 200bp
-
 # genelists
 # genelist.name <- "stable.10M"
 # genelist.name <- "stable.10M.new"
@@ -43,15 +41,16 @@ print(paste0("rowside.ann?: ", which.rowside.ann))
 # genelist.name <- "all"
 # genelist.name <- "stable.10M.newdata"
 # genelist.name <- "intermediate.10M.newdata"
-# genelist.name <- ""
-#whichdata <- "normalized"
-
+# genelist.name <- "rep1.age.specific.stable.10M.new"
+# whichdata <- "normalized"
+# bin.size=200 #10bp or 200bp
 if(genelist.name=="all"){
      print("all genes requested")
      plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/",genelist.name,"/")
      plot_results_dir
      version="hg19-UCSC"
 }else{
+     print(paste0("genelist: ", genelist.name))
      version="hg19"
      if(genelist.name=="stable.10M"){
           print("stable.10M genelist selected")
@@ -73,37 +72,45 @@ if(genelist.name=="all"){
           print("highly.expressed genelist selected")
           genes <- read.table(paste0(system.dir, "Michelle/MethylationData/otherGenelists/list of high expression genes.txt"))
      }
-     if(genelist.name=="age.dependent"){
+     if(genelist.name=="age.dependent"){ #filtered Ash's processed data --> delta beta > 0.4 
           print("age.dependent genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/aging.dependent.methylated.genes_1M10M.txt"))
      }
-     if(genelist.name=="intermediate.10M.newdata"){
+     if(genelist.name=="intermediate.10M.newdata"){ #Ash's metric
           print("intermediate.10M.newdata genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_10M_intermediate.genelist_new.data.txt"))
      }
-     if(genelist.name=="stable.1M.newdata"){
+     if(genelist.name=="stable.1M.newdata"){ #Ash's metric
           print("stable.1M.newdata genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.1M.newdata_genelist.txt"))
      }
-     if(genelist.name=="stable.6M.newdata"){
+     if(genelist.name=="stable.6M.newdata"){ #Ash's metric
           print("stable.6M.newdata genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.6M.newdata_genelist.txt"))
      }
-     if(genelist.name=="stable.10M.newdata"){
+     if(genelist.name=="stable.10M.newdata"){ #Ash's metric
           print("stable.10M.newdata genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.10M.newdata_genelist.txt"))
      }
-     if(genelist.name=="stable.15M.newdata"){
+     if(genelist.name=="stable.15M.newdata"){ #Ash's metric
           print("stable.15M.newdata genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.15M.newdata_genelist.txt"))
      }
-     if(genelist.name=="rep1.trt.specific.10M.new"){
-          print("rep1.trt.specific.10M.new genelist selected")
-          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_10M_rep1_genelist.txt"))
+     if(genelist.name=="rep1.trt.specific.stable.10M.new"){
+          print("rep1.trt.specific.stable.10M.new genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation.stable_10M_rep1_genelist.txt"))
      }
-     if(genelist.name=="rep1.age.specific.10M.new"){
+     if(genelist.name=="rep1.age.specific.stable.10M.new"){
           print("rep1.age.specific.10M.new genelist selected")
-          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation_10M_rep1_genelist.txt"))
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation.stable_10M_rep1_genelist.txt"))
+     }
+     if(genelist.name=="rep1.trt.specific.intermediate.10M.new"){
+          print("rep1.trt.specific.intermediate.10M.new genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation.intermediate_10M_rep1_genelist.txt"))
+     }
+     if(genelist.name=="rep1.age.specific.intermediate.10M.new"){
+          print("rep1.age.specific.intermediate.10M.new genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation.intermediate_10M_rep1_genelist.txt"))
      }
      
      plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/",genelist.name,"/")
@@ -117,12 +124,22 @@ if(genelist.name=="all"){
 }
 
 if(bin.size==200){
-     h3k4.maxbreak=1500
-     h3k27.maxbreak=250
-     dnmt.maxbreak=50
-     ezh2.maxbreak=120
-     inp.maxbreak=50
-     h3.maxbreak=50
+     if(genelist.name=="all"){
+          h3k4.maxbreak=1000
+          h3k27.maxbreak=180
+          dnmt.maxbreak=50
+          ezh2.maxbreak=120
+          inp.maxbreak=50
+          h3.maxbreak=50
+          
+     }else{
+          h3k4.maxbreak=1500
+          h3k27.maxbreak=250
+          dnmt.maxbreak=50
+          ezh2.maxbreak=120
+          inp.maxbreak=50
+          h3.maxbreak=50          
+     }
 }
 if(bin.size==10){
      h3k4.maxbreak=350
@@ -158,7 +175,7 @@ if(version=="hg19-UCSC"){
      datlist <- list()
      datlist[[1]] <- as.data.frame(dat)
      goi <- datlist
-     goi[[1]] <- goi[[1]][sample(1:nrow(goi[[1]]), 200),]
+#     goi[[1]] <- goi[[1]][sample(1:nrow(goi[[1]]), 200),]
 }
 
 #Retain one entry per gene (hgnc_symbol)
