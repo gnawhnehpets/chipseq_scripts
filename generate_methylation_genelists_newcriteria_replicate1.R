@@ -99,7 +99,7 @@ type <- "TSS"
 head(beta.tab_CpGI.PlusMinus1500_TSS)
 
 tss <- beta.tab_CpGI.PlusMinus1500_TSS
-tss_reorder <- cbind.data.frame(tss$unt.1, tss$csc.1, tss$unt.6, tss$csc.6, tss$unt.10, tss$csc.10, tss$unt.15, tss$csc.15)
+tss_reorder <- cbind.data.frame(tss$C.1M, tss$CSC.1M, tss$C.6M, tss$CSC.6M, tss$C.10M, tss$CSC.10M, tss$C.15M, tss$CSC.15M)
 colnames(tss_reorder) <- c("c1", "csc1", "c6", "csc6", "c10", "csc10", "c15", "csc15")
 tss <- tss_reorder
 colnames(tss)
@@ -143,10 +143,12 @@ write.table(age.specific.hypermethylation.6M.genelist, paste(newdir,"/TSS_", gen
 length(age.specific.hypermethylation.6M.true.genelist); length(age.specific.hypermethylation.6M.false.genelist); length(age.specific.hypermethylation.6M.genelist)
 age.specific.hypermethyation.6M.probes <- setdiff(age.specific.hypermethylation.6M.true, age.specific.hypermethylation.6M.false)
 age.specific.hypermethyation.6M.beta <- tss[age.specific.hypermethyation.6M.probes,]
-dat <- get.genelist(age.specific.hypermethyation.6M.beta)
-length(unique(dat))
-head(age.specific.hypermethyation.6M.beta)
-
+if(dim(age.specific.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="age.specific.hypomethylation.intermediate_6M_rep1"
 age.specific.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=-.2 & (tss$csc6-tss$csc1)<=.2),])
@@ -158,9 +160,12 @@ write.table(age.specific.hypomethylation.6M.genelist, paste(newdir,"/TSS_", gene
 length(age.specific.hypomethylation.6M.true.genelist); length(age.specific.hypomethylation.6M.false.genelist); length(age.specific.hypomethylation.6M.genelist)
 age.specific.hypomethyation.6M.probes <- setdiff(age.specific.hypomethylation.6M.true, age.specific.hypomethylation.6M.false)
 age.specific.hypomethyation.6M.beta <- tss[age.specific.hypomethyation.6M.probes,]
-dat <- get.genelist(age.specific.hypomethyation.6M.beta)
-length(unique(dat))
-head(age.specific.hypomethyation.6M.beta)
+if(dim(age.specific.hypomethyation.6M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypomethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)   
+}else{
+     print("No data: ", genelist.name)
+}
 
 #treatment specific (de)methylation
 genelist.name="treatment.specific.hypermethylation.intermediate_6M_rep1"
@@ -173,9 +178,12 @@ write.table(treatment.specific.hypermethylation.6M.genelist, paste(newdir,"/TSS_
 length(treatment.specific.hypermethylation.6M.true.genelist); length(treatment.specific.hypermethylation.6M.false.genelist); length(treatment.specific.hypermethylation.6M.genelist)
 treatment.specific.hypermethyation.6M.probes <- setdiff(treatment.specific.hypermethylation.6M.true, treatment.specific.hypermethylation.6M.false)
 treatment.specific.hypermethyation.6M.beta <- tss[treatment.specific.hypermethyation.6M.probes,]
-dat <- get.genelist(treatment.specific.hypermethyation.6M.beta)
-length(unique(dat))
-head(treatment.specific.hypermethyation.6M.beta)
+if(dim(treatment.specific.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="treatment.specific.hypomethylation.intermediate_6M_rep1"
 treatment.specific.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=.2 & (tss$csc6-tss$csc1)<=-.2),])
@@ -187,9 +195,12 @@ write.table(treatment.specific.hypomethylation.6M.genelist, paste(newdir,"/TSS_"
 length(treatment.specific.hypomethylation.6M.true.genelist); length(treatment.specific.hypomethylation.6M.false.genelist); length(treatment.specific.hypomethylation.6M.genelist)
 treatment.specific.hypomethyation.6M.probes <- setdiff(treatment.specific.hypomethylation.6M.true, treatment.specific.hypomethylation.6M.false)
 treatment.specific.hypomethyation.6M.beta <- tss[treatment.specific.hypomethyation.6M.probes,]
-dat <- get.genelist(treatment.specific.hypomethyation.6M.beta)
-length(unique(dat))
-head(treatment.specific.hypomethyation.6M.beta)
+if(dim(treatment.specific.hypomethyation.6M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypomethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 #####
 # 10M
@@ -205,10 +216,12 @@ write.table(age.specific.hypermethylation.10M.genelist, paste(newdir,"/TSS_", ge
 length(age.specific.hypermethylation.10M.true.genelist); length(age.specific.hypermethylation.10M.false.genelist); length(age.specific.hypermethylation.10M.genelist)
 age.specific.hypermethyation.10M.probes <- setdiff(age.specific.hypermethylation.10M.true, age.specific.hypermethylation.10M.false)
 age.specific.hypermethyation.10M.beta <- tss[age.specific.hypermethyation.10M.probes,]
-dat <- get.genelist(age.specific.hypermethyation.10M.beta)
-length(unique(dat))
-head(age.specific.hypermethyation.10M.beta)
-
+if(dim(age.specific.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="age.specific.hypomethylation.intermediate_10M_rep1"
 age.specific.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=-.2 & (tss$csc10-tss$csc1)<=.2),])
@@ -220,9 +233,12 @@ write.table(age.specific.hypomethylation.10M.genelist, paste(newdir,"/TSS_", gen
 length(age.specific.hypomethylation.10M.true.genelist); length(age.specific.hypomethylation.10M.false.genelist); length(age.specific.hypomethylation.10M.genelist)
 age.specific.hypomethyation.10M.probes <- setdiff(age.specific.hypomethylation.10M.true, age.specific.hypomethylation.10M.false)
 age.specific.hypomethyation.10M.beta <- tss[age.specific.hypomethyation.10M.probes,]
-dat <- get.genelist(age.specific.hypomethyation.10M.beta)
-length(unique(dat))
-head(age.specific.hypomethyation.10M.beta)
+if(dim(age.specific.hypomethyation.10M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypomethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 #treatment specific (de)methylation
 genelist.name="treatment.specific.hypermethylation.intermediate_10M_rep1"
@@ -235,9 +251,12 @@ write.table(treatment.specific.hypermethylation.10M.genelist, paste(newdir,"/TSS
 length(treatment.specific.hypermethylation.10M.true.genelist); length(treatment.specific.hypermethylation.10M.false.genelist); length(treatment.specific.hypermethylation.10M.genelist)
 treatment.specific.hypermethyation.10M.probes <- setdiff(treatment.specific.hypermethylation.10M.true, treatment.specific.hypermethylation.10M.false)
 treatment.specific.hypermethyation.10M.beta <- tss[treatment.specific.hypermethyation.10M.probes,]
-dat <- get.genelist(treatment.specific.hypermethyation.10M.beta)
-length(unique(dat))
-head(treatment.specific.hypermethyation.10M.beta)
+if(dim(treatment.specific.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="treatment.specific.hypomethylation.intermediate_10M_rep1"
 treatment.specific.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=.2 & (tss$csc10-tss$csc1)<=-.2),])
@@ -249,9 +268,12 @@ write.table(treatment.specific.hypomethylation.10M.genelist, paste(newdir,"/TSS_
 length(treatment.specific.hypomethylation.10M.true.genelist); length(treatment.specific.hypomethylation.10M.false.genelist); length(treatment.specific.hypomethylation.10M.genelist)
 treatment.specific.hypomethyation.10M.probes <- setdiff(treatment.specific.hypomethylation.10M.true, treatment.specific.hypomethylation.10M.false)
 treatment.specific.hypomethyation.10M.beta <- tss[treatment.specific.hypomethyation.10M.probes,]
-dat <- get.genelist(treatment.specific.hypomethyation.10M.beta)
-length(unique(dat))
-head(treatment.specific.hypomethyation.10M.beta)
+if(dim(treatment.specific.hypomethyation.10M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypomethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 #####
 # 15M
@@ -268,10 +290,12 @@ write.table(age.specific.hypermethylation.15M.genelist, paste(newdir,"/TSS_", ge
 length(age.specific.hypermethylation.15M.true.genelist); length(age.specific.hypermethylation.15M.false.genelist); length(age.specific.hypermethylation.15M.genelist)
 age.specific.hypermethyation.15M.probes <- setdiff(age.specific.hypermethylation.15M.true, age.specific.hypermethylation.15M.false)
 age.specific.hypermethyation.15M.beta <- tss[age.specific.hypermethyation.15M.probes,]
-dat <- get.genelist(age.specific.hypermethyation.15M.beta)
-length(unique(dat))
-head(age.specific.hypermethyation.15M.beta)
-
+if(dim(age.specific.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="age.specific.hypomethylation.intermediate_15M_rep1"
 age.specific.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=-.2 & (tss$csc15-tss$csc1)<=.2),])
@@ -283,9 +307,12 @@ write.table(age.specific.hypomethylation.15M.genelist, paste(newdir,"/TSS_", gen
 length(age.specific.hypomethylation.15M.true.genelist); length(age.specific.hypomethylation.15M.false.genelist); length(age.specific.hypomethylation.15M.genelist)
 age.specific.hypomethyation.15M.probes <- setdiff(age.specific.hypomethylation.15M.true, age.specific.hypomethylation.15M.false)
 age.specific.hypomethyation.15M.beta <- tss[age.specific.hypomethyation.15M.probes,]
-dat <- get.genelist(age.specific.hypomethyation.15M.beta)
-length(unique(dat))
-head(age.specific.hypomethyation.15M.beta)
+if(dim(age.specific.hypomethyation.15M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypomethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 #treatment specific (de)methylation
 genelist.name="treatment.specific.hypermethylation.intermediate_15M_rep1"
@@ -298,9 +325,12 @@ write.table(treatment.specific.hypermethylation.15M.genelist, paste(newdir,"/TSS
 length(treatment.specific.hypermethylation.15M.true.genelist); length(treatment.specific.hypermethylation.15M.false.genelist); length(treatment.specific.hypermethylation.15M.genelist)
 treatment.specific.hypermethyation.15M.probes <- setdiff(treatment.specific.hypermethylation.15M.true, treatment.specific.hypermethylation.15M.false)
 treatment.specific.hypermethyation.15M.beta <- tss[treatment.specific.hypermethyation.15M.probes,]
-dat <- get.genelist(treatment.specific.hypermethyation.15M.beta)
-length(unique(dat))
-head(treatment.specific.hypermethyation.15M.beta)
+if(dim(treatment.specific.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="treatment.specific.hypomethylation.intermediate_15M_rep1"
 treatment.specific.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=.2 & (tss$csc15-tss$csc1)<=-.2),])
@@ -312,9 +342,12 @@ write.table(treatment.specific.hypomethylation.15M.genelist, paste(newdir,"/TSS_
 length(treatment.specific.hypomethylation.15M.true.genelist); length(treatment.specific.hypomethylation.15M.false.genelist); length(treatment.specific.hypomethylation.15M.genelist)
 treatment.specific.hypomethyation.15M.probes <- setdiff(treatment.specific.hypomethylation.15M.true, treatment.specific.hypomethylation.15M.false)
 treatment.specific.hypomethyation.15M.beta <- tss[treatment.specific.hypomethyation.15M.probes,]
-dat <- get.genelist(treatment.specific.hypomethyation.15M.beta)
-length(unique(dat))
-head(treatment.specific.hypomethyation.15M.beta)
+if(dim(treatment.specific.hypomethyation.15M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypomethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 # #filtered beta.tab matrix 
 # get.genelist <- function(x, system.di=system.dir, probe.to.gen=probe.to.gene, newdi=newdir, typ=type, genelist.nam=genelist.name){
@@ -365,10 +398,12 @@ write.table(age.specific.hypermethylation.6M.genelist, paste(newdir,"/TSS_", gen
 length(age.specific.hypermethylation.6M.true.genelist); length(age.specific.hypermethylation.6M.false.genelist); length(age.specific.hypermethylation.6M.genelist)
 age.specific.hypermethyation.6M.probes <- setdiff(age.specific.hypermethylation.6M.true, age.specific.hypermethylation.6M.false)
 age.specific.hypermethyation.6M.beta <- tss[age.specific.hypermethyation.6M.probes,]
-dat <- get.genelist(age.specific.hypermethyation.6M.beta)
-length(unique(dat))
-head(age.specific.hypermethyation.6M.beta)
-
+if(dim(age.specific.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="age.specific.hypomethylation.stable_6M_rep1"
 age.specific.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=-.2 & (tss$csc6-tss$csc1)<=.05),])
@@ -380,9 +415,12 @@ write.table(age.specific.hypomethylation.6M.genelist, paste(newdir,"/TSS_", gene
 length(age.specific.hypomethylation.6M.true.genelist); length(age.specific.hypomethylation.6M.false.genelist); length(age.specific.hypomethylation.6M.genelist)
 age.specific.hypomethyation.6M.probes <- setdiff(age.specific.hypomethylation.6M.true, age.specific.hypomethylation.6M.false)
 age.specific.hypomethyation.6M.beta <- tss[age.specific.hypomethyation.6M.probes,]
-dat <- get.genelist(age.specific.hypomethyation.6M.beta)
-length(unique(dat))
-head(age.specific.hypomethyation.6M.beta)
+if(dim(age.specific.hypomethyation.6M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypomethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 #treatment specific (de)methylation
 genelist.name="treatment.specific.hypermethylation.stable_6M_rep1"
@@ -395,9 +433,12 @@ write.table(treatment.specific.hypermethylation.6M.genelist, paste(newdir,"/TSS_
 length(treatment.specific.hypermethylation.6M.true.genelist); length(treatment.specific.hypermethylation.6M.false.genelist); length(treatment.specific.hypermethylation.6M.genelist)
 treatment.specific.hypermethyation.6M.probes <- setdiff(treatment.specific.hypermethylation.6M.true, treatment.specific.hypermethylation.6M.false)
 treatment.specific.hypermethyation.6M.beta <- tss[treatment.specific.hypermethyation.6M.probes,]
-dat <- get.genelist(treatment.specific.hypermethyation.6M.beta)
-length(unique(dat))
-head(treatment.specific.hypermethyation.6M.beta)
+if(dim(treatment.specific.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="treatment.specific.hypomethylation.stable_6M_rep1"
 treatment.specific.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=.05 & (tss$csc6-tss$csc1)<=-.2),])
@@ -409,9 +450,12 @@ write.table(treatment.specific.hypomethylation.6M.genelist, paste(newdir,"/TSS_"
 length(treatment.specific.hypomethylation.6M.true.genelist); length(treatment.specific.hypomethylation.6M.false.genelist); length(treatment.specific.hypomethylation.6M.genelist)
 treatment.specific.hypomethyation.6M.probes <- setdiff(treatment.specific.hypomethylation.6M.true, treatment.specific.hypomethylation.6M.false)
 treatment.specific.hypomethyation.6M.beta <- tss[treatment.specific.hypomethyation.6M.probes,]
-dat <- get.genelist(treatment.specific.hypomethyation.6M.beta)
-length(unique(dat))
-head(treatment.specific.hypomethyation.6M.beta)
+if(dim(treatment.specific.hypomethyation.6M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypomethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 #####
 # 10M
@@ -427,10 +471,12 @@ write.table(age.specific.hypermethylation.10M.genelist, paste(newdir,"/TSS_", ge
 length(age.specific.hypermethylation.10M.true.genelist); length(age.specific.hypermethylation.10M.false.genelist); length(age.specific.hypermethylation.10M.genelist)
 age.specific.hypermethyation.10M.probes <- setdiff(age.specific.hypermethylation.10M.true, age.specific.hypermethylation.10M.false)
 age.specific.hypermethyation.10M.beta <- tss[age.specific.hypermethyation.10M.probes,]
-dat <- get.genelist(age.specific.hypermethyation.10M.beta)
-length(unique(dat))
-head(age.specific.hypermethyation.10M.beta)
-
+if(dim(age.specific.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="age.specific.hypomethylation.stable_10M_rep1"
 age.specific.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=-.2 & (tss$csc10-tss$csc1)<=.05),])
@@ -442,9 +488,12 @@ write.table(age.specific.hypomethylation.10M.genelist, paste(newdir,"/TSS_", gen
 length(age.specific.hypomethylation.10M.true.genelist); length(age.specific.hypomethylation.10M.false.genelist); length(age.specific.hypomethylation.10M.genelist)
 age.specific.hypomethyation.10M.probes <- setdiff(age.specific.hypomethylation.10M.true, age.specific.hypomethylation.10M.false)
 age.specific.hypomethyation.10M.beta <- tss[age.specific.hypomethyation.10M.probes,]
-dat <- get.genelist(age.specific.hypomethyation.10M.beta)
-length(unique(dat))
-head(age.specific.hypomethyation.10M.beta)
+if(dim(age.specific.hypomethyation.10M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypomethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 #treatment specific (de)methylation
 genelist.name="treatment.specific.hypermethylation.stable_10M_rep1"
@@ -457,9 +506,12 @@ write.table(treatment.specific.hypermethylation.10M.genelist, paste(newdir,"/TSS
 length(treatment.specific.hypermethylation.10M.true.genelist); length(treatment.specific.hypermethylation.10M.false.genelist); length(treatment.specific.hypermethylation.10M.genelist)
 treatment.specific.hypermethyation.10M.probes <- setdiff(treatment.specific.hypermethylation.10M.true, treatment.specific.hypermethylation.10M.false)
 treatment.specific.hypermethyation.10M.beta <- tss[treatment.specific.hypermethyation.10M.probes,]
-dat <- get.genelist(treatment.specific.hypermethyation.10M.beta)
-length(unique(dat))
-head(treatment.specific.hypermethyation.10M.beta)
+if(dim(treatment.specific.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="treatment.specific.hypomethylation.stable_10M_rep1"
 treatment.specific.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=.05 & (tss$csc10-tss$csc1)<=-.2),])
@@ -471,9 +523,12 @@ write.table(treatment.specific.hypomethylation.10M.genelist, paste(newdir,"/TSS_
 length(treatment.specific.hypomethylation.10M.true.genelist); length(treatment.specific.hypomethylation.10M.false.genelist); length(treatment.specific.hypomethylation.10M.genelist)
 treatment.specific.hypomethyation.10M.probes <- setdiff(treatment.specific.hypomethylation.10M.true, treatment.specific.hypomethylation.10M.false)
 treatment.specific.hypomethyation.10M.beta <- tss[treatment.specific.hypomethyation.10M.probes,]
-dat <- get.genelist(treatment.specific.hypomethyation.10M.beta)
-length(unique(dat))
-head(treatment.specific.hypomethyation.10M.beta)
+if(dim(treatment.specific.hypomethyation.10M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypomethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 #####
 # 15M
@@ -490,10 +545,12 @@ write.table(age.specific.hypermethylation.15M.genelist, paste(newdir,"/TSS_", ge
 length(age.specific.hypermethylation.15M.true.genelist); length(age.specific.hypermethylation.15M.false.genelist); length(age.specific.hypermethylation.15M.genelist)
 age.specific.hypermethyation.15M.probes <- setdiff(age.specific.hypermethylation.15M.true, age.specific.hypermethylation.15M.false)
 age.specific.hypermethyation.15M.beta <- tss[age.specific.hypermethyation.15M.probes,]
-dat <- get.genelist(age.specific.hypermethyation.15M.beta)
-length(unique(dat))
-head(age.specific.hypermethyation.15M.beta)
-
+if(dim(age.specific.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="age.specific.hypomethylation.stable_15M_rep1"
 age.specific.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=-.2 & (tss$csc15-tss$csc1)<=.05),])
@@ -505,9 +562,12 @@ write.table(age.specific.hypomethylation.15M.genelist, paste(newdir,"/TSS_", gen
 length(age.specific.hypomethylation.15M.true.genelist); length(age.specific.hypomethylation.15M.false.genelist); length(age.specific.hypomethylation.15M.genelist)
 age.specific.hypomethyation.15M.probes <- setdiff(age.specific.hypomethylation.15M.true, age.specific.hypomethylation.15M.false)
 age.specific.hypomethyation.15M.beta <- tss[age.specific.hypomethyation.15M.probes,]
-dat <- get.genelist(age.specific.hypomethyation.15M.beta)
-length(unique(dat))
-head(age.specific.hypomethyation.15M.beta)
+if(dim(age.specific.hypomethyation.15M.beta)[1]>0){
+     dat <- get.genelist(age.specific.hypomethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 #treatment specific (de)methylation
 genelist.name="treatment.specific.hypermethylation.stable_15M_rep1"
@@ -520,9 +580,12 @@ write.table(treatment.specific.hypermethylation.15M.genelist, paste(newdir,"/TSS
 length(treatment.specific.hypermethylation.15M.true.genelist); length(treatment.specific.hypermethylation.15M.false.genelist); length(treatment.specific.hypermethylation.15M.genelist)
 treatment.specific.hypermethyation.15M.probes <- setdiff(treatment.specific.hypermethylation.15M.true, treatment.specific.hypermethylation.15M.false)
 treatment.specific.hypermethyation.15M.beta <- tss[treatment.specific.hypermethyation.15M.probes,]
-dat <- get.genelist(treatment.specific.hypermethyation.15M.beta)
-length(unique(dat))
-head(treatment.specific.hypermethyation.15M.beta)
+if(dim(treatment.specific.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
 
 genelist.name="treatment.specific.hypomethylation.stable_15M_rep1"
 treatment.specific.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=.05 & (tss$csc15-tss$csc1)<=-.2),])
@@ -534,6 +597,9 @@ write.table(treatment.specific.hypomethylation.15M.genelist, paste(newdir,"/TSS_
 length(treatment.specific.hypomethylation.15M.true.genelist); length(treatment.specific.hypomethylation.15M.false.genelist); length(treatment.specific.hypomethylation.15M.genelist)
 treatment.specific.hypomethyation.15M.probes <- setdiff(treatment.specific.hypomethylation.15M.true, treatment.specific.hypomethylation.15M.false)
 treatment.specific.hypomethyation.15M.beta <- tss[treatment.specific.hypomethyation.15M.probes,]
-dat <- get.genelist(treatment.specific.hypomethyation.15M.beta)
-length(unique(dat))
-head(treatment.specific.hypomethyation.15M.beta)
+if(dim(treatment.specific.hypomethyation.15M.beta)[1]>0){
+     dat <- get.genelist(treatment.specific.hypomethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)     
+}else{
+     print("No data: ", genelist.name)
+}
