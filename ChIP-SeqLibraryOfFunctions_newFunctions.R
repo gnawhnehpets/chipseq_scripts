@@ -914,10 +914,10 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     print(dim(x.trnposed.sum))
                     print(paste0("WHICH.ROWSIDEANN: ", which.rowsideann))
                     if(which.rowsideann==FALSE){
-                         if(genelist.name=="all"){
+                         #if(genelist.name=="all"){
                               x.trnposed.sum <- x.trnposed.sum[c((nrow(x.trnposed.sum)/2):nrow(x.trnposed.sum)), ]     
                               ratioToInp.x.trnposed.sum <- ratioToInp.x.trnposed.sum[c((nrow(ratioToInp.x.trnposed.sum)/2):nrow(ratioToInp.x.trnposed.sum)), ]     
-                         }
+                         #}
                          print(paste0("# of rows x.trnposed: ", nrow(x.trnposed)))
                          print(paste0("# of rows x.trnposed/2: ", nrow(x.trnposed)/2))
                          print("raw heatmap")
