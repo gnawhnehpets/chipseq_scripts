@@ -125,8 +125,8 @@ if(genelist.name=="all"){
 
 if(bin.size==200){
      if(genelist.name=="all"){
-          h3k4.maxbreak=1000
-          h3k27.maxbreak=180
+          h3k4.maxbreak=500 #1500, 1000, 500
+          h3k27.maxbreak=100 #200, 180, 100
           dnmt.maxbreak=50
           ezh2.maxbreak=120
           inp.maxbreak=50
