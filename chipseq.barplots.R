@@ -4,12 +4,12 @@
 # that are part of each barplot group
 ################################################################################
 ################################################################################
-# system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
+system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
 # system.dir="/Volumes/onc-analysis$/stephenhwang/"
 # system.dir="/amber2/scratch/baylin/shwang/"
-system.dir="Z:/users/shwang26/"
+# system.dir="Z:/users/shwang26/"
 # source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original.R"))
-source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original_newFunctions.R"))
+source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_newFunctions.R"))
 date <- gsub(" \\d+\\:\\d+\\:\\d+.*", "", Sys.time())
 newdir <- paste0(system.dir, "Michelle/Analysis/chipseq_plot/", date)
 newdir
