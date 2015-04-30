@@ -1,7 +1,7 @@
 ##########
 # Purpose:
 ##########
-
+print("CORRECTED")
 # To generate genelists from raw idat files
 # This particular script is specific to Michelle's untreated vs CSC-treated lung cells at 4 timepoints (1M, 6M, 10M, 15M)
 
@@ -99,13 +99,12 @@ type <- "TSS"
 head(beta.tab_CpGI.PlusMinus1500_TSS)
 
 tss <- beta.tab_CpGI.PlusMinus1500_TSS
-tss_reorder <- cbind.data.frame(tss$C.1M, tss$CSC.1M, tss$C.6M, tss$CSC.6M, tss$C.10M, tss$CSC.10M, tss$C.15M, tss$CSC.15M)
+tss_reorder <- cbind.data.frame(tss$unt.1, tss$csc.1, tss$unt.6, tss$csc.6, tss$unt.10, tss$csc.10, tss$unt.15, tss$csc.15)
 colnames(tss_reorder) <- c("c1", "csc1", "c6", "csc6", "c10", "csc10", "c15", "csc15")
 tss <- tss_reorder
 colnames(tss)
 rownames(tss) <- rownames(beta.tab_CpGI.PlusMinus1500_TSS)
-rownames(tss)
-cbind(tss$c1, tss$csc1)
+dim(tss)
 
 #####
 # 1M
@@ -115,162 +114,168 @@ cbind(tss$c1, tss$csc1)
 #Get CpG island probes that get methylated specifically upon further exposure 
 #abs() <= 0.05 will pick probes that do not undergo much changes in methylation upon culturing/ageing.
 #treatment specific (de)methylation
-genelist.name="treatment.specific.hypermethylation_1M_rep1"
-stable.1M.treatment.hypermethylation <- tss[which((tss$csc1-tss$c1)>=.2),]  #stable.1M.newdata
-stable.1M.treatment.hypermethylation.genelist <- get.genelist(stable.1M.treatment.hypermethylation)
-dim(stable.1M.treatment.hypermethylation)
-genelist.name="treatment.specific.hypomethylation_1M_rep1"
-stable.1M.treatment.hypomethylation <- tss[which((tss$csc1-tss$c1)<=-.2),]  #stable.1M.newdata 
-stable.1M.treatment.hypomethylation.genelist <- get.genelist(stable.1M.treatment.hypomethylation)
-dim(stable.1M.treatment.hypomethylation)
+genelist.name="age.hypermethylation_1M_rep1"
+age.stable.1M.hypermethylation <- tss[which((tss$csc1-tss$c1)>=.2),]  #age.stable.1M.newdata
+age.stable.1M.hypermethylation.genelist <- get.genelist(age.stable.1M.hypermethylation)
+dim(age.stable.1M.hypermethylation)
+genelist.name="age.hypomethylation_1M_rep1"
+age.stable.1M.hypomethylation <- tss[which((tss$csc1-tss$c1)<=-.2),]  #age.stable.1M.newdata
+age.stable.1M.hypomethylation.genelist <- get.genelist(age.stable.1M.hypomethylation)
+dim(age.stable.1M.hypomethylation)
 
-##############
-# INTERMEDIATE
-##############
+######################################################################################################################################################################################
+######################################################################################################################################################################################
+# STABLE
+######################################################################################################################################################################################
+######################################################################################################################################################################################
 
 #####
 # 6M
 #####
 getwd()
-#age specific (de)methylation
-genelist.name="age.specific.hypermethylation.intermediate_6M_rep1"
-age.specific.hypermethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)<=.2),])
-age.specific.hypermethylation.6M.true.genelist <- get.only.genelist(age.specific.hypermethylation.6M.true)
-age.specific.hypermethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)>=.2),])
-age.specific.hypermethylation.6M.false.genelist <- get.only.genelist(age.specific.hypermethylation.6M.false)
-age.specific.hypermethylation.6M.genelist <- setdiff(age.specific.hypermethylation.6M.true.genelist, age.specific.hypermethylation.6M.false.genelist)
-write.table(age.specific.hypermethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypermethylation.6M.true.genelist); length(age.specific.hypermethylation.6M.false.genelist); length(age.specific.hypermethylation.6M.genelist)
-age.specific.hypermethyation.6M.probes <- setdiff(age.specific.hypermethylation.6M.true, age.specific.hypermethylation.6M.false)
-age.specific.hypermethyation.6M.beta <- tss[age.specific.hypermethyation.6M.probes,]
-if(dim(age.specific.hypermethyation.6M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypermethyation.6M.beta)
+#age.stable, treatment.specific methylation
+print("checkpoint1")
+genelist.name="age.stable.hypermethylation_6M_rep1"
+age.hypermethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=.05 & (tss$csc6-tss$csc1)>=.2),])
+age.hypermethylation.6M.true.genelist <- get.only.genelist(age.hypermethylation.6M.true)
+age.hypermethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.05 & (tss$csc6-tss$csc1)>=.2),])
+age.hypermethylation.6M.false.genelist <- get.only.genelist(age.hypermethylation.6M.false)
+age.hypermethylation.6M.genelist <- setdiff(age.hypermethylation.6M.true.genelist, age.hypermethylation.6M.false.genelist)
+write.table(age.hypermethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypermethylation.6M.true.genelist); length(age.hypermethylation.6M.false.genelist); length(age.hypermethylation.6M.genelist)
+age.hypermethyation.6M.probes <- setdiff(age.hypermethylation.6M.true, age.hypermethylation.6M.false)
+age.hypermethyation.6M.beta <- tss[age.hypermethyation.6M.probes,]
+if(dim(age.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)
+}else{
+     print("No data: ", genelist.name)
+}
+print("checkpoint2")
+genelist.name="age.stable.hypomethylation_6M_rep1"
+age.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=.05 & (tss$csc6-tss$csc1)<=-.2),])
+age.hypomethylation.6M.true.genelist <- get.only.genelist(age.hypomethylation.6M.true)
+age.hypomethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.05 & (tss$csc6-tss$csc1)<=-.2),])
+age.hypomethylation.6M.false.genelist <- get.only.genelist(age.hypomethylation.6M.false)
+age.hypomethylation.6M.genelist <- setdiff(age.hypomethylation.6M.true.genelist, age.hypomethylation.6M.false.genelist)
+write.table(age.hypomethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypomethylation.6M.true.genelist); length(age.hypomethylation.6M.false.genelist); length(age.hypomethylation.6M.genelist)
+age.hypermethyation.6M.probes <- setdiff(age.hypomethylation.6M.true, age.hypomethylation.6M.false)
+age.hypermethyation.6M.beta <- tss[age.hypermethyation.6M.probes,]
+if(dim(age.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)
+}else{
+     print("No data: ", genelist.name)
+}
+print("checkpoint3")
+#treatment.stable, age.specific methylation
+genelist.name="treatment.stable.hypermethylation_6M_rep1"
+treatment.hypermethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)<=.05),])
+treatment.hypermethylation.6M.true.genelist <- get.only.genelist(treatment.hypermethylation.6M.true)
+treatment.hypermethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)>=.05),])
+treatment.hypermethylation.6M.false.genelist <- get.only.genelist(treatment.hypermethylation.6M.false)
+treatment.hypermethylation.6M.genelist <- setdiff(treatment.hypermethylation.6M.true.genelist, treatment.hypermethylation.6M.false.genelist)
+write.table(treatment.hypermethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypermethylation.6M.true.genelist); length(treatment.hypermethylation.6M.false.genelist); length(treatment.hypermethylation.6M.genelist)
+treatment.hypermethyation.6M.probes <- setdiff(treatment.hypermethylation.6M.true, treatment.hypermethylation.6M.false)
+treatment.hypermethyation.6M.beta <- tss[treatment.hypermethyation.6M.probes,]
+if(dim(treatment.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)
+}else{
+     print("No data: ", genelist.name)
+}
+print("checkpoint4")
+genelist.name="treatment.stable.hypomethylation_6M_rep1"
+treatment.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=-.2 & (tss$csc6-tss$csc1)<=.05),])
+treatment.hypomethylation.6M.true.genelist <- get.only.genelist(treatment.hypomethylation.6M.true)
+treatment.hypomethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)<=-.2 & (tss$csc6-tss$csc1)>=.05),])
+treatment.hypomethylation.6M.false.genelist <- get.only.genelist(treatment.hypomethylation.6M.false)
+treatment.hypomethylation.6M.genelist <- setdiff(treatment.hypomethylation.6M.true.genelist, treatment.hypomethylation.6M.false.genelist)
+write.table(treatment.hypomethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypomethylation.6M.true.genelist); length(treatment.hypomethylation.6M.false.genelist); length(treatment.hypomethylation.6M.genelist)
+treatment.hypermethyation.6M.probes <- setdiff(treatment.hypomethylation.6M.true, treatment.hypomethylation.6M.false)
+treatment.hypermethyation.6M.beta <- tss[treatment.hypermethyation.6M.probes,]
+if(dim(treatment.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.6M.beta)
      length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-genelist.name="age.specific.hypomethylation.intermediate_6M_rep1"
-age.specific.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=-.2 & (tss$csc6-tss$csc1)<=.2),])
-age.specific.hypomethylation.6M.true.genelist <- get.only.genelist(age.specific.hypomethylation.6M.true)
-age.specific.hypomethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)<=-.2 & (tss$csc6-tss$csc1)>=.2),])
-age.specific.hypomethylation.6M.false.genelist <- get.only.genelist(age.specific.hypomethylation.6M.false)
-age.specific.hypomethylation.6M.genelist <- setdiff(age.specific.hypomethylation.6M.true.genelist, age.specific.hypomethylation.6M.false.genelist)
-write.table(age.specific.hypomethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypomethylation.6M.true.genelist); length(age.specific.hypomethylation.6M.false.genelist); length(age.specific.hypomethylation.6M.genelist)
-age.specific.hypomethyation.6M.probes <- setdiff(age.specific.hypomethylation.6M.true, age.specific.hypomethylation.6M.false)
-age.specific.hypomethyation.6M.beta <- tss[age.specific.hypomethyation.6M.probes,]
-if(dim(age.specific.hypomethyation.6M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypomethyation.6M.beta)
-     length(unique(dat)); print(genelist.name)   
-}else{
-     print("No data: ", genelist.name)
-}
-
-#treatment specific (de)methylation
-genelist.name="treatment.specific.hypermethylation.intermediate_6M_rep1"
-treatment.specific.hypermethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=.2 & (tss$csc6-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.6M.true.genelist <- get.only.genelist(treatment.specific.hypermethylation.6M.true)
-treatment.specific.hypermethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.6M.false.genelist <- get.only.genelist(treatment.specific.hypermethylation.6M.false)
-treatment.specific.hypermethylation.6M.genelist <- setdiff(treatment.specific.hypermethylation.6M.true.genelist, treatment.specific.hypermethylation.6M.false.genelist)
-write.table(treatment.specific.hypermethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypermethylation.6M.true.genelist); length(treatment.specific.hypermethylation.6M.false.genelist); length(treatment.specific.hypermethylation.6M.genelist)
-treatment.specific.hypermethyation.6M.probes <- setdiff(treatment.specific.hypermethylation.6M.true, treatment.specific.hypermethylation.6M.false)
-treatment.specific.hypermethyation.6M.beta <- tss[treatment.specific.hypermethyation.6M.probes,]
-if(dim(treatment.specific.hypermethyation.6M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypermethyation.6M.beta)
-     length(unique(dat)); print(genelist.name)     
-}else{
-     print("No data: ", genelist.name)
-}
-
-genelist.name="treatment.specific.hypomethylation.intermediate_6M_rep1"
-treatment.specific.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=.2 & (tss$csc6-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.6M.true.genelist <- get.only.genelist(treatment.specific.hypomethylation.6M.true)
-treatment.specific.hypomethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.6M.false.genelist <- get.only.genelist(treatment.specific.hypomethylation.6M.false)
-treatment.specific.hypomethylation.6M.genelist <- setdiff(treatment.specific.hypomethylation.6M.true.genelist, treatment.specific.hypomethylation.6M.false.genelist)
-write.table(treatment.specific.hypomethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypomethylation.6M.true.genelist); length(treatment.specific.hypomethylation.6M.false.genelist); length(treatment.specific.hypomethylation.6M.genelist)
-treatment.specific.hypomethyation.6M.probes <- setdiff(treatment.specific.hypomethylation.6M.true, treatment.specific.hypomethylation.6M.false)
-treatment.specific.hypomethyation.6M.beta <- tss[treatment.specific.hypomethyation.6M.probes,]
-if(dim(treatment.specific.hypomethyation.6M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypomethyation.6M.beta)
-     length(unique(dat)); print(genelist.name)     
-}else{
-     print("No data: ", genelist.name)
-}
-
 #####
 # 10M
 #####
-#age specific (de)methylation
-genelist.name="age.specific.hypermethylation.intermediate_10M_rep1"
-age.specific.hypermethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)<=.2),])
-age.specific.hypermethylation.10M.true.genelist <- get.only.genelist(age.specific.hypermethylation.10M.true)
-age.specific.hypermethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)>=.2),])
-age.specific.hypermethylation.10M.false.genelist <- get.only.genelist(age.specific.hypermethylation.10M.false)
-age.specific.hypermethylation.10M.genelist <- setdiff(age.specific.hypermethylation.10M.true.genelist, age.specific.hypermethylation.10M.false.genelist)
-write.table(age.specific.hypermethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypermethylation.10M.true.genelist); length(age.specific.hypermethylation.10M.false.genelist); length(age.specific.hypermethylation.10M.genelist)
-age.specific.hypermethyation.10M.probes <- setdiff(age.specific.hypermethylation.10M.true, age.specific.hypermethylation.10M.false)
-age.specific.hypermethyation.10M.beta <- tss[age.specific.hypermethyation.10M.probes,]
-if(dim(age.specific.hypermethyation.10M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypermethyation.10M.beta)
-     length(unique(dat)); print(genelist.name)     
+getwd()
+#age.stable, treatment.specific methylation
+print("checkpoint5")
+genelist.name="age.stable.hypermethylation_10M_rep1"
+age.hypermethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=.05 & (tss$csc10-tss$csc1)>=.2),])
+age.hypermethylation.10M.true.genelist <- get.only.genelist(age.hypermethylation.10M.true)
+age.hypermethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.05 & (tss$csc10-tss$csc1)>=.2),])
+age.hypermethylation.10M.false.genelist <- get.only.genelist(age.hypermethylation.10M.false)
+age.hypermethylation.10M.genelist <- setdiff(age.hypermethylation.10M.true.genelist, age.hypermethylation.10M.false.genelist)
+write.table(age.hypermethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypermethylation.10M.true.genelist); length(age.hypermethylation.10M.false.genelist); length(age.hypermethylation.10M.genelist)
+age.hypermethyation.10M.probes <- setdiff(age.hypermethylation.10M.true, age.hypermethylation.10M.false)
+age.hypermethyation.10M.beta <- tss[age.hypermethyation.10M.probes,]
+if(dim(age.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)
+}else{
+     print("No data: ", genelist.name)
+}
+print("checkpoint6")
+genelist.name="age.stable.hypomethylation_10M_rep1"
+age.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=.05 & (tss$csc10-tss$csc1)<=-.2),])
+age.hypomethylation.10M.true.genelist <- get.only.genelist(age.hypomethylation.10M.true)
+age.hypomethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.05 & (tss$csc10-tss$csc1)<=-.2),])
+age.hypomethylation.10M.false.genelist <- get.only.genelist(age.hypomethylation.10M.false)
+age.hypomethylation.10M.genelist <- setdiff(age.hypomethylation.10M.true.genelist, age.hypomethylation.10M.false.genelist)
+write.table(age.hypomethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypomethylation.10M.true.genelist); length(age.hypomethylation.10M.false.genelist); length(age.hypomethylation.10M.genelist)
+age.hypermethyation.10M.probes <- setdiff(age.hypomethylation.10M.true, age.hypomethylation.10M.false)
+age.hypermethyation.10M.beta <- tss[age.hypermethyation.10M.probes,]
+if(dim(age.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-genelist.name="age.specific.hypomethylation.intermediate_10M_rep1"
-age.specific.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=-.2 & (tss$csc10-tss$csc1)<=.2),])
-age.specific.hypomethylation.10M.true.genelist <- get.only.genelist(age.specific.hypomethylation.10M.true)
-age.specific.hypomethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)<=-.2 & (tss$csc10-tss$csc1)>=.2),])
-age.specific.hypomethylation.10M.false.genelist <- get.only.genelist(age.specific.hypomethylation.10M.false)
-age.specific.hypomethylation.10M.genelist <- setdiff(age.specific.hypomethylation.10M.true.genelist, age.specific.hypomethylation.10M.false.genelist)
-write.table(age.specific.hypomethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypomethylation.10M.true.genelist); length(age.specific.hypomethylation.10M.false.genelist); length(age.specific.hypomethylation.10M.genelist)
-age.specific.hypomethyation.10M.probes <- setdiff(age.specific.hypomethylation.10M.true, age.specific.hypomethylation.10M.false)
-age.specific.hypomethyation.10M.beta <- tss[age.specific.hypomethyation.10M.probes,]
-if(dim(age.specific.hypomethyation.10M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypomethyation.10M.beta)
-     length(unique(dat)); print(genelist.name)     
+#treatment.stable, age.specific methylation
+print("checkpoint7")
+genelist.name="treatment.stable.hypermethylation_10M_rep1"
+treatment.hypermethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)<=.05),])
+treatment.hypermethylation.10M.true.genelist <- get.only.genelist(treatment.hypermethylation.10M.true)
+treatment.hypermethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)>=.05),])
+treatment.hypermethylation.10M.false.genelist <- get.only.genelist(treatment.hypermethylation.10M.false)
+treatment.hypermethylation.10M.genelist <- setdiff(treatment.hypermethylation.10M.true.genelist, treatment.hypermethylation.10M.false.genelist)
+write.table(treatment.hypermethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypermethylation.10M.true.genelist); length(treatment.hypermethylation.10M.false.genelist); length(treatment.hypermethylation.10M.genelist)
+treatment.hypermethyation.10M.probes <- setdiff(treatment.hypermethylation.10M.true, treatment.hypermethylation.10M.false)
+treatment.hypermethyation.10M.beta <- tss[treatment.hypermethyation.10M.probes,]
+if(dim(treatment.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
-
-#treatment specific (de)methylation
-genelist.name="treatment.specific.hypermethylation.intermediate_10M_rep1"
-treatment.specific.hypermethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=.2 & (tss$csc10-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.10M.true.genelist <- get.only.genelist(treatment.specific.hypermethylation.10M.true)
-treatment.specific.hypermethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.10M.false.genelist <- get.only.genelist(treatment.specific.hypermethylation.10M.false)
-treatment.specific.hypermethylation.10M.genelist <- setdiff(treatment.specific.hypermethylation.10M.true.genelist, treatment.specific.hypermethylation.10M.false.genelist)
-write.table(treatment.specific.hypermethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypermethylation.10M.true.genelist); length(treatment.specific.hypermethylation.10M.false.genelist); length(treatment.specific.hypermethylation.10M.genelist)
-treatment.specific.hypermethyation.10M.probes <- setdiff(treatment.specific.hypermethylation.10M.true, treatment.specific.hypermethylation.10M.false)
-treatment.specific.hypermethyation.10M.beta <- tss[treatment.specific.hypermethyation.10M.probes,]
-if(dim(treatment.specific.hypermethyation.10M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypermethyation.10M.beta)
-     length(unique(dat)); print(genelist.name)     
-}else{
-     print("No data: ", genelist.name)
-}
-
-genelist.name="treatment.specific.hypomethylation.intermediate_10M_rep1"
-treatment.specific.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=.2 & (tss$csc10-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.10M.true.genelist <- get.only.genelist(treatment.specific.hypomethylation.10M.true)
-treatment.specific.hypomethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.10M.false.genelist <- get.only.genelist(treatment.specific.hypomethylation.10M.false)
-treatment.specific.hypomethylation.10M.genelist <- setdiff(treatment.specific.hypomethylation.10M.true.genelist, treatment.specific.hypomethylation.10M.false.genelist)
-write.table(treatment.specific.hypomethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypomethylation.10M.true.genelist); length(treatment.specific.hypomethylation.10M.false.genelist); length(treatment.specific.hypomethylation.10M.genelist)
-treatment.specific.hypomethyation.10M.probes <- setdiff(treatment.specific.hypomethylation.10M.true, treatment.specific.hypomethylation.10M.false)
-treatment.specific.hypomethyation.10M.beta <- tss[treatment.specific.hypomethyation.10M.probes,]
-if(dim(treatment.specific.hypomethyation.10M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypomethyation.10M.beta)
-     length(unique(dat)); print(genelist.name)     
+print("checkpoint8")
+genelist.name="treatment.stable.hypomethylation_10M_rep1"
+treatment.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=-.2 & (tss$csc10-tss$csc1)<=.05),])
+treatment.hypomethylation.10M.true.genelist <- get.only.genelist(treatment.hypomethylation.10M.true)
+treatment.hypomethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)<=-.2 & (tss$csc10-tss$csc1)>=.05),])
+treatment.hypomethylation.10M.false.genelist <- get.only.genelist(treatment.hypomethylation.10M.false)
+treatment.hypomethylation.10M.genelist <- setdiff(treatment.hypomethylation.10M.true.genelist, treatment.hypomethylation.10M.false.genelist)
+write.table(treatment.hypomethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypomethylation.10M.true.genelist); length(treatment.hypomethylation.10M.false.genelist); length(treatment.hypomethylation.10M.genelist)
+treatment.hypermethyation.10M.probes <- setdiff(treatment.hypomethylation.10M.true, treatment.hypomethylation.10M.false)
+treatment.hypermethyation.10M.beta <- tss[treatment.hypermethyation.10M.probes,]
+if(dim(treatment.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
@@ -278,181 +283,158 @@ if(dim(treatment.specific.hypomethyation.10M.beta)[1]>0){
 #####
 # 15M
 #####
-
-#age specific (de)methylation
-genelist.name="age.specific.hypermethylation.intermediate_15M_rep1"
-age.specific.hypermethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)<=.2),])
-age.specific.hypermethylation.15M.true.genelist <- get.only.genelist(age.specific.hypermethylation.15M.true)
-age.specific.hypermethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)>=.2),])
-age.specific.hypermethylation.15M.false.genelist <- get.only.genelist(age.specific.hypermethylation.15M.false)
-age.specific.hypermethylation.15M.genelist <- setdiff(age.specific.hypermethylation.15M.true.genelist, age.specific.hypermethylation.15M.false.genelist)
-write.table(age.specific.hypermethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypermethylation.15M.true.genelist); length(age.specific.hypermethylation.15M.false.genelist); length(age.specific.hypermethylation.15M.genelist)
-age.specific.hypermethyation.15M.probes <- setdiff(age.specific.hypermethylation.15M.true, age.specific.hypermethylation.15M.false)
-age.specific.hypermethyation.15M.beta <- tss[age.specific.hypermethyation.15M.probes,]
-if(dim(age.specific.hypermethyation.15M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypermethyation.15M.beta)
-     length(unique(dat)); print(genelist.name)     
+getwd()
+#age.stable, treatment.specific methylation
+print("checkpoint9")
+genelist.name="age.stable.hypermethylation_15M_rep1"
+age.hypermethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=.05 & (tss$csc15-tss$csc1)>=.2),])
+age.hypermethylation.15M.true.genelist <- get.only.genelist(age.hypermethylation.15M.true)
+age.hypermethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.05 & (tss$csc15-tss$csc1)>=.2),])
+age.hypermethylation.15M.false.genelist <- get.only.genelist(age.hypermethylation.15M.false)
+age.hypermethylation.15M.genelist <- setdiff(age.hypermethylation.15M.true.genelist, age.hypermethylation.15M.false.genelist)
+write.table(age.hypermethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypermethylation.15M.true.genelist); length(age.hypermethylation.15M.false.genelist); length(age.hypermethylation.15M.genelist)
+age.hypermethyation.15M.probes <- setdiff(age.hypermethylation.15M.true, age.hypermethylation.15M.false)
+age.hypermethyation.15M.beta <- tss[age.hypermethyation.15M.probes,]
+if(dim(age.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)
+}else{
+     print("No data: ", genelist.name)
+}
+print("checkpoint10")
+genelist.name="age.stable.hypomethylation_15M_rep1"
+age.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=.05 & (tss$csc15-tss$csc1)<=-.2),])
+age.hypomethylation.15M.true.genelist <- get.only.genelist(age.hypomethylation.15M.true)
+age.hypomethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.05 & (tss$csc15-tss$csc1)<=-.2),])
+age.hypomethylation.15M.false.genelist <- get.only.genelist(age.hypomethylation.15M.false)
+age.hypomethylation.15M.genelist <- setdiff(age.hypomethylation.15M.true.genelist, age.hypomethylation.15M.false.genelist)
+write.table(age.hypomethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypomethylation.15M.true.genelist); length(age.hypomethylation.15M.false.genelist); length(age.hypomethylation.15M.genelist)
+age.hypermethyation.15M.probes <- setdiff(age.hypomethylation.15M.true, age.hypomethylation.15M.false)
+age.hypermethyation.15M.beta <- tss[age.hypermethyation.15M.probes,]
+if(dim(age.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-genelist.name="age.specific.hypomethylation.intermediate_15M_rep1"
-age.specific.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=-.2 & (tss$csc15-tss$csc1)<=.2),])
-age.specific.hypomethylation.15M.true.genelist <- get.only.genelist(age.specific.hypomethylation.15M.true)
-age.specific.hypomethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)<=-.2 & (tss$csc15-tss$csc1)>=.2),])
-age.specific.hypomethylation.15M.false.genelist <- get.only.genelist(age.specific.hypomethylation.15M.false)
-age.specific.hypomethylation.15M.genelist <- setdiff(age.specific.hypomethylation.15M.true.genelist, age.specific.hypomethylation.15M.false.genelist)
-write.table(age.specific.hypomethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypomethylation.15M.true.genelist); length(age.specific.hypomethylation.15M.false.genelist); length(age.specific.hypomethylation.15M.genelist)
-age.specific.hypomethyation.15M.probes <- setdiff(age.specific.hypomethylation.15M.true, age.specific.hypomethylation.15M.false)
-age.specific.hypomethyation.15M.beta <- tss[age.specific.hypomethyation.15M.probes,]
-if(dim(age.specific.hypomethyation.15M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypomethyation.15M.beta)
-     length(unique(dat)); print(genelist.name)     
+#treatment.stable, age.specific methylation
+print("checkpoint11")
+genelist.name="treatment.stable.hypermethylation_15M_rep1"
+treatment.hypermethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)<=.05),])
+treatment.hypermethylation.15M.true.genelist <- get.only.genelist(treatment.hypermethylation.15M.true)
+treatment.hypermethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)>=.05),])
+treatment.hypermethylation.15M.false.genelist <- get.only.genelist(treatment.hypermethylation.15M.false)
+treatment.hypermethylation.15M.genelist <- setdiff(treatment.hypermethylation.15M.true.genelist, treatment.hypermethylation.15M.false.genelist)
+write.table(treatment.hypermethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypermethylation.15M.true.genelist); length(treatment.hypermethylation.15M.false.genelist); length(treatment.hypermethylation.15M.genelist)
+treatment.hypermethyation.15M.probes <- setdiff(treatment.hypermethylation.15M.true, treatment.hypermethylation.15M.false)
+treatment.hypermethyation.15M.beta <- tss[treatment.hypermethyation.15M.probes,]
+if(dim(treatment.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-#treatment specific (de)methylation
-genelist.name="treatment.specific.hypermethylation.intermediate_15M_rep1"
-treatment.specific.hypermethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=.2 & (tss$csc15-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.15M.true.genelist <- get.only.genelist(treatment.specific.hypermethylation.15M.true)
-treatment.specific.hypermethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.15M.false.genelist <- get.only.genelist(treatment.specific.hypermethylation.15M.false)
-treatment.specific.hypermethylation.15M.genelist <- setdiff(treatment.specific.hypermethylation.15M.true.genelist, treatment.specific.hypermethylation.15M.false.genelist)
-write.table(treatment.specific.hypermethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypermethylation.15M.true.genelist); length(treatment.specific.hypermethylation.15M.false.genelist); length(treatment.specific.hypermethylation.15M.genelist)
-treatment.specific.hypermethyation.15M.probes <- setdiff(treatment.specific.hypermethylation.15M.true, treatment.specific.hypermethylation.15M.false)
-treatment.specific.hypermethyation.15M.beta <- tss[treatment.specific.hypermethyation.15M.probes,]
-if(dim(treatment.specific.hypermethyation.15M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypermethyation.15M.beta)
-     length(unique(dat)); print(genelist.name)     
+print("checkpoint12")
+genelist.name="treatment.stable.hypomethylation_15M_rep1"
+treatment.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=-.2 & (tss$csc15-tss$csc1)<=.05),])
+treatment.hypomethylation.15M.true.genelist <- get.only.genelist(treatment.hypomethylation.15M.true)
+treatment.hypomethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)<=-.2 & (tss$csc15-tss$csc1)>=.05),])
+treatment.hypomethylation.15M.false.genelist <- get.only.genelist(treatment.hypomethylation.15M.false)
+treatment.hypomethylation.15M.genelist <- setdiff(treatment.hypomethylation.15M.true.genelist, treatment.hypomethylation.15M.false.genelist)
+write.table(treatment.hypomethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypomethylation.15M.true.genelist); length(treatment.hypomethylation.15M.false.genelist); length(treatment.hypomethylation.15M.genelist)
+treatment.hypermethyation.15M.probes <- setdiff(treatment.hypomethylation.15M.true, treatment.hypomethylation.15M.false)
+treatment.hypermethyation.15M.beta <- tss[treatment.hypermethyation.15M.probes,]
+if(dim(treatment.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-genelist.name="treatment.specific.hypomethylation.intermediate_15M_rep1"
-treatment.specific.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=.2 & (tss$csc15-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.15M.true.genelist <- get.only.genelist(treatment.specific.hypomethylation.15M.true)
-treatment.specific.hypomethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.15M.false.genelist <- get.only.genelist(treatment.specific.hypomethylation.15M.false)
-treatment.specific.hypomethylation.15M.genelist <- setdiff(treatment.specific.hypomethylation.15M.true.genelist, treatment.specific.hypomethylation.15M.false.genelist)
-write.table(treatment.specific.hypomethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypomethylation.15M.true.genelist); length(treatment.specific.hypomethylation.15M.false.genelist); length(treatment.specific.hypomethylation.15M.genelist)
-treatment.specific.hypomethyation.15M.probes <- setdiff(treatment.specific.hypomethylation.15M.true, treatment.specific.hypomethylation.15M.false)
-treatment.specific.hypomethyation.15M.beta <- tss[treatment.specific.hypomethyation.15M.probes,]
-if(dim(treatment.specific.hypomethyation.15M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypomethyation.15M.beta)
-     length(unique(dat)); print(genelist.name)     
-}else{
-     print("No data: ", genelist.name)
-}
-
-# #filtered beta.tab matrix 
-# get.genelist <- function(x, system.di=system.dir, probe.to.gen=probe.to.gene, newdi=newdir, typ=type, genelist.nam=genelist.name){
-#           if (length(rownames(x)) > 0) {
-#                x <- cbind.data.frame(x, "Gene"=rep(NA, times=nrow(x)))
-#                for(j in 1:nrow(x)) {
-#                     probe.id <- rownames(x)[j]
-#                     gene <- probe.to.gen$gene[probe.to.gen$probe==probe.id]
-#                     if(length(gene) == 1) { x$Gene[j] <- as.character(gene) }
-#                }
-#                write.table(x, paste(newdi,"/", typ, "_", genelist.nam, "_beta.values.txt",sep=""), quote=F, row.names=T, col.names=NA, sep="\t") #row.names set to T to get the probe ids.
-#           }     
-#           print("beta values written!")
-#           tmp <- as.matrix(sort(unique(unlist(strsplit(x$Gene, ";")))))
-#           write.table(tmp, paste(newdi,"/", typ, "_", genelist.nam, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-#      return(tmp)
-# }
-# 
-# #probes aka rownames() only
-# get.only.genelist <- function(x, probe.to.gen=probe.to.gene, newdi=newdir, typ=type, genelist.nam=genelist.name){
-#      list.of.genes <- vector()
-#      for(i in 1:length(x)) {
-#           probe.id <- x[i]
-#           gene <- unlist(strsplit(as.character(probe.to.gen$gene[probe.to.gen$probe==probe.id]), ";"))
-#           if(length(gene) == 1) { list.of.genes <- c(list.of.genes, gene) }
-#      }
-#      list.of.genes <- sort(unique(list.of.genes))
-# #      write.table(list.of.genes, paste(newdi,"/", typ, "_", genelist.nam, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-#      return(list.of.genes)
-# }
-
-########
-# STABLE
-########
+######################################################################################################################################################################################
+######################################################################################################################################################################################
+# INTERMEDIATE
+######################################################################################################################################################################################
+######################################################################################################################################################################################
 
 #####
 # 6M
 #####
 getwd()
-#age specific (de)methylation
-genelist.name="age.specific.hypermethylation.stable_6M_rep1"
-age.specific.hypermethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)<=.05),])
-age.specific.hypermethylation.6M.true.genelist <- get.only.genelist(age.specific.hypermethylation.6M.true)
-age.specific.hypermethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)>=.05),])
-age.specific.hypermethylation.6M.false.genelist <- get.only.genelist(age.specific.hypermethylation.6M.false)
-age.specific.hypermethylation.6M.genelist <- setdiff(age.specific.hypermethylation.6M.true.genelist, age.specific.hypermethylation.6M.false.genelist)
-write.table(age.specific.hypermethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypermethylation.6M.true.genelist); length(age.specific.hypermethylation.6M.false.genelist); length(age.specific.hypermethylation.6M.genelist)
-age.specific.hypermethyation.6M.probes <- setdiff(age.specific.hypermethylation.6M.true, age.specific.hypermethylation.6M.false)
-age.specific.hypermethyation.6M.beta <- tss[age.specific.hypermethyation.6M.probes,]
-if(dim(age.specific.hypermethyation.6M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypermethyation.6M.beta)
-     length(unique(dat)); print(genelist.name)     
+#age.intermediate, treatment.specific methylation
+print("checkpoint13")
+genelist.name="age.intermediate.hypermethylation_6M_rep1"
+age.hypermethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=.2 & (tss$csc6-tss$csc1)>=.2),])
+age.hypermethylation.6M.true.genelist <- get.only.genelist(age.hypermethylation.6M.true)
+age.hypermethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)>=.2),])
+age.hypermethylation.6M.false.genelist <- get.only.genelist(age.hypermethylation.6M.false)
+age.hypermethylation.6M.genelist <- setdiff(age.hypermethylation.6M.true.genelist, age.hypermethylation.6M.false.genelist)
+write.table(age.hypermethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypermethylation.6M.true.genelist); length(age.hypermethylation.6M.false.genelist); length(age.hypermethylation.6M.genelist)
+age.hypermethyation.6M.probes <- setdiff(age.hypermethylation.6M.true, age.hypermethylation.6M.false)
+age.hypermethyation.6M.beta <- tss[age.hypermethyation.6M.probes,]
+if(dim(age.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)
+}else{
+     print("No data: ", genelist.name)
+}
+print("checkpoint14")
+genelist.name="age.intermediate.hypomethylation_6M_rep1"
+age.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=.2 & (tss$csc6-tss$csc1)<=-.2),])
+age.hypomethylation.6M.true.genelist <- get.only.genelist(age.hypomethylation.6M.true)
+age.hypomethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)<=-.2),])
+age.hypomethylation.6M.false.genelist <- get.only.genelist(age.hypomethylation.6M.false)
+age.hypomethylation.6M.genelist <- setdiff(age.hypomethylation.6M.true.genelist, age.hypomethylation.6M.false.genelist)
+write.table(age.hypomethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypomethylation.6M.true.genelist); length(age.hypomethylation.6M.false.genelist); length(age.hypomethylation.6M.genelist)
+age.hypermethyation.6M.probes <- setdiff(age.hypomethylation.6M.true, age.hypomethylation.6M.false)
+age.hypermethyation.6M.beta <- tss[age.hypermethyation.6M.probes,]
+if(dim(age.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-genelist.name="age.specific.hypomethylation.stable_6M_rep1"
-age.specific.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=-.2 & (tss$csc6-tss$csc1)<=.05),])
-age.specific.hypomethylation.6M.true.genelist <- get.only.genelist(age.specific.hypomethylation.6M.true)
-age.specific.hypomethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)<=-.2 & (tss$csc6-tss$csc1)>=.05),])
-age.specific.hypomethylation.6M.false.genelist <- get.only.genelist(age.specific.hypomethylation.6M.false)
-age.specific.hypomethylation.6M.genelist <- setdiff(age.specific.hypomethylation.6M.true.genelist, age.specific.hypomethylation.6M.false.genelist)
-write.table(age.specific.hypomethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypomethylation.6M.true.genelist); length(age.specific.hypomethylation.6M.false.genelist); length(age.specific.hypomethylation.6M.genelist)
-age.specific.hypomethyation.6M.probes <- setdiff(age.specific.hypomethylation.6M.true, age.specific.hypomethylation.6M.false)
-age.specific.hypomethyation.6M.beta <- tss[age.specific.hypomethyation.6M.probes,]
-if(dim(age.specific.hypomethyation.6M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypomethyation.6M.beta)
-     length(unique(dat)); print(genelist.name)     
+#treatment.intermediate, age.specific methylation
+print("checkpoint15")
+genelist.name="treatment.intermediate.hypermethylation_6M_rep1"
+treatment.hypermethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)<=.2),])
+treatment.hypermethylation.6M.true.genelist <- get.only.genelist(treatment.hypermethylation.6M.true)
+treatment.hypermethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.2 & (tss$csc6-tss$csc1)>=.2),])
+treatment.hypermethylation.6M.false.genelist <- get.only.genelist(treatment.hypermethylation.6M.false)
+treatment.hypermethylation.6M.genelist <- setdiff(treatment.hypermethylation.6M.true.genelist, treatment.hypermethylation.6M.false.genelist)
+write.table(treatment.hypermethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypermethylation.6M.true.genelist); length(treatment.hypermethylation.6M.false.genelist); length(treatment.hypermethylation.6M.genelist)
+treatment.hypermethyation.6M.probes <- setdiff(treatment.hypermethylation.6M.true, treatment.hypermethylation.6M.false)
+treatment.hypermethyation.6M.beta <- tss[treatment.hypermethyation.6M.probes,]
+if(dim(treatment.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
-
-#treatment specific (de)methylation
-genelist.name="treatment.specific.hypermethylation.stable_6M_rep1"
-treatment.specific.hypermethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=.05 & (tss$csc6-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.6M.true.genelist <- get.only.genelist(treatment.specific.hypermethylation.6M.true)
-treatment.specific.hypermethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.05 & (tss$csc6-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.6M.false.genelist <- get.only.genelist(treatment.specific.hypermethylation.6M.false)
-treatment.specific.hypermethylation.6M.genelist <- setdiff(treatment.specific.hypermethylation.6M.true.genelist, treatment.specific.hypermethylation.6M.false.genelist)
-write.table(treatment.specific.hypermethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypermethylation.6M.true.genelist); length(treatment.specific.hypermethylation.6M.false.genelist); length(treatment.specific.hypermethylation.6M.genelist)
-treatment.specific.hypermethyation.6M.probes <- setdiff(treatment.specific.hypermethylation.6M.true, treatment.specific.hypermethylation.6M.false)
-treatment.specific.hypermethyation.6M.beta <- tss[treatment.specific.hypermethyation.6M.probes,]
-if(dim(treatment.specific.hypermethyation.6M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypermethyation.6M.beta)
-     length(unique(dat)); print(genelist.name)     
-}else{
-     print("No data: ", genelist.name)
-}
-
-genelist.name="treatment.specific.hypomethylation.stable_6M_rep1"
-treatment.specific.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=.05 & (tss$csc6-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.6M.true.genelist <- get.only.genelist(treatment.specific.hypomethylation.6M.true)
-treatment.specific.hypomethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)>=.05 & (tss$csc6-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.6M.false.genelist <- get.only.genelist(treatment.specific.hypomethylation.6M.false)
-treatment.specific.hypomethylation.6M.genelist <- setdiff(treatment.specific.hypomethylation.6M.true.genelist, treatment.specific.hypomethylation.6M.false.genelist)
-write.table(treatment.specific.hypomethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypomethylation.6M.true.genelist); length(treatment.specific.hypomethylation.6M.false.genelist); length(treatment.specific.hypomethylation.6M.genelist)
-treatment.specific.hypomethyation.6M.probes <- setdiff(treatment.specific.hypomethylation.6M.true, treatment.specific.hypomethylation.6M.false)
-treatment.specific.hypomethyation.6M.beta <- tss[treatment.specific.hypomethyation.6M.probes,]
-if(dim(treatment.specific.hypomethyation.6M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypomethyation.6M.beta)
-     length(unique(dat)); print(genelist.name)     
+print("checkpoint16")
+genelist.name="treatment.intermediate.hypomethylation_6M_rep1"
+treatment.hypomethylation.6M.true <- rownames(tss[which((tss$c6-tss$c1)<=-.2 & (tss$csc6-tss$csc1)<=.2),])
+treatment.hypomethylation.6M.true.genelist <- get.only.genelist(treatment.hypomethylation.6M.true)
+treatment.hypomethylation.6M.false <- rownames(tss[which((tss$c6-tss$c1)<=-.2 & (tss$csc6-tss$csc1)>=.2),])
+treatment.hypomethylation.6M.false.genelist <- get.only.genelist(treatment.hypomethylation.6M.false)
+treatment.hypomethylation.6M.genelist <- setdiff(treatment.hypomethylation.6M.true.genelist, treatment.hypomethylation.6M.false.genelist)
+write.table(treatment.hypomethylation.6M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypomethylation.6M.true.genelist); length(treatment.hypomethylation.6M.false.genelist); length(treatment.hypomethylation.6M.genelist)
+treatment.hypermethyation.6M.probes <- setdiff(treatment.hypomethylation.6M.true, treatment.hypomethylation.6M.false)
+treatment.hypermethyation.6M.beta <- tss[treatment.hypermethyation.6M.probes,]
+if(dim(treatment.hypermethyation.6M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.6M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
@@ -460,72 +442,77 @@ if(dim(treatment.specific.hypomethyation.6M.beta)[1]>0){
 #####
 # 10M
 #####
-#age specific (de)methylation
-genelist.name="age.specific.hypermethylation.stable_10M_rep1"
-age.specific.hypermethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)<=.05),])
-age.specific.hypermethylation.10M.true.genelist <- get.only.genelist(age.specific.hypermethylation.10M.true)
-age.specific.hypermethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)>=.05),])
-age.specific.hypermethylation.10M.false.genelist <- get.only.genelist(age.specific.hypermethylation.10M.false)
-age.specific.hypermethylation.10M.genelist <- setdiff(age.specific.hypermethylation.10M.true.genelist, age.specific.hypermethylation.10M.false.genelist)
-write.table(age.specific.hypermethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypermethylation.10M.true.genelist); length(age.specific.hypermethylation.10M.false.genelist); length(age.specific.hypermethylation.10M.genelist)
-age.specific.hypermethyation.10M.probes <- setdiff(age.specific.hypermethylation.10M.true, age.specific.hypermethylation.10M.false)
-age.specific.hypermethyation.10M.beta <- tss[age.specific.hypermethyation.10M.probes,]
-if(dim(age.specific.hypermethyation.10M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypermethyation.10M.beta)
-     length(unique(dat)); print(genelist.name)     
+getwd()
+#age.intermediate, treatment.specific methylation
+print("checkpoint17")
+genelist.name="age.intermediate.hypermethylation_10M_rep1"
+age.hypermethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=.2 & (tss$csc10-tss$csc1)>=.2),])
+age.hypermethylation.10M.true.genelist <- get.only.genelist(age.hypermethylation.10M.true)
+age.hypermethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)>=.2),])
+age.hypermethylation.10M.false.genelist <- get.only.genelist(age.hypermethylation.10M.false)
+age.hypermethylation.10M.genelist <- setdiff(age.hypermethylation.10M.true.genelist, age.hypermethylation.10M.false.genelist)
+write.table(age.hypermethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypermethylation.10M.true.genelist); length(age.hypermethylation.10M.false.genelist); length(age.hypermethylation.10M.genelist)
+age.hypermethyation.10M.probes <- setdiff(age.hypermethylation.10M.true, age.hypermethylation.10M.false)
+age.hypermethyation.10M.beta <- tss[age.hypermethyation.10M.probes,]
+if(dim(age.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-genelist.name="age.specific.hypomethylation.stable_10M_rep1"
-age.specific.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=-.2 & (tss$csc10-tss$csc1)<=.05),])
-age.specific.hypomethylation.10M.true.genelist <- get.only.genelist(age.specific.hypomethylation.10M.true)
-age.specific.hypomethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)<=-.2 & (tss$csc10-tss$csc1)>=.05),])
-age.specific.hypomethylation.10M.false.genelist <- get.only.genelist(age.specific.hypomethylation.10M.false)
-age.specific.hypomethylation.10M.genelist <- setdiff(age.specific.hypomethylation.10M.true.genelist, age.specific.hypomethylation.10M.false.genelist)
-write.table(age.specific.hypomethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypomethylation.10M.true.genelist); length(age.specific.hypomethylation.10M.false.genelist); length(age.specific.hypomethylation.10M.genelist)
-age.specific.hypomethyation.10M.probes <- setdiff(age.specific.hypomethylation.10M.true, age.specific.hypomethylation.10M.false)
-age.specific.hypomethyation.10M.beta <- tss[age.specific.hypomethyation.10M.probes,]
-if(dim(age.specific.hypomethyation.10M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypomethyation.10M.beta)
-     length(unique(dat)); print(genelist.name)     
+genelist.name="age.intermediate.hypomethylation_10M_rep1"
+print("checkpoint18")
+age.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=.2 & (tss$csc10-tss$csc1)<=-.2),])
+age.hypomethylation.10M.true.genelist <- get.only.genelist(age.hypomethylation.10M.true)
+age.hypomethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)<=-.2),])
+age.hypomethylation.10M.false.genelist <- get.only.genelist(age.hypomethylation.10M.false)
+age.hypomethylation.10M.genelist <- setdiff(age.hypomethylation.10M.true.genelist, age.hypomethylation.10M.false.genelist)
+write.table(age.hypomethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypomethylation.10M.true.genelist); length(age.hypomethylation.10M.false.genelist); length(age.hypomethylation.10M.genelist)
+age.hypermethyation.10M.probes <- setdiff(age.hypomethylation.10M.true, age.hypomethylation.10M.false)
+age.hypermethyation.10M.beta <- tss[age.hypermethyation.10M.probes,]
+if(dim(age.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-#treatment specific (de)methylation
-genelist.name="treatment.specific.hypermethylation.stable_10M_rep1"
-treatment.specific.hypermethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=.05 & (tss$csc10-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.10M.true.genelist <- get.only.genelist(treatment.specific.hypermethylation.10M.true)
-treatment.specific.hypermethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.05 & (tss$csc10-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.10M.false.genelist <- get.only.genelist(treatment.specific.hypermethylation.10M.false)
-treatment.specific.hypermethylation.10M.genelist <- setdiff(treatment.specific.hypermethylation.10M.true.genelist, treatment.specific.hypermethylation.10M.false.genelist)
-write.table(treatment.specific.hypermethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypermethylation.10M.true.genelist); length(treatment.specific.hypermethylation.10M.false.genelist); length(treatment.specific.hypermethylation.10M.genelist)
-treatment.specific.hypermethyation.10M.probes <- setdiff(treatment.specific.hypermethylation.10M.true, treatment.specific.hypermethylation.10M.false)
-treatment.specific.hypermethyation.10M.beta <- tss[treatment.specific.hypermethyation.10M.probes,]
-if(dim(treatment.specific.hypermethyation.10M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypermethyation.10M.beta)
-     length(unique(dat)); print(genelist.name)     
+#treatment.intermediate, age.specific methylation
+genelist.name="treatment.intermediate.hypermethylation_10M_rep1"
+print("checkpoint19")
+treatment.hypermethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)<=.2),])
+treatment.hypermethylation.10M.true.genelist <- get.only.genelist(treatment.hypermethylation.10M.true)
+treatment.hypermethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.2 & (tss$csc10-tss$csc1)>=.2),])
+treatment.hypermethylation.10M.false.genelist <- get.only.genelist(treatment.hypermethylation.10M.false)
+treatment.hypermethylation.10M.genelist <- setdiff(treatment.hypermethylation.10M.true.genelist, treatment.hypermethylation.10M.false.genelist)
+write.table(treatment.hypermethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypermethylation.10M.true.genelist); length(treatment.hypermethylation.10M.false.genelist); length(treatment.hypermethylation.10M.genelist)
+treatment.hypermethyation.10M.probes <- setdiff(treatment.hypermethylation.10M.true, treatment.hypermethylation.10M.false)
+treatment.hypermethyation.10M.beta <- tss[treatment.hypermethyation.10M.probes,]
+if(dim(treatment.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-genelist.name="treatment.specific.hypomethylation.stable_10M_rep1"
-treatment.specific.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=.05 & (tss$csc10-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.10M.true.genelist <- get.only.genelist(treatment.specific.hypomethylation.10M.true)
-treatment.specific.hypomethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)>=.05 & (tss$csc10-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.10M.false.genelist <- get.only.genelist(treatment.specific.hypomethylation.10M.false)
-treatment.specific.hypomethylation.10M.genelist <- setdiff(treatment.specific.hypomethylation.10M.true.genelist, treatment.specific.hypomethylation.10M.false.genelist)
-write.table(treatment.specific.hypomethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypomethylation.10M.true.genelist); length(treatment.specific.hypomethylation.10M.false.genelist); length(treatment.specific.hypomethylation.10M.genelist)
-treatment.specific.hypomethyation.10M.probes <- setdiff(treatment.specific.hypomethylation.10M.true, treatment.specific.hypomethylation.10M.false)
-treatment.specific.hypomethyation.10M.beta <- tss[treatment.specific.hypomethyation.10M.probes,]
-if(dim(treatment.specific.hypomethyation.10M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypomethyation.10M.beta)
-     length(unique(dat)); print(genelist.name)     
+genelist.name="treatment.intermediate.hypomethylation_10M_rep1"
+print("checkpoint20")
+treatment.hypomethylation.10M.true <- rownames(tss[which((tss$c10-tss$c1)<=-.2 & (tss$csc10-tss$csc1)<=.2),])
+treatment.hypomethylation.10M.true.genelist <- get.only.genelist(treatment.hypomethylation.10M.true)
+treatment.hypomethylation.10M.false <- rownames(tss[which((tss$c10-tss$c1)<=-.2 & (tss$csc10-tss$csc1)>=.2),])
+treatment.hypomethylation.10M.false.genelist <- get.only.genelist(treatment.hypomethylation.10M.false)
+treatment.hypomethylation.10M.genelist <- setdiff(treatment.hypomethylation.10M.true.genelist, treatment.hypomethylation.10M.false.genelist)
+write.table(treatment.hypomethylation.10M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypomethylation.10M.true.genelist); length(treatment.hypomethylation.10M.false.genelist); length(treatment.hypomethylation.10M.genelist)
+treatment.hypermethyation.10M.probes <- setdiff(treatment.hypomethylation.10M.true, treatment.hypomethylation.10M.false)
+treatment.hypermethyation.10M.beta <- tss[treatment.hypermethyation.10M.probes,]
+if(dim(treatment.hypermethyation.10M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.10M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
@@ -533,73 +520,77 @@ if(dim(treatment.specific.hypomethyation.10M.beta)[1]>0){
 #####
 # 15M
 #####
-
-#age specific (de)methylation
-genelist.name="age.specific.hypermethylation.stable_15M_rep1"
-age.specific.hypermethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)<=.05),])
-age.specific.hypermethylation.15M.true.genelist <- get.only.genelist(age.specific.hypermethylation.15M.true)
-age.specific.hypermethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)>=.05),])
-age.specific.hypermethylation.15M.false.genelist <- get.only.genelist(age.specific.hypermethylation.15M.false)
-age.specific.hypermethylation.15M.genelist <- setdiff(age.specific.hypermethylation.15M.true.genelist, age.specific.hypermethylation.15M.false.genelist)
-write.table(age.specific.hypermethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypermethylation.15M.true.genelist); length(age.specific.hypermethylation.15M.false.genelist); length(age.specific.hypermethylation.15M.genelist)
-age.specific.hypermethyation.15M.probes <- setdiff(age.specific.hypermethylation.15M.true, age.specific.hypermethylation.15M.false)
-age.specific.hypermethyation.15M.beta <- tss[age.specific.hypermethyation.15M.probes,]
-if(dim(age.specific.hypermethyation.15M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypermethyation.15M.beta)
-     length(unique(dat)); print(genelist.name)     
+getwd()
+#age.intermediate, treatment.specific methylation
+genelist.name="age.intermediate.hypermethylation_15M_rep1"
+print("checkpoint21")
+age.hypermethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=.2 & (tss$csc15-tss$csc1)>=.2),])
+age.hypermethylation.15M.true.genelist <- get.only.genelist(age.hypermethylation.15M.true)
+age.hypermethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)>=.2),])
+age.hypermethylation.15M.false.genelist <- get.only.genelist(age.hypermethylation.15M.false)
+age.hypermethylation.15M.genelist <- setdiff(age.hypermethylation.15M.true.genelist, age.hypermethylation.15M.false.genelist)
+write.table(age.hypermethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypermethylation.15M.true.genelist); length(age.hypermethylation.15M.false.genelist); length(age.hypermethylation.15M.genelist)
+age.hypermethyation.15M.probes <- setdiff(age.hypermethylation.15M.true, age.hypermethylation.15M.false)
+age.hypermethyation.15M.beta <- tss[age.hypermethyation.15M.probes,]
+if(dim(age.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-genelist.name="age.specific.hypomethylation.stable_15M_rep1"
-age.specific.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=-.2 & (tss$csc15-tss$csc1)<=.05),])
-age.specific.hypomethylation.15M.true.genelist <- get.only.genelist(age.specific.hypomethylation.15M.true)
-age.specific.hypomethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)<=-.2 & (tss$csc15-tss$csc1)>=.05),])
-age.specific.hypomethylation.15M.false.genelist <- get.only.genelist(age.specific.hypomethylation.15M.false)
-age.specific.hypomethylation.15M.genelist <- setdiff(age.specific.hypomethylation.15M.true.genelist, age.specific.hypomethylation.15M.false.genelist)
-write.table(age.specific.hypomethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(age.specific.hypomethylation.15M.true.genelist); length(age.specific.hypomethylation.15M.false.genelist); length(age.specific.hypomethylation.15M.genelist)
-age.specific.hypomethyation.15M.probes <- setdiff(age.specific.hypomethylation.15M.true, age.specific.hypomethylation.15M.false)
-age.specific.hypomethyation.15M.beta <- tss[age.specific.hypomethyation.15M.probes,]
-if(dim(age.specific.hypomethyation.15M.beta)[1]>0){
-     dat <- get.genelist(age.specific.hypomethyation.15M.beta)
-     length(unique(dat)); print(genelist.name)     
+genelist.name="age.intermediate.hypomethylation_15M_rep1"
+print("checkpoint22")
+age.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=.2 & (tss$csc15-tss$csc1)<=-.2),])
+age.hypomethylation.15M.true.genelist <- get.only.genelist(age.hypomethylation.15M.true)
+age.hypomethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)<=-.2),])
+age.hypomethylation.15M.false.genelist <- get.only.genelist(age.hypomethylation.15M.false)
+age.hypomethylation.15M.genelist <- setdiff(age.hypomethylation.15M.true.genelist, age.hypomethylation.15M.false.genelist)
+write.table(age.hypomethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(age.hypomethylation.15M.true.genelist); length(age.hypomethylation.15M.false.genelist); length(age.hypomethylation.15M.genelist)
+age.hypermethyation.15M.probes <- setdiff(age.hypomethylation.15M.true, age.hypomethylation.15M.false)
+age.hypermethyation.15M.beta <- tss[age.hypermethyation.15M.probes,]
+if(dim(age.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(age.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-#treatment specific (de)methylation
-genelist.name="treatment.specific.hypermethylation.stable_15M_rep1"
-treatment.specific.hypermethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=.05 & (tss$csc15-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.15M.true.genelist <- get.only.genelist(treatment.specific.hypermethylation.15M.true)
-treatment.specific.hypermethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.05 & (tss$csc15-tss$csc1)>=.2),])
-treatment.specific.hypermethylation.15M.false.genelist <- get.only.genelist(treatment.specific.hypermethylation.15M.false)
-treatment.specific.hypermethylation.15M.genelist <- setdiff(treatment.specific.hypermethylation.15M.true.genelist, treatment.specific.hypermethylation.15M.false.genelist)
-write.table(treatment.specific.hypermethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypermethylation.15M.true.genelist); length(treatment.specific.hypermethylation.15M.false.genelist); length(treatment.specific.hypermethylation.15M.genelist)
-treatment.specific.hypermethyation.15M.probes <- setdiff(treatment.specific.hypermethylation.15M.true, treatment.specific.hypermethylation.15M.false)
-treatment.specific.hypermethyation.15M.beta <- tss[treatment.specific.hypermethyation.15M.probes,]
-if(dim(treatment.specific.hypermethyation.15M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypermethyation.15M.beta)
-     length(unique(dat)); print(genelist.name)     
+#treatment.intermediate, age.specific methylation
+genelist.name="treatment.intermediate.hypermethylation_15M_rep1"
+print("checkpoint23")
+treatment.hypermethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)<=.2),])
+treatment.hypermethylation.15M.true.genelist <- get.only.genelist(treatment.hypermethylation.15M.true)
+treatment.hypermethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.2 & (tss$csc15-tss$csc1)>=.2),])
+treatment.hypermethylation.15M.false.genelist <- get.only.genelist(treatment.hypermethylation.15M.false)
+treatment.hypermethylation.15M.genelist <- setdiff(treatment.hypermethylation.15M.true.genelist, treatment.hypermethylation.15M.false.genelist)
+write.table(treatment.hypermethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypermethylation.15M.true.genelist); length(treatment.hypermethylation.15M.false.genelist); length(treatment.hypermethylation.15M.genelist)
+treatment.hypermethyation.15M.probes <- setdiff(treatment.hypermethylation.15M.true, treatment.hypermethylation.15M.false)
+treatment.hypermethyation.15M.beta <- tss[treatment.hypermethyation.15M.probes,]
+if(dim(treatment.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
 
-genelist.name="treatment.specific.hypomethylation.stable_15M_rep1"
-treatment.specific.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=.05 & (tss$csc15-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.15M.true.genelist <- get.only.genelist(treatment.specific.hypomethylation.15M.true)
-treatment.specific.hypomethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)>=.05 & (tss$csc15-tss$csc1)<=-.2),])
-treatment.specific.hypomethylation.15M.false.genelist <- get.only.genelist(treatment.specific.hypomethylation.15M.false)
-treatment.specific.hypomethylation.15M.genelist <- setdiff(treatment.specific.hypomethylation.15M.true.genelist, treatment.specific.hypomethylation.15M.false.genelist)
-write.table(treatment.specific.hypomethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
-length(treatment.specific.hypomethylation.15M.true.genelist); length(treatment.specific.hypomethylation.15M.false.genelist); length(treatment.specific.hypomethylation.15M.genelist)
-treatment.specific.hypomethyation.15M.probes <- setdiff(treatment.specific.hypomethylation.15M.true, treatment.specific.hypomethylation.15M.false)
-treatment.specific.hypomethyation.15M.beta <- tss[treatment.specific.hypomethyation.15M.probes,]
-if(dim(treatment.specific.hypomethyation.15M.beta)[1]>0){
-     dat <- get.genelist(treatment.specific.hypomethyation.15M.beta)
-     length(unique(dat)); print(genelist.name)     
+genelist.name="treatment.intermediate.hypomethylation_15M_rep1"
+print("checkpoint24")
+treatment.hypomethylation.15M.true <- rownames(tss[which((tss$c15-tss$c1)<=-.2 & (tss$csc15-tss$csc1)<=.2),])
+treatment.hypomethylation.15M.true.genelist <- get.only.genelist(treatment.hypomethylation.15M.true)
+treatment.hypomethylation.15M.false <- rownames(tss[which((tss$c15-tss$c1)<=-.2 & (tss$csc15-tss$csc1)>=.2),])
+treatment.hypomethylation.15M.false.genelist <- get.only.genelist(treatment.hypomethylation.15M.false)
+treatment.hypomethylation.15M.genelist <- setdiff(treatment.hypomethylation.15M.true.genelist, treatment.hypomethylation.15M.false.genelist)
+write.table(treatment.hypomethylation.15M.genelist, paste(newdir,"/TSS_", genelist.name, "_genelist.txt",sep=""), quote=F, row.names=F, col.names=F) #row.names set to T to get the probe ids.
+length(treatment.hypomethylation.15M.true.genelist); length(treatment.hypomethylation.15M.false.genelist); length(treatment.hypomethylation.15M.genelist)
+treatment.hypermethyation.15M.probes <- setdiff(treatment.hypomethylation.15M.true, treatment.hypomethylation.15M.false)
+treatment.hypermethyation.15M.beta <- tss[treatment.hypermethyation.15M.probes,]
+if(dim(treatment.hypermethyation.15M.beta)[1]>0){
+     dat <- get.genelist(treatment.hypermethyation.15M.beta)
+     length(unique(dat)); print(genelist.name)
 }else{
      print("No data: ", genelist.name)
 }
