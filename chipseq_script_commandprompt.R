@@ -96,23 +96,38 @@ if(genelist.name=="all"){
           print("stable.15M.newdata genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation_stable.15M.newdata_genelist.txt"))
      }
-     if(genelist.name=="rep1.trt.specific.stable.10M.new"){
-          print("rep1.trt.specific.stable.10M.new genelist selected")
-          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation.stable_10M_rep1_genelist.txt"))
+#      if(genelist.name=="rep1.trt.specific.stable.10M.new"){
+#           print("rep1.trt.specific.stable.10M.new genelist selected")
+#           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation.stable_10M_rep1_genelist.txt"))
+#      }
+#      if(genelist.name=="rep1.age.specific.stable.10M.new"){
+#           print("rep1.age.specific.10M.new genelist selected")
+#           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation.stable_10M_rep1_genelist.txt"))
+#      }
+#      if(genelist.name=="rep1.trt.specific.intermediate.10M.new"){
+#           print("rep1.trt.specific.intermediate.10M.new genelist selected")
+#           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation.intermediate_10M_rep1_genelist.txt"))
+#      }
+#      if(genelist.name=="rep1.age.specific.intermediate.10M.new"){
+#           print("rep1.age.specific.intermediate.10M.new genelist selected")
+#           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation.intermediate_10M_rep1_genelist.txt"))
+#      }
+     if(genelist.name=="rep1.trt.stable.10M.new"){
+          print("rep1.trt.stable.10M.new genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.stable.hypermethylation_10M_rep1_genelist.txt"))
      }
-     if(genelist.name=="rep1.age.specific.stable.10M.new"){
-          print("rep1.age.specific.10M.new genelist selected")
-          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation.stable_10M_rep1_genelist.txt"))
+     if(genelist.name=="rep1.age.stable.10M.new"){
+          print("rep1.age.10M.new genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.stable.hypermethylation_10M_rep1_genelist.txt"))
      }
-     if(genelist.name=="rep1.trt.specific.intermediate.10M.new"){
-          print("rep1.trt.specific.intermediate.10M.new genelist selected")
-          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.specific.hypermethylation.intermediate_10M_rep1_genelist.txt"))
+     if(genelist.name=="rep1.trt.intermediate.10M.new"){
+          print("rep1.trt.intermediate.10M.new genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_treatment.intermediate.hypermethylation_10M_rep1_genelist.txt"))
      }
-     if(genelist.name=="rep1.age.specific.intermediate.10M.new"){
-          print("rep1.age.specific.intermediate.10M.new genelist selected")
-          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.specific.hypermethylation.intermediate_10M_rep1_genelist.txt"))
-     }
-     
+     if(genelist.name=="rep1.age.intermediate.10M.new"){
+          print("rep1.age.intermediate.10M.new genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age.intermediate.hypermethylation_10M_rep1_genelist.txt"))
+     }     
      plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/",genelist.name,"/")
      plot_results_dir
      
