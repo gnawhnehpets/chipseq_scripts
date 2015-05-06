@@ -139,7 +139,7 @@ fun.TSSwindows <- function(goi.list, RegAroundTSS, bin, allGenesTSSWindowsBedFil
 ############################################################
 # Function to retrieve coverage data for a histone modification within a defined region up and 
 # downstream from the TSS for each gene in a gene list
-fun.GetGeneCoverage <- function(genelist.info, coverage.data, bin=200, RegAroundTSS=10000, chr.prefix.chromosome=T, version){
+fun.GetGeneCoverage <- function(genelist.info, coverage.data, bin=200, RegAroundTSS=10000, chr.prefix.chromosome=T, version, name.bucket=name.bucket){
     # This function extracts the coverage data in a defined region around the TSS (RegAroundTSS); 
     # genelist.info is the dataframe consisting the required information ("Gene", "Chromosome", "TSS", "Strand") 
     # about the genes (typically obtained from biomaRt); 
@@ -203,7 +203,61 @@ fun.GetGeneCoverage <- function(genelist.info, coverage.data, bin=200, RegAround
      names(genelist.info) <- chr
      coverage.data <- lapply(chr, FUN=function(u){coverage.data[coverage.data[,"Chromosome"] %in% u, ]})
      names(coverage.data) <- chr
-#      bucket <- vector()
+     genelist.info.new <- do.call(rbind, genelist.info)
+     # dim(genelist.info.new)
+     # genelist.info.new
+     # head(coverage.data[["chr1"]])
+     coverage <- vector()
+     for(i in 1:nrow(genelist.info.new)){
+          u <- genelist.info.new[i,"Chromosome"]
+          coverage.data.u <- coverage.data[[u]]
+          gene.coverage <- vector()
+          if(genelist.info.new[i, "Strand"]==1){
+               up <- as.numeric(genelist.info.new[i, "TSS"]) - window.bp
+               down <- as.numeric(genelist.info.new[i, "TSS"]) + window.bp
+               #pick the bins up and downstream of the TSS window (set to the bin size, i.e. the bin contaiing the TSS coordinate is considered
+               #the central bin, and the coverage in the required number of bins up- and down-stream from the central bin will be extracted)
+               gene.coverage <- coverage.data.u[(coverage.data.u[,"start"] >= up - bin) & (coverage.data.u[,"end"] < down + bin), "Seq_tags"]
+               # The number of bins extracted for gene.coverage should be equal to num.bins. For eg. for 10000bp and 200 bp bin, it will be 51. 
+               # If for some reason the number of coverage bins do not correspond to this number, remove them from the analysis (thus retain 
+               # only genes having number of coverage bins= num.bins). Note that the coverage.data should have start-end columns of the form 
+               # 0-200, 200-400, 400-600 (and not 0-199, 200-399, etc) for the >= and < operators to pick exactly the required number of bins.
+               # if the TSS is at an end of a chromosome (or the data for that region is lacking), then report these as NA's so that the 
+               # plotting functions later on work.
+               if (length(gene.coverage) == num.bins){ #print("hit1"); 
+                    gene.coverage=gene.coverage 
+               }else{ #print("hit2"); 
+                    gene.coverage=rep(NA,num.bins)}
+          }
+          else{
+               up <- as.numeric(genelist.info.new[i, "TSS"]) + window.bp
+               down <- as.numeric(genelist.info.new[i, "TSS"]) - window.bp
+               #pick the bins up and downstream of the TSS window as above (note that the up and down definitions are changed here because of the transcript orientation).
+               #Note that the coverage.data should have start-end columns of the form 0-200, 200-400, 400-600 (and not 0-199, 200-399, etc) for the >= and < operators to pick exactly the required number of bins.
+               gene.coverage <- coverage.data.u[(coverage.data.u[,"end"] < up + bin) & (coverage.data.u[,"start"] >= down - bin), c("start", "end", "Seq_tags")]
+               gene.coverage <- gene.coverage[order(gene.coverage[,"start"], decreasing=T), ] #this is done to have transcripts in the minus strand to be oriented from upstream to downstream
+               gene.coverage <- gene.coverage[, "Seq_tags"]
+               if (length(gene.coverage) == num.bins){#print("hit3"); 
+                    gene.coverage=gene.coverage 
+               }else{#print("hit4"); 
+                    gene.coverage=rep(NA,num.bins)}
+          }
+          gene.coverage <- as.matrix(gene.coverage)
+          if(dim(gene.coverage)[1]==num.bins){          
+               colnames(gene.coverage) <- genelist.info.new[i, "Gene"]
+               coverage <- cbind(coverage, gene.coverage)
+          }
+     }
+     dim(coverage)
+     print("###########################")
+     print("HEAD OF COVERAGE")
+     print("###########################")
+     print(head(coverage))
+#      print(paste0("colnames: ", colnames(coverage)))
+     print(dim(coverage))
+#     name.bucket <<- c(name.bucket, colnames(coverage))
+     return(coverage)
+#      name.bucket <- vector()
 #      #for each chromosome...
 #      # WORKING
 #      newlist <- lapply(chr, FUN=function(u){
@@ -256,7 +310,7 @@ fun.GetGeneCoverage <- function(genelist.info, coverage.data, bin=200, RegAround
 #                          }
 #                     }
 # #                    print(paste0("class: ", class(gene.coverage)))
-# #                     bucket <- c(bucket, genelist.info.u[x,"Gene"])
+# #                     name.bucket <- c(name.bucket, genelist.info.u[x,"Gene"])
 # #                     names(gene.coverage) <- genelist.info.u[x,"Gene"]
 # #                     colnames(gene.coverage) <- genelist.info.u[x,"Gene"]
 #                     new.list <- list("gene.cov"=gene.coverage, "names"=genelist.info.u[x,"Gene"])
@@ -334,57 +388,66 @@ fun.GetGeneCoverage <- function(genelist.info, coverage.data, bin=200, RegAround
 
 # #for each chromosome...
 # # WORKING
-newlist <- lapply(chr, FUN=function(u){
-     genelist.info.u <- genelist.info[[u]]
-     
-     #Get coverage data only if there is a gene in a particular iteration of a chromosome. 'if' condition used here so that the script 
-     #does not stop here  with an error if there is no gene in the query belonging to a particular chromosome.
-     if(dim(genelist.info.u)[1] > 0){
-          coverage.data.u <- coverage.data[[u]]
-          cov.chr <- sapply(1:nrow(genelist.info.u), FUN=function(x){
-               #           print(x)
-               if(genelist.info.u[x, "Strand"] == 1){
-                    up <- as.numeric(genelist.info.u[x, "TSS"]) - window.bp
-                    down <- as.numeric(genelist.info.u[x, "TSS"]) + window.bp
-                    
-                    #pick the bins up and downstream of the TSS window (set to the bin size, i.e. the bin contaiing the TSS coordinate is considered
-                    #the central bin, and the coverage in the required number of bins up- and down-stream from the central bin will be extracted)
-                    gene.coverage <- coverage.data.u[(coverage.data.u[,"start"] >= up - bin) & (coverage.data.u[,"end"] < down + bin), "Seq_tags"]
-                    # The number of bins extracted for gene.coverage should be equal to num.bins. For eg. for 10000bp and 200 bp bin, it will be 51. 
-                    # If for some reason the number of coverage bins do not correspond to this number, remove them from the analysis (thus retain 
-                    # only genes having number of coverage bins= num.bins). Note that the coverage.data should have start-end columns of the form 
-                    # 0-200, 200-400, 400-600 (and not 0-199, 200-399, etc) for the >= and < operators to pick exactly the required number of bins.
-                    # if the TSS is at an end of a chromosome (or the data for that region is lacking), then report these as NA's so that the 
-                    # plotting functions later on work.
-                    #                print(paste0("strand==1: ", class(gene.coverage)))
-                    if (length(gene.coverage) == num.bins){
-                         gene.coverage=gene.coverage
-                    }else{
-                         gene.coverage=rep(NA,num.bins)
-                    }
-               }else{
-                    
-                    up <- as.numeric(genelist.info.u[x, "TSS"]) + window.bp
-                    down <- as.numeric(genelist.info.u[x, "TSS"]) - window.bp
-                    #pick the bins up and downstream of the TSS window as above (note that the up and down definitions are changed here because of the transcript orientation).
-                    #Note that the coverage.data should have start-end columns of the form 0-200, 200-400, 400-600 (and not 0-199, 200-399, etc) for the >= and < operators to pick exactly the required number of bins.
-                    #                 gene.coverage <- vector()
-                    gene.coverage <- coverage.data.u[(coverage.data.u[,"end"] < up + bin) & (coverage.data.u[,"start"] >= down - bin), c("start", "end", "Seq_tags")]
-                    gene.coverage <- gene.coverage[order(gene.coverage[,"start"], decreasing=T), ] #this is done to have transcripts in the minus strand to be oriented from upstream to downstream
-                    gene.coverage <- gene.coverage[, "Seq_tags"]
-                    #               print(paste0("else:      ", class(gene.coverage)))
-                    if (length(gene.coverage) == num.bins){
-                         gene.coverage=gene.coverage
-                    }else{
-                         gene.coverage=rep(NA,num.bins)
-                    }
-               }
-               return(gene.coverage)
-          })
-          return(cov.chr)
-     }
-})
-coverage <- do.call(cbind, newlist)
+
+# newlist <- lapply(chr, FUN=function(u){
+#      genelist.info.u <- genelist.info[[u]]
+#      
+#      #Get coverage data only if there is a gene in a particular iteration of a chromosome. 'if' condition used here so that the script 
+#      #does not stop here  with an error if there is no gene in the query belonging to a particular chromosome.
+#      if(dim(genelist.info.u)[1] > 0){
+#           coverage.data.u <- coverage.data[[u]]
+#           cov.chr <- sapply(1:nrow(genelist.info.u), FUN=function(x){
+#                if(genelist.info.u[x, "Strand"] == 1){
+#                     up <- as.numeric(genelist.info.u[x, "TSS"]) - window.bp
+#                     down <- as.numeric(genelist.info.u[x, "TSS"]) + window.bp
+#                     
+#                     #pick the bins up and downstream of the TSS window (set to the bin size, i.e. the bin contaiing the TSS coordinate is considered
+#                     #the central bin, and the coverage in the required number of bins up- and down-stream from the central bin will be extracted)
+#                     gene.coverage <- coverage.data.u[(coverage.data.u[,"start"] >= up - bin) & (coverage.data.u[,"end"] < down + bin), "Seq_tags"]
+#                     # The number of bins extracted for gene.coverage should be equal to num.bins. For eg. for 10000bp and 200 bp bin, it will be 51. 
+#                     # If for some reason the number of coverage bins do not correspond to this number, remove them from the analysis (thus retain 
+#                     # only genes having number of coverage bins= num.bins). Note that the coverage.data should have start-end columns of the form 
+#                     # 0-200, 200-400, 400-600 (and not 0-199, 200-399, etc) for the >= and < operators to pick exactly the required number of bins.
+#                     # if the TSS is at an end of a chromosome (or the data for that region is lacking), then report these as NA's so that the 
+#                     # plotting functions later on work.
+#                     #                print(paste0("strand==1: ", class(gene.coverage)))
+#                     if (length(gene.coverage) == num.bins){
+#                          gene.coverage=gene.coverage
+#                     }else{
+#                          gene.coverage=rep(NA,num.bins)
+#                     }
+#                }else{
+#                     
+#                     up <- as.numeric(genelist.info.u[x, "TSS"]) + window.bp
+#                     down <- as.numeric(genelist.info.u[x, "TSS"]) - window.bp
+#                     #pick the bins up and downstream of the TSS window as above (note that the up and down definitions are changed here because of the transcript orientation).
+#                     #Note that the coverage.data should have start-end columns of the form 0-200, 200-400, 400-600 (and not 0-199, 200-399, etc) for the >= and < operators to pick exactly the required number of bins.
+#                     #                 gene.coverage <- vector()
+#                     gene.coverage <- coverage.data.u[(coverage.data.u[,"end"] < up + bin) & (coverage.data.u[,"start"] >= down - bin), c("start", "end", "Seq_tags")]
+#                     gene.coverage <- gene.coverage[order(gene.coverage[,"start"], decreasing=T), ] #this is done to have transcripts in the minus strand to be oriented from upstream to downstream
+#                     gene.coverage <- gene.coverage[, "Seq_tags"]
+#                     #               print(paste0("else:      ", class(gene.coverage)))
+#                     if (length(gene.coverage) == num.bins){
+#                          gene.coverage=gene.coverage
+#                     }else{
+#                          gene.coverage=rep(NA,num.bins)
+#                     }
+#                }
+#                name.bucket <<- c(name.bucket, genelist.info.u[x, "Gene"])
+# #               print(paste0("gene: ", genelist.info.u[x, "Gene"]))
+# #               print(paste0("name.bucket: ", name.bucket))
+#                return(gene.coverage)
+#           })
+#           return(cov.chr)
+#      }
+# })
+# coverage <- do.call(cbind, newlist)
+# # print(paste0("class: ", class(coverage)))
+# # print(paste0("dim: ", dim(coverage)))
+# # print(paste0("length: ", length(name.bucket)))
+# # colnames(coverage) <- name.bucket
+# # print(paste0("dim: ", dim(coverage)))
+# # print(paste0("dim: ", dim(coverage)))
 }
 
 
@@ -721,7 +784,7 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           num.bins <- (RegAroundTSS/bin)
           int <-  seq(from=-((num.bins-1)/2), to= (num.bins-1)/2, by=1)*bin
      }
-     print(paste0("int: ", int))
+#      print(paste0("int: ", int))
      # Read the input coverage file
      if(exists("input_coverage_file"))
      {
@@ -752,9 +815,33 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           for(g in 1:length(genelist.info)){
 #                g=1 #for troubleshooting
                #Retrieve regions within RegAroundTSS of TSS for each gene for each mark
-               chipCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=chip.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
-               print(rownames(chipCoverage.TSS))
-               inputCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=input.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
+#                chipCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=chip.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
+#                print(rownames(chipCoverage.TSS))
+#                inputCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=input.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
+               print("checkpoint:name.bucket1a")
+               name.bucket<-vector()
+               chipCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=chip.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version, name.bucket=name.bucket)
+               head(chipCoverage.TSS)
+               dim(chipCoverage.TSS)
+               print("checkpoint:name.bucket1b")
+#                print(paste0("bucket length: ", length(name.bucket)))
+#                print(paste0("bucket dim: ", dim(name.bucket)))
+#                print(name.bucket)
+#                colnames(chipCoverage.TSS) <- name.bucket
+               print("checkpoint:name.bucket1c")
+               
+               name.bucket<-vector()
+               inputCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=input.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version, name.bucket=name.bucket)
+               print("checkpoint:name.bucket2b")
+               
+               head(inputCoverage.TSS)
+               dim(inputCoverage.TSS)
+#                colnames(inputCoverage.TSS) <- name.bucket
+               print("checkpoint:name.bucket2c")
+               rownames(chipCoverage.TSS) <- rownames(inputCoverage.TSS) <- int
+               print(head(chipCoverage.TSS))
+               print(head(inputCoverage.TSS))
+               print("checkpoint:name.bucket3")
                
                if(dim(t(na.omit(t(chipCoverage.TSS))))[2] >= 2){#there should be coverage data for at least two genes (automatically it means that there is atleast two-gene coverage data for the input also). na.omit removes rows that contain NA in a data frame. t used here because columns containing NAs have to be removed - thus after omitting columns with NA, coverage data should have data for atleast 2 gene  to satisfy the 'if' statement.
                     ## Calculate average ChIP coverage
@@ -785,8 +872,12 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     }
                     # Generate matices for heatmaps
                     x.trnposed <- t(chipCoverage.TSS)
+#                     print("X.TRNPOSED1")
+#                     print(head(x.trnposed))
                     # remove NA values to account for missing values in 10bp bin
                     x.trnposed <- x.trnposed[complete.cases(x.trnposed),]
+#                     print("X.TRNPOSED2")
+#                     print(head(x.trnposed))
                     ratioToInp.x.trnposed <- t(chipCoverage.TSS/inputCoverage.TSSAverage) #ratio of seq reads to average of input for this set of genes
                     # remove NA values to account for missing values in 10bp bin
                     ratioToInp.x.trnposed <- ratioToInp.x.trnposed[complete.cases(ratioToInp.x.trnposed),]
@@ -796,7 +887,7 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     }
                     
                     colnames(x.trnposed) <- colnames(ratioToInp.x.trnposed) <- int
-                    rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$hgnc_symbol
+#                    rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$hgnc_symbol
                     numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x.trnposed, na.rm=T)[2]))
                     numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(ratioToInp.x.trnposed, na.rm=T)[2]))
 
@@ -876,6 +967,8 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                          dev.off()
                     }
                     if(which.rowsideann=="sort"){
+                         load(paste0(system.dir, "/Michelle/Robjects/sort.bivalent.annotations.rda"))
+                         
                          print("checkpoint.heatmap1b")
                          #If C10D samples, save the sort indices per sample
                          grep("^C10DInput", dir(coverage_files.dir))
@@ -938,12 +1031,48 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                               }
                          }
                          x.trnposed.order <- x.trnposed[custom.order,]
+#                          rownames(x.trnposed.order) <- rownames(x.trnposed)[custom.order]
                          ratioToInp.x.trnposed.order <- ratioToInp.x.trnposed[custom.order,]
+#                          print("#################")
+#                          print("ROW XTRNPOSED")
+#                          print("#################")
+#                          print(rownames(x.trnposed))
+                         print("#################")
+                         print("ROW XTRNPOSED.ORDER")
+                         print("#################")
+                         
+                         print(rownames(x.trnposed.order))
+                         print("#################")
+                         print("HEAD XTRNPOSED")
+                         print("#################")
+                         print(head(x.trnposed.order))
                          print(paste0("# of rows x.trnposed: ", nrow(x.trnposed)))
                          print(paste0("# of rows x.trnposed.order: ", nrow(x.trnposed.order)))
+                         
+                         c10d.bivalent <- C10D_K4.K27_genes
+                         csc10d.bivalent <- CSC10D_K4.K27_genes
+                         print("#################")
+                         print("HEAD c10d.bivalent")
+                         print("#################")
+                         print(paste0("length: ", length(c10d.bivalent)))
+                         print(c10d.bivalent)
+
+                         #length(which(grepl("TRIM36", c10d.bivalent)))
+                         row.annotation.color1 <- vector()
+                         # for (i in 1:length(dendrogram.order)) {
+                         # row.annotation.color[i] <- ifelse(dendrogram.order[i]==2, "green4", "red4")
+                         # }
+                         for (i in 1:length(rownames(x.trnposed.order))) {
+                              if(length(which(grepl(rownames(x.trnposed.order)[i], c10d.bivalent)))==1){
+                                   row.annotation.color1[i] <- "red"
+                              }else{
+                                   row.annotation.color1[i] <- "white"
+                              }
+                         }
+
                          print("raw heatmap")
                          jpeg(heat_plot_raw, height=500, width=800, quality=100)
-                         heatmap.3(x.trnposed.order, Rowv=F, Colv=F, col=mycol, scale="none", trace="none", dendrogram="none", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                         heatmap.3(x.trnposed.order, Rowv=F, Colv=F, col=mycol, RowSideColors=row.annotation.color1, scale="none", trace="none", dendrogram="none", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
                          dev.off()
                          print("ratio heatmap")
                          jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
