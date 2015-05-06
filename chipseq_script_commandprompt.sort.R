@@ -134,6 +134,10 @@ if(genelist.name=="all"){
           print("rep1.agerelated.10M.new genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age-related.05.hypermethylation_10M_rep1_genelist.txt"))
      }     
+     if(genelist.name=="rep1.cscrelated.10M.new"){
+          print("rep1.agerelated.10M.new genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_csc-related.05.hypermethylation_10M_rep1_genelist.txt"))
+     }     
 
      plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/",genelist.name,"/")
      plot_results_dir
