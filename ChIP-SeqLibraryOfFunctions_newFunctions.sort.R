@@ -139,7 +139,7 @@ fun.TSSwindows <- function(goi.list, RegAroundTSS, bin, allGenesTSSWindowsBedFil
 ############################################################
 # Function to retrieve coverage data for a histone modification within a defined region up and 
 # downstream from the TSS for each gene in a gene list
-fun.GetGeneCoverage <- function(genelist.info, coverage.data, bin=200, RegAroundTSS=10000, chr.prefix.chromosome=T, version, name.bucket=name.bucket){
+fun.GetGeneCoverage <- function(genelist.info, coverage.data, bin=200, RegAroundTSS=10000, chr.prefix.chromosome=T, version){#, name.bucket=name.bucket){
     # This function extracts the coverage data in a defined region around the TSS (RegAroundTSS); 
     # genelist.info is the dataframe consisting the required information ("Gene", "Chromosome", "TSS", "Strand") 
     # about the genes (typically obtained from biomaRt); 
@@ -796,10 +796,6 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
      }
      
      for(i in coverage_files){
-          
-          # i <- coverage_files[4] # for troubleshooting
-          # coverage_files
-          # i
           ############################################################
           ##Load the ChIP_seq coverage data
           ############################################################
@@ -811,7 +807,9 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           colnames(chip.coverage) <- c("Chromosome", "start", "end", "Seq_tags")
           chipCoverage.TSSAverageList <- list() # holds the ChIP average values object for genes in genelist.info
           inputCoverage.TSSAverageList <- list() # holds the Input average values object for genes in genelist.info
-          
+          print("#########################")
+          print(paste("i: ", i))
+          print("#########################")
           for(g in 1:length(genelist.info)){
 #                g=1 #for troubleshooting
                #Retrieve regions within RegAroundTSS of TSS for each gene for each mark
@@ -819,19 +817,19 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
 #                print(rownames(chipCoverage.TSS))
 #                inputCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=input.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)
                print("checkpoint:name.bucket1a")
-               name.bucket<-vector()
-               chipCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=chip.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version, name.bucket=name.bucket)
+#                name.bucket<-vector()
+               chipCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=chip.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)#, name.bucket=name.bucket)
                head(chipCoverage.TSS)
                dim(chipCoverage.TSS)
-               print("checkpoint:name.bucket1b")
+#                print("checkpoint:name.bucket1b")
 #                print(paste0("bucket length: ", length(name.bucket)))
 #                print(paste0("bucket dim: ", dim(name.bucket)))
 #                print(name.bucket)
 #                colnames(chipCoverage.TSS) <- name.bucket
-               print("checkpoint:name.bucket1c")
+#                print("checkpoint:name.bucket1c")
                
-               name.bucket<-vector()
-               inputCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=input.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version, name.bucket=name.bucket)
+#                name.bucket<-vector()
+               inputCoverage.TSS <- fun.GetGeneCoverage(genelist.info=genelist.info[[g]], coverage.data=input.coverage, RegAroundTSS=RegAroundTSS, bin=bin, chr.prefix.chromosome=chr.prefix.chromosome, version=version)#, name.bucket=name.bucket)
                print("checkpoint:name.bucket2b")
                
                head(inputCoverage.TSS)
@@ -842,7 +840,9 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                print(head(chipCoverage.TSS))
                print(head(inputCoverage.TSS))
                print("checkpoint:name.bucket3")
-               
+print("##########################")
+print(paste0("I CHECKPOINT1: ", i))
+print("##########################")
                if(dim(t(na.omit(t(chipCoverage.TSS))))[2] >= 2){#there should be coverage data for at least two genes (automatically it means that there is atleast two-gene coverage data for the input also). na.omit removes rows that contain NA in a data frame. t used here because columns containing NAs have to be removed - thus after omitting columns with NA, coverage data should have data for atleast 2 gene  to satisfy the 'if' statement.
                     ## Calculate average ChIP coverage
                     chipCoverage.TSSAverage <- apply(chipCoverage.TSS, 1, mean, na.rm=T)
@@ -872,12 +872,8 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     }
                     # Generate matices for heatmaps
                     x.trnposed <- t(chipCoverage.TSS)
-#                     print("X.TRNPOSED1")
-#                     print(head(x.trnposed))
                     # remove NA values to account for missing values in 10bp bin
                     x.trnposed <- x.trnposed[complete.cases(x.trnposed),]
-#                     print("X.TRNPOSED2")
-#                     print(head(x.trnposed))
                     ratioToInp.x.trnposed <- t(chipCoverage.TSS/inputCoverage.TSSAverage) #ratio of seq reads to average of input for this set of genes
                     # remove NA values to account for missing values in 10bp bin
                     ratioToInp.x.trnposed <- ratioToInp.x.trnposed[complete.cases(ratioToInp.x.trnposed),]
@@ -887,14 +883,15 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     }
                     
                     colnames(x.trnposed) <- colnames(ratioToInp.x.trnposed) <- int
-#                    rownames(x.trnposed) <- rownames(ratioToInp.x.trnposed) <- genelist.info[[g]]$hgnc_symbol
                     numberOfColors.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(x.trnposed, na.rm=T)[2]))
                     numberOfColors.ratioToInp.x.trnposed <- colorRampPalette(c("white", "black"))(round(range(ratioToInp.x.trnposed, na.rm=T)[2]))
 
                     # JPEG plots because pdf sizes are too huge
-                    ## Raw heatmap
-                    
+                    ##################################################
+                    ##################################################
                     # set break increment depending on range of counts
+                    ##################################################
+                    ##################################################
                     h3k4.increment <- h3k4.max/100
                     h3k27.increment <- h3k27.max/100
                     dnmt.increment <- dnmt.max/100
@@ -940,6 +937,11 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     }
                     mycol <- colorpanel(n=length(breaks)-1,low="gray100",mid="gray50",high="gray0")
                     print(paste0("WHICH.ROWSIDEANN: ", which.rowsideann))
+                    ##################################################
+                    ##################################################
+                    # Plots created depending on rowside options
+                    ##################################################
+                    ##################################################
                     if(which.rowsideann==FALSE){
                          print("checkpoint.heatmap1a")
                          #Sort rows by total read count, no clustering
@@ -973,6 +975,9 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                          #If C10D samples, save the sort indices per sample
                          grep("^C10DInput", dir(coverage_files.dir))
                          custom.order <- vector()
+                         print("##########################")
+                         print(paste0("I CHECKPOINT2: ", i))
+                         print("##########################")
                          if(grepl("^C10D", i)){
                               if(grepl("^C10DH3K4", i)){
                                    C10DH3K4.order <- order(rowSums(x.trnposed))
@@ -1031,55 +1036,52 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                               }
                          }
                          x.trnposed.order <- x.trnposed[custom.order,]
-#                          rownames(x.trnposed.order) <- rownames(x.trnposed)[custom.order]
                          ratioToInp.x.trnposed.order <- ratioToInp.x.trnposed[custom.order,]
 #                          print("#################")
 #                          print("ROW XTRNPOSED")
 #                          print("#################")
 #                          print(rownames(x.trnposed))
-                         print("#################")
-                         print("ROW XTRNPOSED.ORDER")
-                         print("#################")
                          
-                         print(rownames(x.trnposed.order))
-                         print("#################")
-                         print("HEAD XTRNPOSED")
-                         print("#################")
-                         print(head(x.trnposed.order))
-                         print(paste0("# of rows x.trnposed: ", nrow(x.trnposed)))
-                         print(paste0("# of rows x.trnposed.order: ", nrow(x.trnposed.order)))
+#                          print(rownames(x.trnposed.order))
+#                          print(head(x.trnposed.order))
+#                          print(paste0("# of rows x.trnposed: ", nrow(x.trnposed)))
+#                          print(paste0("# of rows x.trnposed.order: ", nrow(x.trnposed.order)))
                          
                          c10d.bivalent <- C10D_K4.K27_genes
                          csc10d.bivalent <- CSC10D_K4.K27_genes
-                         print("#################")
-                         print("HEAD c10d.bivalent")
-                         print("#################")
-                         print(paste0("length: ", length(c10d.bivalent)))
-                         print(c10d.bivalent)
+#                          print("############################")
+#                          print("# create bivalent annotation")
+#                          print("############################")
 
                          #length(which(grepl("TRIM36", c10d.bivalent)))
                          row.annotation.color1 <- vector()
-                         # for (i in 1:length(dendrogram.order)) {
-                         # row.annotation.color[i] <- ifelse(dendrogram.order[i]==2, "green4", "red4")
-                         # }
-                         for (i in 1:length(rownames(x.trnposed.order))) {
-                              if(length(which(grepl(rownames(x.trnposed.order)[i], c10d.bivalent)))==1){
-                                   row.annotation.color1[i] <- "red"
-                              }else{
-                                   row.annotation.color1[i] <- "white"
-                              }
+                         for (j in 1:length(rownames(x.trnposed.order))) {
+                              row.annotation.color1[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], c10d.bivalent)))==1, "green2", "gray20")
                          }
-
+                         row.annotation.color2 <- vector()
+                         for (j in 1:length(rownames(x.trnposed.order))) {
+                              row.annotation.color2[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], csc10d.bivalent)))==1, "green2", "gray20")
+                         }
+# man the contrast between /r/baltimore and /r/triangle. "i was woken up last night by loud popp
+                         row.annotation.color1 <- t(as.matrix(row.annotation.color1))
+                         rownames(row.annotation.color1) <- "C10D.BIV"
+                         row.annotation.color2 <- t(as.matrix(row.annotation.color2))
+                         rownames(row.annotation.color2) <- "CSC10D.BIV"
+                         custom.annotation <- rbind(row.annotation.color1, row.annotation.color2)
+                         print(paste0("DIM: ", dim(custom.annotation)))
+                         for(k in 1:ncol(custom.annotation)){
+                              if(custom.annotation[1,k]=="green2" & custom.annotation[2,k]=="green2"){ custom.annotation[1,k] <- "lightblue"; custom.annotation[2,k] <- "lightblue"}
+#                               ifelse(custom.annotation[2,i]=="green4", custom.annotation[2,i] <- "lightblue", )
+                         }
                          print("raw heatmap")
                          jpeg(heat_plot_raw, height=500, width=800, quality=100)
-                         heatmap.3(x.trnposed.order, Rowv=F, Colv=F, col=mycol, RowSideColors=row.annotation.color1, scale="none", trace="none", dendrogram="none", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                         heatmap.3(x.trnposed.order, Rowv=F, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="none", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
                          dev.off()
                          print("ratio heatmap")
                          jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
-                         heatmap.3(ratioToInp.x.trnposed.order, Rowv=F, Colv=F, col=mycol, scale="none", trace="none", dendrogram="none", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                         heatmap.3(ratioToInp.x.trnposed.order, Rowv=F, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="none", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
                          dev.off()
-                    }
-                    
+                    }                    
                     if(which.rowsideann=="cluster" | which.rowsideann==TRUE){
                          print("checkpoint.heatmap1c")
                          print("raw heatmap")
@@ -1093,7 +1095,7 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                     }
                     
                     
-#                     
+# ORIGINAL                     
 #                     jpeg(heat_plot_raw, height = 500, width = 800, quality=100)
 #                     if(which.rowsideann){
 #                          heatmap.3(x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
@@ -1133,9 +1135,17 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           } # end of for loop to loop through gene lists in genelist.info 
           
           # Plot average coverage and RATIO to input plots
+          print("#########################")
+          print("I TEST")
+          print("#########################")
+          print(paste("i: ", i))
           avAndRATIO_plot <- paste(i, "avAndRATIO_plot.pdf", sep="-")
           avAndRATIO_plot <- paste(plot.Directory, avAndRATIO_plot, sep="/")
           avAndRATIO_plot
+          print("#########################")
+          print("avAndRATIO_plot")
+          print("#########################")
+          print(avAndRATIO_plot)
           pdf(avAndRATIO_plot, height = 5, width = 8)
           par(mfcol=c(1,1), mar=c(5,5,3,1))
           # Average plot
