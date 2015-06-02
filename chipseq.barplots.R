@@ -5,11 +5,12 @@
 ################################################################################
 ################################################################################
 system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
+system.dir="/Volumes/onc-analysis$/users/shwang26/"
 # system.dir="/Volumes/onc-analysis$/stephenhwang/"
 # system.dir="/amber2/scratch/baylin/shwang/"
 # system.dir="Z:/users/shwang26/"
 # source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_original.R"))
-source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_newFunctions.R"))
+source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_newFunctions.sort.R"))
 date <- gsub(" \\d+\\:\\d+\\:\\d+.*", "", Sys.time())
 newdir <- paste0(system.dir, "Michelle/Analysis/chipseq_plot/", date)
 newdir
@@ -44,7 +45,7 @@ load(file=paste0(system.dir, "Michelle/Robjects/genelists.rda"))
 # generate plots
 ################################################################################
 ################################################################################
-methylatedGeneListsDir=paste0(system.dir, "Michelle/MethylationData/methylatedGeneLists")
+methylatedGeneListsDir=paste0(system.dir, "Michelle/MethylationData/methylatedGeneLists/old")
 
 
 fun.find.unique.genes.between.group(C10D_EZH2_genes, CSC10D_EZH2_genes, "C10D", "CSC10D_EZH2")
@@ -54,6 +55,8 @@ fun.find.unique.genes.between.group(C10D_K4.K27_genes, CSC10D_K4.K27_genes, "C10
 fun.find.unique.genes.between.group(C3M_K4.K27_genes, CSC3M_K4.K27_genes, "C3M", "CSC3M_K4.K27")
 fun.find.unique.genes.between.group(C10M_K4.K27_genes, CSC10M_K4.K27_genes, "C10M", "CSC10M_K4.K27")
 
+#original barplots
+getwd()
 # create barplots
 for(i in dir(methylatedGeneListsDir)){ # for each file
      tab=read.table(file.path(methylatedGeneListsDir, i), header=F, sep="\t", stringsAsFactors=F) # read in
@@ -130,7 +133,7 @@ for(i in dir(methylatedGeneListsDir)){ # for each file
                  set6Name="C3M_EZH2", 
                  set7Name="CSC3M_EZH2", 
                  barPlotName=paste(i, "barPlotEZH2", sep="_"), 
-                 plotDir=paste0(dir,"Michelle/Analysis/Plots/all3_Comparisons")
+                 plotDir=paste0(dir,"Michelle/Analysis/Plots/all3_Comparisons"))
 }
 
 # generate barplots based off all comparisons
@@ -197,18 +200,12 @@ dir(methylatedGeneListsDir)
 genelists <- c("intermediate.10M", 
                "intermediate.10M.new", 
                "stable.10M", 
-               "stable.10M.new", 
-               "age.dependent",
-               "intermediate.10M.newdata",
-               "intermediate.15M.newdata",
-               "intermediate.6M.newdata",
-               "stable.10M.newdata",
-               "stable.15M.newdata",
-               "stable.1M.newdata",
-               "stable.6M.newdata",
+               "stable.10M.new"
                )
-filename <- dir(methylatedGeneListsDir)[4]
-genelist.name <- genelists[4]
+filename <- dir(methylatedGeneListsDir)[3]
+genelist.name <- genelists[3]
+# filename <- dir(methylatedGeneListsDir)[11]
+# genelist.name <- genelists[6]
 filename
 genelist.name
 meth.genes=read.table(file.path(methylatedGeneListsDir, filename), header=F, sep="\t", stringsAsFactors=F) # read in
@@ -224,61 +221,180 @@ colnames(meth.genes) <- genelist.name
 head(meth.genes)
 dim(meth.genes)
 # all genes
-mark = cbind("EZH2", "H3K4", "H3K27", "K4.K27")
-# mark <- mark[2]
-# mark
+mark = cbind("EZH2", "H3K4", "H3K27", "DNMT1", "K4.K27")
 
-# pause <- function(x)
-# {
-#      p1 <- proc.time()
-#      Sys.sleep(x)
-#      proc.time() - p1 # The cpu usage should be negligible
-# }
-# pause(3.7)
+harix <- as.matrix(read.table(paste0(system.dir, "Michelle/Required_Files/Annotations/barplot/x.txt"), fill=TRUE, row.names=NULL, stringsAsFactors = FALSE, header=TRUE))
+harix
+intersect<- intersect(harix, cpgi.genes)
+length(intersect)
+diff <- setdiff(cpgi.genes, harix)
+diff
+length(intersect)+length(diff)
 
+length(diff)
+
+cpgi.genes.tmp <- read.table(paste0(system.dir, "Michelle/Required_Files/Annotations/barplot/CpG_island_genes.txt"), fill=TRUE, row.names=NULL, stringsAsFactors = TRUE)
+cpgi.genes.tmp <- read.table.("/Users/stephenhwang/Downloads/")
+#cpgi.genes.tmp <- read.table(paste0(system.dir, "Michelle/Required_Files/Annotations/barplot/CpG_island_genes.txt"), fill=TRUE, row.names=NULL, stringsAsFactors = FALSE, sep="\t")
+cpgi.genes <- sort(unique(cpgi.genes.tmp$hgnc_symbol))
+cpgi.genes
+dim(cpgi.genes.tmp)
+length(cpgi.genes)
+head(cpgi.genes.tmp)
+head(cpgi.genes.tmp$hgnc_symbol, n=1000)
+
+noncpgi.genes.tmp <- read.table(paste0(system.dir, "/Michelle/Required_Files/Annotations/barplot/Non-CpG_island_genes.txt"), fill=TRUE, row.names=NULL, header=TRUE)
+noncpgi.genes <- sort(unique(noncpgi.genes.tmp$hgnc_symbol))
+head(noncpgi.genes.tmp)
+dim(noncpgi.genes.tmp)
+length(noncpgi.genes)
+head(noncpgi.genes.tmp$hgnc_symbol, n=1000)
+
+intersect(C10D_EZH2_genes, cpgi.genes)
+intersect(C10D_EZH2_genes, noncpgi.genes)
+
+look.at="noncpgvscpg"
+look.at="cpg"
+look.at="noncpg"
+look.at="both"
 for(i in 1:length(mark)){
-     if(mark[i]=="EZH2")     {
-          print("EZH2 hit")
-          s1 <- unique(C10D_EZH2_genes)
-          s2 <- unique(CSC10D_EZH2_genes)
-          s3 <- unique(C3M_EZH2_genes)
-          s4 <- unique(CSC3M_EZH2_genes)
-          s5 <- unique(C10M_EZH2_genes)
-          s6 <- unique(CSC10M_EZH2_genes)
+     load(file=paste0(system.dir, "Michelle/Robjects/genelists.rda"))
+     if(look.at=="both"){
+          print("both")
+          name1 <- "both_C10D"
+          name2 <- "both_CSC10D"
+          name3 <- "both_C3M"
+          name4 <- "both_CSC3M"
+          name5 <- "both_C10M"
+          name6 <- "both_CSC10M"
+          if(mark[i]=="EZH2"){
+               print("EZH2 hit")
+               s1 <- unique(C10D_EZH2_genes)
+               s2 <- unique(CSC10D_EZH2_genes)
+               s3 <- unique(C3M_EZH2_genes)
+               s4 <- unique(CSC3M_EZH2_genes)
+               s5 <- unique(C10M_EZH2_genes)
+               s6 <- unique(CSC10M_EZH2_genes)
+          }
+          if(mark[i]=="H3K4"){
+               print("H3K4 hit")
+               s1 <- unique(C10D_K4_genes)
+               s2 <- unique(CSC10D_K4_genes)
+               s3 <- unique(C3M_K4_genes)
+               s4 <- unique(CSC3M_K4_genes)
+               s5 <- unique(C10M_K4_genes)
+               s6 <- unique(CSC10M_K4_genes)          
+          }
+          if(mark[i]=="H3K27"){
+               print("H3K27 hit")
+               s1 <- unique(C10D_K27_genes)
+               s2 <- unique(CSC10D_K27_genes)
+               s3 <- unique(C3M_K27_genes)
+               s4 <- unique(CSC3M_K27_genes)
+               s5 <- unique(C10M_K27_genes)
+               s6 <- unique(CSC10M_K27_genes)          
+          }
+          if(mark[i]=="K4.K27"){
+               print("K4.K27 hit")
+               s1 <- unique(C10D_K4.K27_genes)
+               s2 <- unique(CSC10D_K4.K27_genes)
+               s3 <- unique(C3M_K4.K27_genes)
+               s4 <- unique(CSC3M_K4.K27_genes)
+               s5 <- unique(C10M_K4.K27_genes)
+               s6 <- unique(CSC10M_K4.K27_genes)
+          }
      }
-     if(mark[i]=="H3K4"){
-          print("H3K4 hit")
-          s1 <- unique(C10D_K4_genes)
-          s2 <- unique(CSC10D_K4_genes)
-          s3 <- unique(C3M_K4_genes)
-          s4 <- unique(CSC3M_K4_genes)
-          s5 <- unique(C10M_K4_genes)
-          s6 <- unique(CSC10M_K4_genes)          
+     if(look.at=="cpg"){
+          print("CPG")
+          name1 <- "cpg_C10D"
+          name2 <- "cpg_CSC10D"
+          name3 <- "cpg_C3M"
+          name4 <- "cpg_CSC3M"
+          name5 <- "cpg_C10M"
+          name6 <- "cpg_CSC10M"
+          if(mark[i]=="EZH2"){
+               print("EZH2 hit")
+               s1 <- unique(intersect(C10D_EZH2_genes, cpgi.genes))
+               s2 <- unique(intersect(CSC10D_EZH2_genes, cpgi.genes))
+               s3 <- unique(intersect(C3M_EZH2_genes, cpgi.genes))
+               s4 <- unique(intersect(CSC3M_EZH2_genes, cpgi.genes))
+               s5 <- unique(intersect(C10M_EZH2_genes, cpgi.genes))
+               s6 <- unique(intersect(CSC10M_EZH2_genes, cpgi.genes))
+          }
+          if(mark[i]=="H3K4"){
+               print("H3K4 hit")
+               s1 <- unique(intersect(C10D_K4_genes, cpgi.genes))
+               s2 <- unique(intersect(CSC10D_K4_genes, cpgi.genes))
+               s3 <- unique(intersect(C3M_K4_genes, cpgi.genes))
+               s4 <- unique(intersect(CSC3M_K4_genes, cpgi.genes))
+               s5 <- unique(intersect(C10M_K4_genes, cpgi.genes))
+               s6 <- unique(intersect(CSC10M_K4_genes, cpgi.genes))          
+          }
+          if(mark[i]=="H3K27"){
+               print("H3K27 hit")
+               s1 <- unique(intersect(C10D_K27_genes, cpgi.genes))
+               s2 <- unique(intersect(CSC10D_K27_genes, cpgi.genes))
+               s3 <- unique(intersect(C3M_K27_genes, cpgi.genes))
+               s4 <- unique(intersect(CSC3M_K27_genes, cpgi.genes))
+               s5 <- unique(intersect(C10M_K27_genes, cpgi.genes))
+               s6 <- unique(intersect(CSC10M_K27_genes, cpgi.genes))          
+          }
+          if(mark[i]=="K4.K27"){
+               print("K4.K27 hit")
+               s1 <- unique(intersect(C10D_K4.K27_genes, cpgi.genes))
+               s2 <- unique(intersect(CSC10D_K4.K27_genes, cpgi.genes))
+               s3 <- unique(intersect(C3M_K4.K27_genes, cpgi.genes))
+               s4 <- unique(intersect(CSC3M_K4.K27_genes, cpgi.genes))
+               s5 <- unique(intersect(C10M_K4.K27_genes, cpgi.genes))
+               s6 <- unique(intersect(CSC10M_K4.K27_genes, cpgi.genes))
+          }
      }
-     if(mark[i]=="H3K27"){
-          print("H3K27 hit")
-          s1 <- unique(C10D_K27_genes)
-          s2 <- unique(CSC10D_K27_genes)
-          s3 <- unique(C3M_K27_genes)
-          s4 <- unique(CSC3M_K27_genes)
-          s5 <- unique(C10M_K27_genes)
-          s6 <- unique(CSC10M_K27_genes)          
+     if(look.at=="noncpg"){
+          print("NON-CPG")
+          name1 <- "noncpg_C10D"
+          name2 <- "noncpg_CSC10D"
+          name3 <- "noncpg_C3M"
+          name4 <- "noncpg_CSC3M"
+          name5 <- "noncpg_C10M"
+          name6 <- "noncpg_CSC10M"
+          if(mark[i]=="EZH2"){
+               print("EZH2 hit")
+               s1 <- unique(intersect(C10D_EZH2_genes, noncpgi.genes))
+               s2 <- unique(intersect(CSC10D_EZH2_genes, noncpgi.genes))
+               s3 <- unique(intersect(C3M_EZH2_genes, noncpgi.genes))
+               s4 <- unique(intersect(CSC3M_EZH2_genes, noncpgi.genes))
+               s5 <- unique(intersect(C10M_EZH2_genes, noncpgi.genes))
+               s6 <- unique(intersect(CSC10M_EZH2_genes, noncpgi.genes))
+          }
+          if(mark[i]=="H3K4"){
+               print("H3K4 hit")
+               s1 <- unique(intersect(C10D_K4_genes, noncpgi.genes))
+               s2 <- unique(intersect(CSC10D_K4_genes, noncpgi.genes))
+               s3 <- unique(intersect(C3M_K4_genes, noncpgi.genes))
+               s4 <- unique(intersect(CSC3M_K4_genes, noncpgi.genes))
+               s5 <- unique(intersect(C10M_K4_genes, noncpgi.genes))
+               s6 <- unique(intersect(CSC10M_K4_genes, noncpgi.genes))          
+          }
+          if(mark[i]=="H3K27"){
+               print("H3K27 hit")
+               s1 <- unique(intersect(C10D_K27_genes, noncpgi.genes))
+               s2 <- unique(intersect(CSC10D_K27_genes, noncpgi.genes))
+               s3 <- unique(intersect(C3M_K27_genes, noncpgi.genes))
+               s4 <- unique(intersect(CSC3M_K27_genes, noncpgi.genes))
+               s5 <- unique(intersect(C10M_K27_genes, noncpgi.genes))
+               s6 <- unique(intersect(CSC10M_K27_genes, noncpgi.genes))          
+          }
+          if(mark[i]=="K4.K27"){
+               print("K4.K27 hit")
+               s1 <- unique(intersect(C10D_K4.K27_genes, noncpgi.genes))
+               s2 <- unique(intersect(CSC10D_K4.K27_genes, noncpgi.genes))
+               s3 <- unique(intersect(C3M_K4.K27_genes, noncpgi.genes))
+               s4 <- unique(intersect(CSC3M_K4.K27_genes, noncpgi.genes))
+               s5 <- unique(intersect(C10M_K4.K27_genes, noncpgi.genes))
+               s6 <- unique(intersect(CSC10M_K4.K27_genes, noncpgi.genes))
+          }
      }
-     if(mark[i]=="K4.K27"){
-          print("K4.K27 hit")
-          s1 <- unique(C10D_K4.K27_genes)
-          s2 <- unique(CSC10D_K4.K27_genes)
-          s3 <- unique(C3M_K4.K27_genes)
-          s4 <- unique(CSC3M_K4.K27_genes)
-          s5 <- unique(C10M_K4.K27_genes)
-          s6 <- unique(CSC10M_K4.K27_genes)
-     }
-     name1 <- "C10D"
-     name2 <- "CSC10D"
-     name3 <- "C3M"
-     name4 <- "CSC3M"
-     name5 <- "C10M"
-     name6 <- "CSC10M"
+
      ################################
      # all.genes
      ################################
@@ -490,12 +606,12 @@ for(i in 1:length(mark)){
   percentage.m6t
   
      # writeout common all.genes across all timepoints
-     write.table(c(paste0("# common.all.genes_CONTROL_", mark[i], "_" ,genelist.name), sort(common.con_genes)), file=paste0("common.all.genes_CONTROL_", mark[i], "_" , genelist.name, "_sample.group.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
-     write.table(c(paste0("# common.all.genes_CSC_", mark[i], "_" ,genelist.name), sort(common.csc_genes)), file=paste0("common.all.genes_CSC_", mark[i], "_" , genelist.name, "_sample.group.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(c(paste0("# common.all.genes_CONTROL_", mark[i], "_", look.at, "_", genelist.name), sort(common.con_genes)), file=paste0("common.all.genes_CONTROL_", mark[i], "_" , genelist.name, "_sample.group.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(c(paste0("# common.all.genes_CSC_", mark[i], "_", look.at, "_", genelist.name), sort(common.csc_genes)), file=paste0("common.all.genes_CSC_", mark[i], "_" , genelist.name, "_sample.group.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
      #* writeout common genes between control and csc at timepoint
-     write.table(c(paste0("# common.10D.genes_", mark[i], "_" ,genelist.name), sort(common.10d_genes)), file=paste0("common.10D.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
-     write.table(c(paste0("# common.3M.genes_", mark[i], "_" ,genelist.name), sort(common.3m_genes)), file=paste0("common.3M.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
-     write.table(c(paste0("# common.10M.genes_", mark[i], "_" ,genelist.name), sort(common.10m_genes)), file=paste0("common.10M.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(c(paste0("# common.10D.genes_", mark[i], "_", look.at, "_", genelist.name), sort(common.10d_genes)), file=paste0("common.10D.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(c(paste0("# common.3M.genes_", mark[i], "_", look.at, "_", genelist.name), sort(common.3m_genes)), file=paste0("common.3M.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(c(paste0("# common.10M.genes_", mark[i], "_", look.at, "_", genelist.name), sort(common.10m_genes)), file=paste0("common.10M.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
 
      # writeout genes unique to control/csc vs. common control/csc genes
      write.table(c(paste0("# unique.all.genes_", mark[i], "_" ,genelist.name, "_", name1), sort(unique.to.s1)), file=paste0("unique.all.genes_", mark[i], "_" , genelist.name, "_", name1,"_sample.group.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
@@ -513,12 +629,12 @@ for(i in 1:length(mark)){
      write.table(c(paste0("# unique.csc10m.genes_", mark[i], "_" ,genelist.name, "_", name6), sort(unique.to.csc10m)), file=paste0("unique.csc10m.genes_", mark[i], "_" , genelist.name, "_", name6,"_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
      
      # writeout common meth.genes across all timepoints
-     write.table(c(paste0("# common.meth.genes_CONTROL_", mark[i], "_" ,genelist.name), sort(m.con_genes)), file=paste0("common.meth.genes_CONTROL_", mark[i], "_" , genelist.name, "_sample.group.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
-     write.table(c(paste0("# common.meth.genes_CSC_", mark[i], "_" ,genelist.name), sort(m.csc_genes)), file=paste0("common.meth.genes_CSC_", mark[i], "_" , genelist.name, "_sample.group.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)     
+     write.table(c(paste0("# common.meth.genes_CONTROL_", mark[i], "_", look.at, "_", genelist.name), sort(m.con_genes)), file=paste0("common.meth.genes_CONTROL_", mark[i], "_" , genelist.name, "_sample.group.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(c(paste0("# common.meth.genes_CSC_", mark[i], "_", look.at, "_", genelist.name), sort(m.csc_genes)), file=paste0("common.meth.genes_CSC_", mark[i], "_" , genelist.name, "_sample.group.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)     
      # writeout common meth genes between control and csc at timepoint
-     write.table(c(paste0("# common.meth.10d.genes_", mark[i], "_" ,genelist.name), sort(m.10d_genes)), file=paste0("common.meth.10d.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
-     write.table(c(paste0("# common.meth.3m.genes_", mark[i], "_" ,genelist.name), sort(m.3m_genes)), file=paste0("common.meth.3m.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
-     write.table(c(paste0("# common.meth.10m.genes_", mark[i], "_" ,genelist.name), sort(m.10m_genes)), file=paste0("common.meth.10m.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(c(paste0("# common.meth.10d.genes_", mark[i], "_", look.at, "_", genelist.name), sort(m.10d_genes)), file=paste0("common.meth.10d.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(c(paste0("# common.meth.3m.genes_", mark[i], "_", look.at, "_", genelist.name), sort(m.3m_genes)), file=paste0("common.meth.3m.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
+     write.table(c(paste0("# common.meth.10m.genes_", mark[i], "_", look.at, "_", genelist.name), sort(m.10m_genes)), file=paste0("common.meth.10m.genes_", mark[i], "_" , genelist.name, "_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
      
      # writeout meth.genes unique at each control timepoint vs common control genes
      write.table(c(paste0("# unique.meth.genes_", mark[i], "_" ,genelist.name, "_", name1), sort(unique.meth.genes.to.1)), file=paste0("unique.meth.genes_", mark[i], "_" , genelist.name, "_", name1,"_sample.group.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
@@ -535,12 +651,190 @@ for(i in 1:length(mark)){
      write.table(c(paste0("# unique.meth.c10m.genes_", mark[i], "_" ,genelist.name, "_", name5), sort(unique.meth.genes.to.5t)), file=paste0("unique.meth.c10m.genes_", mark[i], "_" , genelist.name, "_", name5,"_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
      write.table(c(paste0("# unique.meth.csc10m.genes_", mark[i], "_" ,genelist.name, "_", name6), sort(unique.meth.genes.to.6t)), file=paste0("unique.meth.csc10m.genes_", mark[i], "_" , genelist.name, "_", name6,"_timepoint.txt"), row.names=FALSE, col.names=FALSE, quote=FALSE)
      
+#      ###########################################
+#      # PLOT 8
+#      # BOTH CONTROL & CSC - unique&common methylated.genes
+#      ###########################################
+#      ylim_custom1 <- c(0, max(cbind(n1, n2, n3, n4, n5, n6)))
+#      jpeg(paste0("unique&common.meth.genes_",mark[i],"_",genelist.name,"_sample.group.jpeg"), height = 900, width = 1600, quality=100)
+#      tmpmat <- rbind(c(0,1,2,3,0,4,5,0,6,7,8,0))
+#      layout(tmpmat, widths=c(1,3,3.5,3.5,3,3.5,3.5,3,3.5,3.5,11,2))
+#      par(mar=c(3,2,5,2))
+#      # stack1 - C10D, CSC10D
+#      #1
+#      barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+#      mtext(text='# of genes',side=2,line=1, cex=2)
+#      #2
+#      # stack3 - C10D, CSC10D
+#      b <- barplot(t(cbind(c(unique.m1), c(m.con))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name1), cex.names=2.5, cex.axis=2.5, cex.lab=2.5, ylim=ylim_custom1, beside=FALSE) #ylab="# of genes", 
+#      text(b, 1, percentage.m1, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique.m2), c(m.csc))), col=c("royalblue", "darkgoldenrod4") , names.arg=c(name2), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.m2, cex=2.5, pos=3)
+#      # stack2 - C3M, CSC3M
+#      b <- barplot(t(cbind(c(unique.m3), c(m.con))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name3), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.m3, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique.m4), c(m.csc))), col=c("royalblue", "darkgoldenrod4") , names.arg=c(name4), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.m4, cex=2.5, pos=3)
+#      # stack3 - C10M, CSC10M
+#      b <- barplot(t(cbind(c(unique.m5), c(m.con))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name5), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.m5, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique.m6), c(m.csc))), col=c("royalblue", "darkgoldenrod4") , names.arg=c(name6), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.m6, cex=2.5, pos=3)
+#      # dummy plot
+#      barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+#      legend("center", fill=c("lightskyblue", "royalblue", "darkgoldenrod1", "white", "darkgoldenrod4", "white"), legend=c("unique CON meth.genes", "unique CSC meth.genes", "common meth.genes", "across all CON timepoints","common meth.genes", "across all CSC timepoints"), inset=c(-1.6,0), border="white", box.col="white", cex=2)
+#      title(paste0(mark[i], " - ",genelist.name,"\nunique&common meth.genes"), cex.main=3, outer=FALSE, line=-2)
+#      dev.off()
+#      
+#      ###########################################
+#      # PLOT 9
+#      # BOTH CONTROL & CSC - unique&common all.genes
+#      ###########################################
+#      ylim_custom1 <- c(0, max(cbind(a1, a2, a3, a4, a5, a6)))
+#      ylim_custom1
+#      jpeg(paste0("unique&common.all.genes_",mark[i],"_",genelist.name,"_sample.group.jpeg"), height = 900, width = 1600, quality=100)
+#      tmpmat <- rbind(c(0,1,2,3,0,4,5,0,6,7,8,0))
+#      layout(tmpmat, widths=c(1,3,3.5,3.5,3,3.5,3.5,3,3.5,3.5,11,2))
+#      par(mar=c(3,2,5,2))
+#      # stack1 - C10D, CSC10D
+#      #1
+#      barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+#      mtext(text='# of genes',side=2,line=1, cex=2)
+#      #2
+#      # stack3 - C10D, CSC10D
+#      b <- barplot(t(cbind(c(unique1), c(common.con))), col=c("green2", "orange") , names.arg=c(name1), cex.names=2.5, cex.axis=2.5, cex.lab=2.5, ylim=ylim_custom1, beside=FALSE) #ylab="# of genes", 
+#      text(b, 1, percentage.1, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique2), c(common.csc))), col=c("green4", "red") , names.arg=c(name2), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.2, cex=2.5, pos=3)
+#      # stack2 - C3M, CSC3M
+#      b <- barplot(t(cbind(c(unique3), c(common.con))), col=c("green2", "orange") , names.arg=c(name3), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.3, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique4), c(common.csc))), col=c("green4", "red") , names.arg=c(name4), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.4, cex=2.5, pos=3)
+#      # stack3 - C10M, CSC10M
+#      b <- barplot(t(cbind(c(unique5), c(common.con))), col=c("green2", "orange") , names.arg=c(name5), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.5, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique6), c(common.csc))), col=c("green4", "red") , names.arg=c(name6), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.6, cex=2.5, pos=3)
+#      # dummy plot
+#      barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+#      legend("center", fill=c("green2", "green4", "orange", "white", "red", "white"), legend=c("unique CON genes", "unique CSC genes", "common genes across", "all CON timepoints","common genes across", "all CSC timepoints"), inset=c(-1.6,0), border="white", box.col="white", cex=2)
+#      title(paste0(mark[i], " - ",genelist.name,"\nunique&common meth.genes"), cex.main=3, outer=FALSE, line=-2)
+#      dev.off()
+# 
+#      ###########################################
+#      # PLOT 10
+#      # unique&common methylated.genes between control and csc at timepoint
+#      ###########################################
+#      ylim_custom1 <- c(0, max(cbind(n1, n2, n3, n4, n5, n6)))
+#      jpeg(paste0("unique&common.controlvscsc.meth.genes_",mark[i],"_",genelist.name,"_timepoint.jpeg"), height = 900, width = 1600, quality=100)
+#      tmpmat <- rbind(c(0,1,2,3,0,4,5,0,6,7,8,0))
+#      layout(tmpmat, widths=c(1,3,3.5,3.5,3,3.5,3.5,3,3.5,3.5,11,2))
+#      par(mar=c(3,2,5,2))
+#      # stack1 - C10D, CSC10D
+#      #1
+#      barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+#      mtext(text='# of genes',side=2,line=1, cex=2)
+#      #2
+#      # stack3 - C10D, CSC10D
+#      b <- barplot(t(cbind(c(unique.m1t), c(m.10d))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name1), cex.names=2.5, cex.axis=2.5, cex.lab=2.5, ylim=ylim_custom1, beside=FALSE) #ylab="# of genes", 
+#      text(b, 1, percentage.m1t, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique.m2t), c(m.10d))), col=c("royalblue", "darkgoldenrod1") , names.arg=c(name2), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.m2t, cex=2.5, pos=3)
+#      # stack2 - C3M, CSC3M
+#      b <- barplot(t(cbind(c(unique.m3t), c(m.3m))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name3), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.m3t, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique.m4t), c(m.3m))), col=c("royalblue", "darkgoldenrod1") , names.arg=c(name4), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.m4t, cex=2.5, pos=3)
+#      # stack3 - C10M, CSC10M
+#      b <- barplot(t(cbind(c(unique.m5t), c(m.10m))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name5), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.m5t, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique.m6t), c(m.10m))), col=c("royalblue", "darkgoldenrod1") , names.arg=c(name6), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.m6t, cex=2.5, pos=3)
+#      # dummy plot
+#      barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+#      legend("center", fill=c("lightskyblue", "royalblue", "darkgoldenrod1", "white"), legend=c("unique control meth.genes at timepoint", "unique csc meth.genes at timepoint", "common meth.genes between", "control & csc at timepoint"), inset=c(-1.6,0), border="white", box.col="white", cex=2)
+#      title(paste0(mark[i], " - ",genelist.name,"\nunique&common meth.genes between\ncontrol & csc at timepoint"), cex.main=2.5, outer=FALSE, line=-2)
+#      dev.off()
+# 
+#      ###########################################
+#      # PLOT 11
+#      # BOTH CONTROL & CSC - unique&common genes between control & csc at timepoint
+#      ###########################################
+#      ylim_custom1 <- c(0, max(cbind(a1, a2, a3, a4, a5, a6)))
+#      ylim_custom1
+#      jpeg(paste0("unique&common.controlvscsc.genes_",mark[i],"_",genelist.name,"_timepoint.jpeg"), height = 900, width = 1600, quality=100)
+#      tmpmat <- rbind(c(0,1,2,3,0,4,5,0,6,7,8,0))
+#      layout(tmpmat, widths=c(1,3,3.5,3.5,3,3.5,3.5,3,3.5,3.5,11,2))
+#      par(mar=c(3,2,5,2))
+#      # stack1 - C10D, CSC10D
+#      #1
+#      barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+#      mtext(text='# of genes',side=2,line=1, cex=2)
+#      #2
+#      # stack3 - C10D, CSC10D
+#      b <- barplot(t(cbind(c(unique1t), c(common.10d))), col=c("green2", "orange") , names.arg=c(name1), cex.names=2.5, cex.axis=2.5, cex.lab=2.5, ylim=ylim_custom1, beside=FALSE) #ylab="# of genes", 
+#      text(b, 1, percentage.1t, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique2t), c(common.10d))), col=c("green4", "orange") , names.arg=c(name2), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.2t, cex=2.5, pos=3)
+#      # stack2 - C3M, CSC3M
+#      b <- barplot(t(cbind(c(unique3t), c(common.3m))), col=c("green2", "orange") , names.arg=c(name3), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.3t, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique4t), c(common.3m))), col=c("green4", "orange") , names.arg=c(name4), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.4t, cex=2.5, pos=3)
+#      # stack3 - C10M, CSC10M
+#      b <- barplot(t(cbind(c(unique5t), c(common.10m))), col=c("green2", "orange") , names.arg=c(name5), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.5t, cex=2.5, pos=3)
+#      b <- barplot(t(cbind(c(unique6t), c(common.10m))), col=c("green4", "orange") , names.arg=c(name6), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
+#      text(b, 1, percentage.6t, cex=2.5, pos=3)
+#      # dummy plot
+#      barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+#      legend("center", fill=c("green2", "green4", "orange", "white"), legend=c("unique control genes at timepoint", "unique csc genes at timepoint", "common genes between", "control & csc at timepoint"), inset=c(-1.6,0), border="white", box.col="white", cex=2)
+#      title(paste0(mark[i], " - ",genelist.name,"\nunique&common meth.genes between\ncontrol & csc at timepoint"), cex.main=2.5, outer=FALSE, line=-2)
+#      dev.off()
+
+  ###########################################
+  # PLOT 12
+  # BOTH CONTROL & CSC - genes between control & csc CONSOLIDATED
+  ###########################################
+  ylim_custom1 <- c(0, max(cbind(a1, a2, a3, a4, a5, a6)))
+  ylim_custom1
+  jpeg(paste0("consolidate.controlvscsc.genes_",mark[i],"_",look.at,"_",genelist.name,"_timepoint.jpeg"), height = 900, width = 1600, quality=100)
+  tmpmat <- rbind(c(0,1,2,3,0,4,5,0,6,7,8,0))
+  layout(tmpmat, widths=c(1,3,3.5,3.5,3,3.5,3.5,3,3.5,3.5,11,2))
+  par(mar=c(3,2,5,2))
+  # stack1 - C10D, CSC10D
+  #1
+  barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+  mtext(text='# of genes',side=2,line=1, cex=2)
+  #2
+  # stack3 - C10D, CSC10D
+  b <- barplot(t(cbind(c(unique1t), c(common.10d))), col=c("orange", "orange") , names.arg=c(name1), cex.names=2.5, cex.axis=2.5, cex.lab=2.5, ylim=ylim_custom1, beside=FALSE, border=NA) #ylab="# of genes", 
+#   text(b, 1, percentage.1t, cex=2.5, pos=3)
+  b <- barplot(t(cbind(c(unique2t), c(common.10d))), col=c("red", "red") , names.arg=c(name2), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE, border=NA)
+#   text(b, 1, percentage.2t, cex=2.5, pos=3)
+  # stack2 - C3M, CSC3M
+  b <- barplot(t(cbind(c(unique3t), c(common.3m))), col=c("orange", "orange") , names.arg=c(name3), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE, border=NA)
+#   text(b, 1, percentage.3t, cex=2.5, pos=3)
+  b <- barplot(t(cbind(c(unique4t), c(common.3m))), col=c("red", "red") , names.arg=c(name4), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE, border=NA)
+#   text(b, 1, percentage.4t, cex=2.5, pos=3)
+  # stack3 - C10M, CSC10M
+  b <- barplot(t(cbind(c(unique5t), c(common.10m))), col=c("orange", "orange") , names.arg=c(name5), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE, border=NA)
+#   text(b, 1, percentage.5t, cex=2.5, pos=3)
+  b <- barplot(t(cbind(c(unique6t), c(common.10m))), col=c("red", "red") , names.arg=c(name6), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE, border=NA)
+#   text(b, 1, percentage.6t, cex=2.5, pos=3)
+  # dummy plot
+  barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+  legend("center", fill=c("orange", "red"), legend=c("untreated", "csc treated"), inset=c(-1.6,0), border="white", box.col="white", cex=2)
+  title(paste0(mark[i], " - ",genelist.name,"\n genes between\ncontrol & csc at timepoint"), cex.main=2.5, outer=FALSE, line=-2)
+  dev.off()
+  
      ###########################################
-     # PLOT 8
-     # BOTH CONTROL & CSC - unique&common methylated.genes
+     # PLOT 12
+     # methylated.genes between control and csc at timepoint
      ###########################################
      ylim_custom1 <- c(0, max(cbind(n1, n2, n3, n4, n5, n6)))
-     jpeg(paste0("unique&common.meth.genes_",mark[i],"_",genelist.name,"_sample.group.jpeg"), height = 900, width = 1600, quality=100)
+     jpeg(paste0("consolidated.controlvscsc.meth.genes_",mark[i],"_",look.at,"_",genelist.name,"_timepoint.jpeg"), height = 900, width = 1600, quality=100)
      tmpmat <- rbind(c(0,1,2,3,0,4,5,0,6,7,8,0))
      layout(tmpmat, widths=c(1,3,3.5,3.5,3,3.5,3.5,3,3.5,3.5,11,2))
      par(mar=c(3,2,5,2))
@@ -550,133 +844,344 @@ for(i in 1:length(mark)){
      mtext(text='# of genes',side=2,line=1, cex=2)
      #2
      # stack3 - C10D, CSC10D
-     b <- barplot(t(cbind(c(unique.m1), c(m.con))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name1), cex.names=2.5, cex.axis=2.5, cex.lab=2.5, ylim=ylim_custom1, beside=FALSE) #ylab="# of genes", 
-     text(b, 1, percentage.m1, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique.m2), c(m.csc))), col=c("royalblue", "darkgoldenrod4") , names.arg=c(name2), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.m2, cex=2.5, pos=3)
+     b <- barplot(t(cbind(c(unique.m1t), c(m.10d))), col=c("darkgoldenrod1", "darkgoldenrod1") , names.arg=c(name1), cex.names=2.5, cex.axis=2.5, cex.lab=2.5, ylim=ylim_custom1, beside=FALSE, border=NA) #ylab="# of genes", 
+#      text(b, 1, percentage.m1t, cex=2.5, pos=3)
+     b <- barplot(t(cbind(c(unique.m2t), c(m.10d))), col=c("saddlebrown", "saddlebrown") , names.arg=c(name2), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE, border=NA)
+#      text(b, 1, percentage.m2t, cex=2.5, pos=3)
      # stack2 - C3M, CSC3M
-     b <- barplot(t(cbind(c(unique.m3), c(m.con))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name3), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.m3, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique.m4), c(m.csc))), col=c("royalblue", "darkgoldenrod4") , names.arg=c(name4), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.m4, cex=2.5, pos=3)
+     b <- barplot(t(cbind(c(unique.m3t), c(m.3m))), col=c("darkgoldenrod1", "darkgoldenrod1") , names.arg=c(name3), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE, border=NA)
+#      text(b, 1, percentage.m3t, cex=2.5, pos=3)
+     b <- barplot(t(cbind(c(unique.m4t), c(m.3m))), col=c("saddlebrown", "saddlebrown") , names.arg=c(name4), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE, border=NA)
+#      text(b, 1, percentage.m4t, cex=2.5, pos=3)
      # stack3 - C10M, CSC10M
-     b <- barplot(t(cbind(c(unique.m5), c(m.con))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name5), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.m5, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique.m6), c(m.csc))), col=c("royalblue", "darkgoldenrod4") , names.arg=c(name6), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.m6, cex=2.5, pos=3)
+     b <- barplot(t(cbind(c(unique.m5t), c(m.10m))), col=c("darkgoldenrod1", "darkgoldenrod1") , names.arg=c(name5), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE, border=NA)
+#      text(b, 1, percentage.m5t, cex=2.5, pos=3)
+     b <- barplot(t(cbind(c(unique.m6t), c(m.10m))), col=c("saddlebrown", "saddlebrown") , names.arg=c(name6), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE, border=NA)
+#      text(b, 1, percentage.m6t, cex=2.5, pos=3)
      # dummy plot
      barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
-     legend("center", fill=c("lightskyblue", "royalblue", "darkgoldenrod1", "white", "darkgoldenrod4", "white"), legend=c("unique CON meth.genes", "unique CSC meth.genes", "common meth.genes", "across all CON timepoints","common meth.genes", "across all CSC timepoints"), inset=c(-1.6,0), border="white", box.col="white", cex=2)
-     title(paste0(mark[i], " - ",genelist.name,"\nunique&common meth.genes"), cex.main=3, outer=FALSE, line=-2)
+     legend("center", fill=c("darkgoldenrod1", "saddlebrown"), legend=c("untreated", "csc treated"), inset=c(-1.6,0), border="white", box.col="white", cex=2)
+     title(paste0(mark[i], " - ",genelist.name,"\nmeth.genes between\ncontrol & csc at timepoint"), cex.main=2.5, outer=FALSE, line=-2)
      dev.off()
-     
-     ###########################################
-     # PLOT 9
-     # BOTH CONTROL & CSC - unique&common all.genes
-     ###########################################
-     ylim_custom1 <- c(0, max(cbind(a1, a2, a3, a4, a5, a6)))
-     ylim_custom1
-     jpeg(paste0("unique&common.all.genes_",mark[i],"_",genelist.name,"_sample.group.jpeg"), height = 900, width = 1600, quality=100)
-     tmpmat <- rbind(c(0,1,2,3,0,4,5,0,6,7,8,0))
-     layout(tmpmat, widths=c(1,3,3.5,3.5,3,3.5,3.5,3,3.5,3.5,11,2))
-     par(mar=c(3,2,5,2))
-     # stack1 - C10D, CSC10D
-     #1
-     barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
-     mtext(text='# of genes',side=2,line=1, cex=2)
-     #2
-     # stack3 - C10D, CSC10D
-     b <- barplot(t(cbind(c(unique1), c(common.con))), col=c("green2", "orange") , names.arg=c(name1), cex.names=2.5, cex.axis=2.5, cex.lab=2.5, ylim=ylim_custom1, beside=FALSE) #ylab="# of genes", 
-     text(b, 1, percentage.1, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique2), c(common.csc))), col=c("green4", "red") , names.arg=c(name2), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.2, cex=2.5, pos=3)
-     # stack2 - C3M, CSC3M
-     b <- barplot(t(cbind(c(unique3), c(common.con))), col=c("green2", "orange") , names.arg=c(name3), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.3, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique4), c(common.csc))), col=c("green4", "red") , names.arg=c(name4), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.4, cex=2.5, pos=3)
-     # stack3 - C10M, CSC10M
-     b <- barplot(t(cbind(c(unique5), c(common.con))), col=c("green2", "orange") , names.arg=c(name5), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.5, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique6), c(common.csc))), col=c("green4", "red") , names.arg=c(name6), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.6, cex=2.5, pos=3)
-     # dummy plot
-     barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
-     legend("center", fill=c("green2", "green4", "orange", "white", "red", "white"), legend=c("unique CON genes", "unique CSC genes", "common genes across", "all CON timepoints","common genes across", "all CSC timepoints"), inset=c(-1.6,0), border="white", box.col="white", cex=2)
-     title(paste0(mark[i], " - ",genelist.name,"\nunique&common meth.genes"), cex.main=3, outer=FALSE, line=-2)
-     dev.off()
-
-     ###########################################
-     # PLOT 10
-     # unique&common methylated.genes between control and csc at timepoint
-     ###########################################
-     ylim_custom1 <- c(0, max(cbind(n1, n2, n3, n4, n5, n6)))
-     jpeg(paste0("unique&common.controlvscsc.meth.genes_",mark[i],"_",genelist.name,"_timepoint.jpeg"), height = 900, width = 1600, quality=100)
-     tmpmat <- rbind(c(0,1,2,3,0,4,5,0,6,7,8,0))
-     layout(tmpmat, widths=c(1,3,3.5,3.5,3,3.5,3.5,3,3.5,3.5,11,2))
-     par(mar=c(3,2,5,2))
-     # stack1 - C10D, CSC10D
-     #1
-     barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
-     mtext(text='# of genes',side=2,line=1, cex=2)
-     #2
-     # stack3 - C10D, CSC10D
-     b <- barplot(t(cbind(c(unique.m1t), c(m.10d))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name1), cex.names=2.5, cex.axis=2.5, cex.lab=2.5, ylim=ylim_custom1, beside=FALSE) #ylab="# of genes", 
-     text(b, 1, percentage.m1t, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique.m2t), c(m.10d))), col=c("royalblue", "darkgoldenrod1") , names.arg=c(name2), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.m2t, cex=2.5, pos=3)
-     # stack2 - C3M, CSC3M
-     b <- barplot(t(cbind(c(unique.m3t), c(m.3m))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name3), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.m3t, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique.m4t), c(m.3m))), col=c("royalblue", "darkgoldenrod1") , names.arg=c(name4), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.m4t, cex=2.5, pos=3)
-     # stack3 - C10M, CSC10M
-     b <- barplot(t(cbind(c(unique.m5t), c(m.10m))), col=c("lightskyblue", "darkgoldenrod1") , names.arg=c(name5), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.m5t, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique.m6t), c(m.10m))), col=c("royalblue", "darkgoldenrod1") , names.arg=c(name6), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.m6t, cex=2.5, pos=3)
-     # dummy plot
-     barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
-     legend("center", fill=c("lightskyblue", "royalblue", "darkgoldenrod1", "white"), legend=c("unique control meth.genes at timepoint", "unique csc meth.genes at timepoint", "common meth.genes between", "control & csc at timepoint"), inset=c(-1.6,0), border="white", box.col="white", cex=2)
-     title(paste0(mark[i], " - ",genelist.name,"\nunique&common meth.genes between\ncontrol & csc at timepoint"), cex.main=2.5, outer=FALSE, line=-2)
-     dev.off()
-
-     ###########################################
-     # PLOT 11
-     # BOTH CONTROL & CSC - unique&common genes between control & csc at timepoint
-     ###########################################
-     ylim_custom1 <- c(0, max(cbind(a1, a2, a3, a4, a5, a6)))
-     ylim_custom1
-     jpeg(paste0("unique&common.controlvscsc.genes_",mark[i],"_",genelist.name,"_timepoint.jpeg"), height = 900, width = 1600, quality=100)
-     tmpmat <- rbind(c(0,1,2,3,0,4,5,0,6,7,8,0))
-     layout(tmpmat, widths=c(1,3,3.5,3.5,3,3.5,3.5,3,3.5,3.5,11,2))
-     par(mar=c(3,2,5,2))
-     # stack1 - C10D, CSC10D
-     #1
-     barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
-     mtext(text='# of genes',side=2,line=1, cex=2)
-     #2
-     # stack3 - C10D, CSC10D
-     b <- barplot(t(cbind(c(unique1t), c(common.10d))), col=c("green2", "orange") , names.arg=c(name1), cex.names=2.5, cex.axis=2.5, cex.lab=2.5, ylim=ylim_custom1, beside=FALSE) #ylab="# of genes", 
-     text(b, 1, percentage.1t, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique2t), c(common.10d))), col=c("green4", "orange") , names.arg=c(name2), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.2t, cex=2.5, pos=3)
-     # stack2 - C3M, CSC3M
-     b <- barplot(t(cbind(c(unique3t), c(common.3m))), col=c("green2", "orange") , names.arg=c(name3), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.3t, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique4t), c(common.3m))), col=c("green4", "orange") , names.arg=c(name4), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.4t, cex=2.5, pos=3)
-     # stack3 - C10M, CSC10M
-     b <- barplot(t(cbind(c(unique5t), c(common.10m))), col=c("green2", "orange") , names.arg=c(name5), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.5t, cex=2.5, pos=3)
-     b <- barplot(t(cbind(c(unique6t), c(common.10m))), col=c("green4", "orange") , names.arg=c(name6), cex.names=2.5, ylim=ylim_custom1, yaxt='n', beside=FALSE)
-     text(b, 1, percentage.6t, cex=2.5, pos=3)
-     # dummy plot
-     barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
-     legend("center", fill=c("green2", "green4", "orange", "white"), legend=c("unique control genes at timepoint", "unique csc genes at timepoint", "common genes between", "control & csc at timepoint"), inset=c(-1.6,0), border="white", box.col="white", cex=2)
-     title(paste0(mark[i], " - ",genelist.name,"\nunique&common meth.genes between\ncontrol & csc at timepoint"), cex.main=2.5, outer=FALSE, line=-2)
-     dev.off()
-     
      Sys.sleep(3)
   getwd()
 }
+
+# methylatedGeneListsDir=paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/")
+# filename <- dir(methylatedGeneListsDir)[3]
+# filename
+# meth.genes=read.table(file.path(methylatedGeneListsDir, filename), header=F, sep="\t", stringsAsFactors=F) # read in
+# for(j in grep(";", meth.genes[,1])){
+#      meth.genes[j,1] = strsplit(meth.genes[j,1], split=";")[[1]][1]
+# }  
+# meth.genes <- as.matrix(meth.genes)
+# meth.genes <- sort(unique(meth.genes))
+# # source("http://www.r-statistics.com/wp-content/uploads/2010/02/Barnard.R.txt")
+
+venndiagram.barplot_new3 <- function(bivalent.genes, title, b=100){
+     load(file=paste0(system.dir, "Michelle/Robjects/all.genes.rda"))
+     all.genes <- all.genes
+     length_all.genes <- length(all.genes)
+     methylated.genes <- meth.genes
+     length(methylated.genes)
+     bivalent.genes <- unique(bivalent.genes)
+     intersect(methylated.genes, bivalent.genes)
+     setdiff(methylated.genes, bivalent.genes)
+     length_methylated.genes <- length(methylated.genes)
+     length_bivalent.genes <- length(bivalent.genes)
+     #row2
+     methylated.bivalent.genes <- intersect(methylated.genes, bivalent.genes)
+     unmethylated.bivalent.genes <- setdiff(bivalent.genes, methylated.genes)
+     length_methylated.bivalent.genes <- length(methylated.bivalent.genes) #3
+     length_unmethylated.bivalent.genes <- length(unmethylated.bivalent.genes) #4
+     #row1
+     methylated.row1.genes <- setdiff(methylated.genes, methylated.bivalent.genes)
+     length_methylated.row1.genes <- length(methylated.row1.genes)
+     row1total <- length_all.genes-length_bivalent.genes
+     length_unmethylated.row1.genes <- row1total-length_methylated.row1.genes
+     
+     #values for contingency table     
+     length_methylated.row1.genes
+     length_unmethylated.row1.genes
+     length_methylated.bivalent.genes
+     length_unmethylated.bivalent.genes
+     
+     # create matrix
+     row1 <- cbind(length_methylated.row1.genes, length_unmethylated.row1.genes)
+     row2 <- cbind(length_methylated.bivalent.genes, length_unmethylated.bivalent.genes)
+     mat <- rbind(row1, row2)
+     rownames(mat) <- c(paste0("all.genes-bivalent.",title,".genes"), paste0("bivalent.",title,".genes"))
+     colnames(mat) <- c("meth", "unmeth")
+     print(mat)
+     
+     #VennDiagram
+     library(VennDiagram)
+     grid.newpage()
+     # proportions for 2 independent samples
+     # n <= 20
+     #      fish1 <- fisher.test(mat, alternative="less")
+     #      fish1 <- fisher.test(mat)
+     #      print(fish1)
+     # print(paste0("fisher.pval: ", fish1$p.value), quote=FALSE)
+     
+     # n > 20
+     ztest <- prop.test(mat)
+     print(ztest)
+     print(paste0("z.test.pval: ", ztest$p.value), quote=FALSE)
+     
+     # proportions for >= 2 independent samples
+     #      chi <- chisq.test(mat, simulate.p.value=TRUE, B=b)
+     #      chi <- chisq.test(mat)
+     #      print(chi)
+     #      print(paste0("chi.sq.pval: ", chi$p.value), quote=FALSE)
+}
+
+
+venndiagram.barplot_new3(C10D_K4.K27_genes, "unt10d")
+venndiagram.barplot_new3(CSC10D_K4.K27_genes, "csc10d")
+venndiagram.barplot_new3(C3M_K4.K27_genes, "unt3m")
+venndiagram.barplot_new3(CSC3M_K4.K27_genes, "csc3m")
+venndiagram.barplot_new3(C10M_K4.K27_genes, "unt10m")
+venndiagram.barplot_new3(CSC10M_K4.K27_genes, "csc10m")
+venndiagram.barplot_new3(c(C10D_K4.K27_genes, C3M_K4.K27_genes, C10M_K4.K27_genes), "all_unt")
+venndiagram.barplot_new3(c(CSC10D_K4.K27_genes, CSC3M_K4.K27_genes, CSC10M_K4.K27_genes), "all_csc")
+
+
+# venndiagram.barplot_new(C10D_K4.K27_genes, m1)
+# venndiagram.barplot_new(CSC10D_K4.K27_genes, m2)
+# venndiagram.barplot_new(C3M_K4.K27_genes, m3)
+# venndiagram.barplot_new(CSC3M_K4.K27_genes, m4)
+# venndiagram.barplot_new(C10M_K4.K27_genes, m5)
+# venndiagram.barplot_new(CSC10M_K4.K27_genes, m6)
+# venndiagram.barplot_new(c(CSC10D_K4.K27_genes, CSC3M_K4.K27_genes, CSC10M_K4.K27_genes), c(m2, m4, m6))
+# 
+# venndiagram.barplot_new <- function(bivalent.genes, methylated.genes, title1, title2){
+#      load(file=paste0(system.dir, "Michelle/Robjects/all.genes.rda"))
+#      all.genes <- all.genes
+#      length_all.genes <- length(all.genes)
+# #      bivalent.genes <- C10D_K4.K27_genes
+# #      methylated.genes <- m1
+#      bivalent.genes <- bivalent.genes
+#      methylated.genes <- methylated.genes
+#      methylated.bivalent.genes <- intersect(methylated.genes, bivalent.genes)
+#      unmethylated.bivalent.genes <- setdiff(bivalent.genes, methylated.genes)
+#      length_methylated.bivalent.genes <- length(methylated.bivalent.genes) #3
+#      length_unmethylated.bivalent.genes <- length(unmethylated.bivalent.genes) #4
+#      methylated.rest.genes <- intersect(setdiff(all.genes, methylated.bivalent.genes), methylated.genes)
+# #      methylated.rest.genes <- setdiff(all.genes, methylated.bivalent.genes)
+# #      methylated.rest.genes <- intersect(all.genes, methylated.genes)
+#      length_methylated.rest.genes <- length(methylated.rest.genes) #1
+#      length_unmethylated.rest.genes <- length_all.genes-length_methylated.rest.genes #2
+#      length(all.genes)
+#      
+#      length_methylated.rest.genes
+#      length_unmethylated.rest.genes
+#      length_methylated.bivalent.genes
+#      length_unmethylated.bivalent.genes
+# 
+#      # Thank you for the accommmodation. It will help my wife and me tremendously! I am excited to to start, and I look forward 
+#      mat <- matrix(c(length_methylated.rest.genes,
+#                      length_methylated.bivalent.genes,
+#                      length_unmethylated.rest.genes,
+#                      length_unmethylated.bivalent.genes
+#                      ), nrow=2, dimnames=list(Anno=c("non-bivalent.genes", "bivalent.genes"), State=c("meth", "unmeth")))
+#      print(mat)
+#      #VennDiagram
+#      library(VennDiagram)
+#      grid.newpage()
+# #      csc.biv.csc.meth <- matrix(c(num_biv.csc.genes-num_common_csc.biv.csc.meth.genes, 
+# #                                   num_meth.csc.genes--num_common_csc.biv.csc.meth.genes, 
+# #                                   num_meth.csc.genes--num_common_csc.biv.csc.meth.genes, 
+# #                                   num_biv.csc.genes-num_common_csc.biv.csc.meth.genes), nrow = 2, dimnames = list(Guess = c("BIV", "METH"), Truth = c("BIV", "METH")))
+#      fish1 <- fisher.test(mat, alternative="less")
+#      print(fish1$p.value)
+# }
+# 
+#      jpeg(filename=paste0("venndiagram_",title2,"_csc.biv.csc.meth_p.value.", fish1$p.value, ".jpeg"))
+#      
+#      draw.pairwise.venn(num_biv.csc.genes, num_meth.csc.genes, num_common_csc.biv.csc.meth.genes, 
+#                         category = c("CSC bivalent genes", "CSC meth.genes"), 
+#                         lty = rep("blank", 2), 
+#                         fill = c("light blue", "pink"), 
+#                         alpha = rep(0.5, 2), 
+#                         cat.pos = c(0, 0), 
+#                         cat.dist = rep(0.025, 2)
+#      )
+#      dev.off()
+#      
+#      grid.newpage()
+#      unt.biv.csc.meth <- matrix(c(num_biv.unt.genes-num_common_unt.biv.csc.meth.genes, num_meth.csc.genes-num_common_unt.biv.csc.meth.genes, num_meth.csc.genes-num_common_unt.biv.csc.meth.genes, num_biv.unt.genes-num_common_unt.biv.csc.meth.genes), nrow = 2, dimnames = list(Guess = c("BIV", "METH"), Truth = c("BIV", "METH")))
+#      fish2 <- fisher.test(unt.biv.csc.meth, alternative = "greater")
+#      jpeg(filename=paste0("venndiagram_",title1,"_unt.biv.csc.meth_p.value.", fish2$p.value, ".jpeg"))
+#      
+#      draw.pairwise.venn(num_biv.unt.genes, num_meth.csc.genes, num_common_unt.biv.csc.meth.genes, 
+#                         category = c("CONTROL bivalent genes", "CSC meth.genes"), 
+#                         lty = rep("blank", 2), 
+#                         fill = c("light blue", "pink"), 
+#                         alpha = rep(0.5, 2), 
+#                         cat.pos = c(0, 0), 
+#                         cat.dist = rep(0.025, 2))
+#      dev.off()
+# }
+# 
+# 
+# 
+# 
+# 
+# 
+# # all genes, bivalency
+# # methylation: 
+# # control bivalent: how many of them are methylated (71)
+# # csc bivalent: how many of them are methylated (101)
+# 
+# # methylated.genes: 
+# # c.bivalent genes:
+# # all bivalent
+# 
+# venndiagram.barplot_new2 <- function(bivalent.genes, title){
+#      load(file=paste0(system.dir, "Michelle/Robjects/all.genes.rda"))
+#      all.genes <- all.genes
+#      length_all.genes <- length(all.genes)
+# #      bivalent.genes <- C10D_K4.K27_genes
+# #      title="unt10d"
+#      methylated.genes <- unique(c(m1,m2,m3,m4,m5,m6))
+# 
+#      bivalent.genes <- bivalent.genes
+#      length(methylated.genes)
+#      length(bivalent.genes)
+#      methylated.genes <- methylated.genes
+#      methylated.bivalent.genes <- intersect(methylated.genes, bivalent.genes)
+#      unmethylated.bivalent.genes <- setdiff(bivalent.genes, methylated.genes)
+#      length_methylated.bivalent.genes <- length(methylated.bivalent.genes) #3
+#      length_unmethylated.bivalent.genes <- length(unmethylated.bivalent.genes) #4
+#      methylated.row1.genes <- intersect(all.genes, methylated.genes)
+#      
+#      #      methylated.rest.genes <- setdiff(all.genes, methylated.bivalent.genes)
+#      #      methylated.rest.genes <- intersect(all.genes, methylated.genes)
+#      length_methylated.row1.genes <- length(methylated.row1.genes) #1
+#      length_unmethylated.row1.genes <- length_all.genes-length_methylated.row1.genes #2
+#      length(all.genes)
+#      
+#      length_methylated.row1.genes
+#      length_unmethylated.row1.genes
+#      length_methylated.bivalent.genes
+#      length_unmethylated.bivalent.genes
+#      
+#      # Thank you for the accommmodation. It will help my wife and me tremendously! I am excited to to start, and I look forward 
+#      mat <- matrix(c(length_methylated.row1.genes,
+#                      length_methylated.bivalent.genes,
+#                      length_unmethylated.row1.genes,
+#                      length_unmethylated.bivalent.genes
+#      ), nrow=2, dimnames=list(Anno=c("all.genes", paste0("bivalent.",title,".genes")), State=c("meth", "unmeth")))
+# 
+#      print(mat)
+#      #VennDiagram
+#      library(VennDiagram)
+#      grid.newpage()
+#      #      csc.biv.csc.meth <- matrix(c(num_biv.csc.genes-num_common_csc.biv.csc.meth.genes, 
+#      #                                   num_meth.csc.genes--num_common_csc.biv.csc.meth.genes, 
+#      #                                   num_meth.csc.genes--num_common_csc.biv.csc.meth.genes, 
+#      #                                   num_biv.csc.genes-num_common_csc.biv.csc.meth.genes), nrow = 2, dimnames = list(Guess = c("BIV", "METH"), Truth = c("BIV", "METH")))
+#      fish1 <- fisher.test(mat, alternative="less")
+#      chi <- chisq.test(mat)
+#      chi
+#      print(paste0("fisher.pval: ", fish1$p.value), quote=FALSE)
+#      print(paste0("chi.sq.pval: ", chi$p.value), quote=FALSE)
+# }
+# 
+# venndiagram.barplot_new2(C10D_K4.K27_genes, unique(c(m1,m3,m5)))
+# venndiagram.barplot_new2(CSC10D_K4.K27_genes, unique(c(m2,m4,m6)))
+# venndiagram.barplot_new2(C3M_K4.K27_genes, unique(c(m1,m3,m5)))
+# venndiagram.barplot_new2(CSC3M_K4.K27_genes, unique(c(m2,m4,m6)))
+# venndiagram.barplot_new2(C10M_K4.K27_genes, unique(c(m1,m3,m5)))
+# venndiagram.barplot_new2(CSC10M_K4.K27_genes, unique(c(m2,m4,m6)))
+# venndiagram.barplot_new2(c(CSC10D_K4.K27_genes, CSC3M_K4.K27_genes, CSC10M_K4.K27_genes))
+# 
+# venndiagram.barplot_new2(C10D_K4.K27_genes, "unt10d")
+# venndiagram.barplot_new2(CSC10D_K4.K27_genes, "csc10d")
+# venndiagram.barplot_new2(C3M_K4.K27_genes, "unt3m")
+# venndiagram.barplot_new2(CSC3M_K4.K27_genes, "csc3m")
+# venndiagram.barplot_new2(C10M_K4.K27_genes, "unt10m")
+# venndiagram.barplot_new2(CSC10M_K4.K27_genes, "csc10m")
+# venndiagram.barplot_new2(c(C10D_K4.K27_genes, C3M_K4.K27_genes, C10M_K4.K27_genes), "all_unt")
+# venndiagram.barplot_new2(c(CSC10D_K4.K27_genes, CSC3M_K4.K27_genes, CSC10M_K4.K27_genes), "all_csc")
+
+
+# venndiagram.barplot <- function(a,b,c,d,title1, title2){
+# # all.genes <- 28290
+# #   all.biv.unt.genes <- unique(a)
+# #   all.biv.csc.genes <- unique(b)
+# #   all.meth.unt.genes <- unique(c)
+# #   all.meth.csc.genes <- unique(d)
+# all.biv.unt.genes <- unique(c(C10D_K4.K27_genes, C3M_K4.K27_genes, C10M_K4.K27_genes))
+# all.biv.csc.genes <- unique(c(CSC10D_K4.K27_genes, CSC3M_K4.K27_genes, CSC10M_K4.K27_genes))
+# all.meth.unt.genes <- unique(c(m1,m3,m5))
+# all.meth.csc.genes <- unique(c(m2,m4,m6))
+# 
+# 
+# 
+#   num_biv.unt.genes <- length(all.biv.unt.genes)
+#   num_biv.csc.genes <- length(all.biv.csc.genes)
+#   num_meth.unt.genes <- length(all.meth.unt.genes)
+#   num_meth.csc.genes <- length(all.meth.csc.genes) #1
+# # num_difference.methunmeth.genes <- all.genes - num_meth.csc.genes #2
+#   
+#   common_csc.biv.csc.meth.genes <- intersect(all.biv.csc.genes, all.meth.csc.genes)
+#   num_common_csc.biv.csc.meth.genes <- length(common_csc.biv.csc.meth.genes)
+#   
+#   common_unt.biv.csc.meth.genes <- intersect(all.biv.unt.genes, all.meth.csc.genes)
+#   num_common_unt.biv.csc.meth.genes <- length(common_unt.biv.csc.meth.genes)
+#   #VennDiagram
+#   grid.newpage()
+#   csc.biv.csc.meth <- matrix(c(num_biv.csc.genes-num_common_csc.biv.csc.meth.genes, 
+#                                num_meth.csc.genes--num_common_csc.biv.csc.meth.genes, 
+#                                num_meth.csc.genes--num_common_csc.biv.csc.meth.genes, 
+#                                num_biv.csc.genes-num_common_csc.biv.csc.meth.genes), nrow = 2, dimnames = list(Guess = c("BIV", "METH"), Truth = c("BIV", "METH")))
+#   fish1 <- fisher.test(csc.biv.csc.meth, alternative = "greater")
+#   jpeg(filename=paste0("venndiagram_",title2,"_csc.biv.csc.meth_p.value.", fish1$p.value, ".jpeg"))
+#   #   TeaTasting <-
+#   #     matrix(c(3, 1, 1, 3),
+#   #            nrow = 2,
+#   #            dimnames = list(Guess = c("Milk", "Tea"),
+#   #                            Truth = c("Milk", "Tea")))
+#   
+#   draw.pairwise.venn(num_biv.csc.genes, num_meth.csc.genes, num_common_csc.biv.csc.meth.genes, 
+#                      category = c("CSC bivalent genes", "CSC meth.genes"), 
+#                      lty = rep("blank", 2), 
+#                      fill = c("light blue", "pink"), 
+#                      alpha = rep(0.5, 2), 
+#                      cat.pos = c(0, 0), 
+#                      cat.dist = rep(0.025, 2)
+#   )
+#   dev.off()
+#   
+#   grid.newpage()
+#   unt.biv.csc.meth <- matrix(c(num_biv.unt.genes-num_common_unt.biv.csc.meth.genes, num_meth.csc.genes-num_common_unt.biv.csc.meth.genes, num_meth.csc.genes-num_common_unt.biv.csc.meth.genes, num_biv.unt.genes-num_common_unt.biv.csc.meth.genes), nrow = 2, dimnames = list(Guess = c("BIV", "METH"), Truth = c("BIV", "METH")))
+#   fish2 <- fisher.test(unt.biv.csc.meth, alternative = "greater")
+#   jpeg(filename=paste0("venndiagram_",title1,"_unt.biv.csc.meth_p.value.", fish2$p.value, ".jpeg"))
+#   
+#   draw.pairwise.venn(num_biv.unt.genes, num_meth.csc.genes, num_common_unt.biv.csc.meth.genes, 
+#                      category = c("CONTROL bivalent genes", "CSC meth.genes"), 
+#                      lty = rep("blank", 2), 
+#                      fill = c("light blue", "pink"), 
+#                      alpha = rep(0.5, 2), 
+#                      cat.pos = c(0, 0), 
+#                      cat.dist = rep(0.025, 2))
+#   dev.off()
+# }
+
+cpgislands - what is happening at edge of islands?
+DNMT1 and EZH2 - average and borders
+
+global scale - 
+  
+  total counts gene by gene
+
+PCA plots
+Delta plots and scatterplots
+
+anything that is stable and intermediate, classify as intermediate
+sliding 1000bp window per 200 bp
+
+randomly picked cpgi islands
+
