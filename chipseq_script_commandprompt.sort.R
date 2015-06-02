@@ -64,7 +64,7 @@ if(genelist.name=="all"){
      if(genelist.name=="stable.10M.new"){
           print("stable.10M.new genelist selected")
           genes <- read.table(paste0(system.dir, "Michelle/MethylationData/methylatedGeneLists/new/age_stable_methylated_genes_at_10months_new_cutoff.txt"))
-          genes <- genes[1:25,]
+#           genes <- genes[1:25,]
      }
      if(genelist.name=="intermediate.10M.new"){
           print("intermediate.10M.new genelist selected")
@@ -135,9 +135,50 @@ if(genelist.name=="all"){
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_age-related.05.hypermethylation_10M_rep1_genelist.txt"))
      }     
      if(genelist.name=="rep1.cscrelated.10M.new"){
-          print("rep1.agerelated.10M.new genelist selected")
+          print("rep1.cscrelated.10M.new genelist selected")
           genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/new/TSS_csc-related.05.hypermethylation_10M_rep1_genelist.txt"))
      }     
+     if(genelist.name=="rep1.agerelated.stable.10M.new.sb"){
+       print("rep1.agerelated.stable.10M.new.sb genelist selected")
+       genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/rep1.agerelated_sb/TSS_age-related.05.hypermethylation_10M_rep1_sb_genelist.txt"))       
+     }     
+    if(genelist.name=="rep1.agerelated.intermediate.10M.new.sb"){
+      print("rep1.agerelated.intermediate.10M.new.sb genelist selected")
+      genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/rep1.agerelated_sb/TSS_age-related.2.hypermethylation_10M_rep1_sb_genelist.txt"))       
+    }     
+     if(genelist.name=="rep1.agerelated.true.intermediate.10M.new.sb"){
+          print("rep1.agerelated.true.intermediate.10M.new.sb genelist selected")
+          genes <- read.table(paste0(system.dir,"Michelle/MethylationData/methylatedGeneLists/rep1.agerelated_sb/TSS_age-related.2.true.hypermethylation_10M_rep1_sb_genelist.txt"))       
+     }
+     if(genelist.name=="stable.10M.new.sb"){
+          print("stable.10M.new.sb genelist selected")
+          genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/stable.10M.new.sb/stable.10M.new.sb_genelist.txt"))       
+     }     
+     if(genelist.name=="intermediate.10M.new.sb"){
+          print("intermediate.10M.new.sb genelist selected")
+          genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/stable.10M.new.sb/intermediate.10M.new.sb_genelist.txt"))
+     }     
+     if(genelist.name=="csc.further.methylation.2"){
+          print("csc.further.methylation.2 genelist selected")
+          genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/csc.further/TSS_age.2.csc.2.further.hypermethylation_10M_rep1_genelist.txt"))       
+     }     
+
+     if(genelist.name=="csc.further.methylation.4"){
+          print("csc.further.methylation.4 genelist selected")
+          genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/csc.further/TSS_age.2.csc.4.further.hypermethylation_10M_rep1_genelist.txt"))       
+     }     
+     if(genelist.name=="unique.intermediate.10M.new.sb"){
+          print("intermediate.10M.new.sb genelist selected")
+          genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/stable.10M.new.sb/unique.intermediate_genelist.txt"))
+     }     
+if(genelist.name=="random.cpg"){
+     print("random.noncpg genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/cpgi/random.cpg.txt"))
+}     
+if(genelist.name=="random.noncpg"){
+     print("random.cpg genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/cpgi/random.noncpg.txt"))
+}     
 
      plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/",genelist.name,"/")
      plot_results_dir
@@ -148,7 +189,7 @@ if(genelist.name=="all"){
      names(genes) <- genelist.name
      genes
 }
-
+print("CHECK")
 if(bin.size==200){
      if(genelist.name=="all"){
           h3k4.maxbreak=400 #1500, 1000, 500
@@ -190,6 +231,7 @@ coverage_files_dir
 ############################################################
 # Add this into the 'if' statements above ??
 # annotation for just genes of interest
+print("CHECK2")
 if(version=="hg19"){
      goi <- fun.genelist.info(goi.list=genes, genelist.names=genelist.name, goi.list.type="hgnc_symbol", version=version)
 }
@@ -205,7 +247,7 @@ if(version=="hg19-UCSC"){
      goi <- datlist
 #     goi[[1]] <- goi[[1]][sample(1:nrow(goi[[1]]), 200),]
 }
-
+print("CHECK3")
 #Retain one entry per gene (hgnc_symbol)
 goi <- lapply(c(1:length(goi)), FUN=function(i){
      x <- goi[[i]]
@@ -214,6 +256,10 @@ goi <- lapply(c(1:length(goi)), FUN=function(i){
 names(goi) <- genelist.name
 head(goi[[1]])
 dim(goi[[1]]) #
+head(goi[[1]])
+# all.genes <- goi[[1]]$Gene
+# length(unique(all.genes))
+# save(all.genes, file=paste0(system.dir, "Michelle/Robjects/all.genes.rda"))
 
 ############################################################
 # Make plots
@@ -232,7 +278,7 @@ dim(goi[[1]]) #
 # whichgenelist=genelist.name
 # plot.Directory=paste0(system.dir, "Michelle/BED_files/Coverage_TSS_200bp_bin/normalizedBED_200bp_bin/outputdir/", genelist.name)
 
-
+print("CHECK4")
 # C10D
 dir(coverage_files_dir)
 coverage_files <- dir(coverage_files_dir)[grep("C10D", dir(coverage_files_dir))[1:6]]
