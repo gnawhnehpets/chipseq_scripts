@@ -25,6 +25,7 @@ source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_newFunct
 marks <- c("H3K4", "H3K27", "EZH2", "DNMT1", "H3", "Input")
 timepoints <- c("C10D", "CSC10D", "C3M", "CSC3M", "C10M", "CSC10M")
 
+# Generate Input-normalized values for each group at every timepoint
 for(i in marks){
      print("################################")
      print(i)
@@ -32,23 +33,24 @@ for(i in marks){
      input.dir <- paste0(system.dir, "/Michelle/BED_files/Coverage_TSS_200bp_bin/normalizedBED_200bp_bin/outputdir/", whichgenelist, "/Input/")
      marks.dir <- paste0(system.dir, "/Michelle/BED_files/Coverage_TSS_200bp_bin/normalizedBED_200bp_bin/outputdir/", whichgenelist, "/", i, "/")
      for(j in timepoints){
+          # read in Input file for that particular timepoint
           input.file <- dir(input.dir)[grep(paste0("^",j ,".*average_values.txt"), dir(input.dir))]
-          #     print(input.file)    
           path.to.input <- paste0(input.dir, input.file)
           input.file <- as.matrix(read.table(path.to.input, header=TRUE))
+          # read in sample file for that particular timepoint
           marks.file <- dir(marks.dir)[grep(paste0("^",j,".*average_values.txt"), dir(marks.dir))]
           path.to.mark <- paste0(marks.dir, marks.file)
           path.to.mark
           marks.file <- as.matrix(read.table(path.to.mark, header=TRUE))
+          # normalize to input
           ratio.file <- marks.file/input.file
           print(head(ratio.file))
           write.table(ratio.file, file=paste0(system.dir, "/Michelle/BED_files/Coverage_TSS_200bp_bin/normalizedBED_200bp_bin/outputdir/", whichgenelist, "/", i, "/", j, "_",i, "_ratio_values.txt"), row.names=FALSE, col.names=TRUE, quote=FALSE)
      }
 }
 
-# bin.size=200
-# whichgenelist="stable.10M.newdata" # CHANGE DEPENDING ON GENELIST USED
-
+# Combine average values into a single plot
+# Combine Input-normalized values into a single plot
 sample.type=c("DNMT1", "EZH2", "H3", "H3K4", "H3K27", "Input")
 for(i in sample.type){
      output.dir <- paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/normalizedBED_",bin.size,"bp_bin/outputdir/", whichgenelist, "/", i, "/")
