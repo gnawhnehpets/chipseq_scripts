@@ -7,9 +7,10 @@
 # Usage:
 ########
 
-# Rscript chipseq_script_commandprompt.R stable.10M.newdata normalized 200 FALSE
-# Rscript chipseq_script_commandprompt.R genelist.name whichdata bin.size which.rowside.ann
-# Rscript chipseq_script_commandprompt.R genelist.name whichdata bin.size cluster/sort/FALSE
+# Rscript chipseq_script_commandprompt.sort.R stable.10M.new normalized 200 FALSE
+# Rscript chipseq_script_commandprompt.sort.R genelist.name whichdata bin.size which.rowside.ann
+# Rscript chipseq_script_commandprompt.sort.R genelist.name whichdata bin.size cluster/sort/sort.new/FALSE
+
 
 # Read in chipseq functions and genelist annotations
 print(Sys.time())
@@ -22,10 +23,20 @@ options(bitmapType='cairo')
 setwd(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_200bp_bin/normalizedBED_200bp_bin/outputdir/"))
 # Read in arguments
 args <- commandArgs(trailingOnly=TRUE)
-genelist.name <- as.character(args[1])
-whichdata <- as.character(args[2])
+genelist.name <- as.character(args[1]) #genelist name
+whichdata <- as.character(args[2]) # normalized or unnormalized
 bin.size <- as.numeric(args[3]) #10bp or 200bp
-which.rowside.ann <- as.character(args[4]) #FALSE or TRUE to rowside.ann
+##################################################################
+which.rowside.ann <- as.character(args[4]) # rowside annotation option
+
+###################
+# Possible options:
+###################
+# cluster = rowside order based on unt10d.H3K4, csc10d.H3K4 clustering
+# FALSE = rowside sort specific to mark & timepoint
+# sort = rowside sort by unt10d specific to mark
+# sort.new = rowside sort by unt10d.H3K4
+##################################################################
 print(paste0("genelist: ", genelist.name))
 print(paste0("norm?: ", whichdata))
 print(paste0("bin: ", bin.size))
@@ -43,6 +54,7 @@ print(paste0("rowside.ann?: ", which.rowside.ann))
 # genelist.name <- "stable.10M.newdata"
 # genelist.name <- "intermediate.10M.newdata"
 # genelist.name <- "rep1.age.specific.stable.10M.new"
+# genelist.name <- "random.cpg"
 # whichdata <- "normalized"
 # bin.size=200 #10bp or 200bp
 if(genelist.name=="all"){
@@ -179,6 +191,45 @@ if(genelist.name=="random.noncpg"){
      print("random.cpg genelist selected")
      genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/cpgi/random.noncpg.txt"))
 }     
+if(genelist.name=="agerelated_new"){
+     print("agerelated_new genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/agerelated_new/agerelated.4.specific.genes.txt"))
+}     
+if(genelist.name=="cscrelated_new"){
+     print("cscrelated_new genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/agerelated_new/cscrelated.4.specific.genes.txt"))
+}     
+if(genelist.name=="csc.specific.bivalent"){
+     print("csc.specific.bivalent genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/csc.specific.bivalent/csc.specific.bivalent.genes.txt"))
+}     
+if(genelist.name=="csc.bivalent"){
+     print("csc.bivalent genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/csc.specific.bivalent/csc.bivalent.genes.txt"))
+}     
+if(genelist.name=="unt.specific.bivalent"){
+     print("unt.specific.bivalent genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/unt.specific.bivalent/unt.specific.bivalent.genes.txt"))
+}     
+if(genelist.name=="unt.bivalent"){
+     print("unt.bivalent genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/unt.specific.bivalent/unt.bivalent.genes.txt"))
+}     
+
+if(genelist.name=="csc.further.4"){
+     print("csc.further.4 genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/furthermethylated/TSS_age.2.csc.4.further.hypermethylation_10M_rep1_genelist.txt"))
+}     
+if(genelist.name=="csc.further.2"){
+     print("csc.further.2 genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/furthermethylated/TSS_age.2.csc.2.further.hypermethylation_10M_rep1_genelist.txt"))
+}     
+
+if(genelist.name=="cscrelated.methylation.stable"){
+     print("cscrelated.methylation.stable genelist selected")
+     genes <- read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/compiled/agerelated_new/TSS_csc-related.hypermethylation.stable_10M_rep1_sb_genelist.txt"))
+}     
+
 
      plot_results_dir = paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/",whichdata,"BED_",bin.size,"bp_bin/outputdir/",genelist.name,"/")
      plot_results_dir
@@ -266,7 +317,7 @@ head(goi[[1]])
 ## Make plots using coverage data generated form filtered bam files
 ############################################################
 #The coverage data used here is 10bp binned data across the TSS
-## The argument RegAroundTSS is set to 10000, which means that coverage will be plotted for ±5000bp from the TSS
+# The argument RegAroundTSS is set to 10000, which means that coverage will be plotted for ±5000bp from the TSS
 # # For troubleshooting
 # genelist.info=goi
 # coverage_files=coverage_files
@@ -278,51 +329,63 @@ head(goi[[1]])
 # whichgenelist=genelist.name
 # plot.Directory=paste0(system.dir, "Michelle/BED_files/Coverage_TSS_200bp_bin/normalizedBED_200bp_bin/outputdir/", genelist.name)
 
+if(which.rowside.ann=="sort.new"){
+     # Generate C10D H3K4 annotation bar first
+     dir(coverage_files_dir)
+     coverage_files <- dir(coverage_files_dir)[grep("C10D", dir(coverage_files_dir))[1:6]]
+     input_coverage_file = coverage_files[grep("Input_R1", coverage_files)]
+     input_coverage_file
+     coverage_files <- coverage_files[grep("H3K4_R1", coverage_files)] #REMOVE H3 (do not run H3)
+     coverage_files
+     fun.average_heat.plots(genelist.info=goi, coverage_files=coverage_files, input_coverage_file=input_coverage_file, coverage_files.dir=coverage_files_dir, RegAroundTSS=10000, bin=bin.size, chr.prefix.chromosome=T, plot.Directory=paste0(plot_results_dir, "C10D"), version=version, whichgenelist=genelist.name, h3k4.max=h3k4.maxbreak, h3k27.max=h3k27.maxbreak, dnmt.max=dnmt.maxbreak, ezh2.max=ezh2.maxbreak, inp.max=inp.maxbreak, h3.max=h3.maxbreak, which.rowsideann=which.rowside.ann)
+}
+
 print("CHECK4")
 # C10D
 dir(coverage_files_dir)
 coverage_files <- dir(coverage_files_dir)[grep("C10D", dir(coverage_files_dir))[1:6]]
+coverage_files <- coverage_files[-grep("H3_R1", coverage_files)] #REMOVE H3 (do not run H3)
 coverage_files
-input_coverage_file = coverage_files[6]
+input_coverage_file = coverage_files[grep("Input_R1", coverage_files)]
 input_coverage_file
 fun.average_heat.plots(genelist.info=goi, coverage_files=coverage_files, input_coverage_file=input_coverage_file, coverage_files.dir=coverage_files_dir, RegAroundTSS=10000, bin=bin.size, chr.prefix.chromosome=T, plot.Directory=paste0(plot_results_dir, "C10D"), version=version, whichgenelist=genelist.name, h3k4.max=h3k4.maxbreak, h3k27.max=h3k27.maxbreak, dnmt.max=dnmt.maxbreak, ezh2.max=ezh2.maxbreak, inp.max=inp.maxbreak, h3.max=h3.maxbreak, which.rowsideann=which.rowside.ann)
 
 # CSC10D
 coverage_files = dir(coverage_files_dir)[grep("C10D", dir(coverage_files_dir))[7:12]]
-input_coverage_file = coverage_files[6]
-# coverage_files <- coverage_files[-6]
-input_coverage_file
+coverage_files <- coverage_files[-grep("H3_R1", coverage_files)] #REMOVE H3 (do not run H3)
 coverage_files
+input_coverage_file = coverage_files[grep("Input_R1", coverage_files)]
+input_coverage_file
 fun.average_heat.plots(genelist.info=goi, coverage_files=coverage_files, input_coverage_file=input_coverage_file, coverage_files.dir=coverage_files_dir, RegAroundTSS=10000, bin=bin.size, chr.prefix.chromosome=T, plot.Directory=paste0(plot_results_dir, "CSC10D"), version=version, whichgenelist=genelist.name, h3k4.max=h3k4.maxbreak, h3k27.max=h3k27.maxbreak, dnmt.max=dnmt.maxbreak, ezh2.max=ezh2.maxbreak, inp.max=inp.maxbreak, h3.max=h3.maxbreak, which.rowsideann=which.rowside.ann)
 
 # C3M
 coverage_files = dir(coverage_files_dir)[grep("C3M", dir(coverage_files_dir))[1:6]]
-input_coverage_file = coverage_files[6]
-# coverage_files <- coverage_files[-6]
-input_coverage_file
+coverage_files <- coverage_files[-grep("H3_R1", coverage_files)] #REMOVE H3 (do not run H3)
 coverage_files
+input_coverage_file = coverage_files[grep("Input_R1", coverage_files)]
+input_coverage_file
 fun.average_heat.plots(genelist.info=goi, coverage_files=coverage_files, input_coverage_file=input_coverage_file, coverage_files.dir=coverage_files_dir, RegAroundTSS=10000, bin=bin.size, chr.prefix.chromosome=T, plot.Directory=paste0(plot_results_dir, "C3M"), version=version, whichgenelist=genelist.name, h3k4.max=h3k4.maxbreak, h3k27.max=h3k27.maxbreak, dnmt.max=dnmt.maxbreak, ezh2.max=ezh2.maxbreak, inp.max=inp.maxbreak, h3.max=h3.maxbreak, which.rowsideann=which.rowside.ann)
 
 # CSC3M
 coverage_files = dir(coverage_files_dir)[grep("C3M", dir(coverage_files_dir))[7:12]] #CSC3M
-input_coverage_file = coverage_files[6]
-# coverage_files <- coverage_files[-6]
-input_coverage_file
+coverage_files <- coverage_files[-grep("H3_R1", coverage_files)] #REMOVE H3 (do not run H3)
 coverage_files
+input_coverage_file = coverage_files[grep("Input_R1", coverage_files)]
+input_coverage_file
 fun.average_heat.plots(genelist.info=goi, coverage_files=coverage_files, input_coverage_file=input_coverage_file, coverage_files.dir=coverage_files_dir, RegAroundTSS=10000, bin=bin.size, chr.prefix.chromosome=T, plot.Directory=paste0(plot_results_dir, "CSC3M"), version=version, whichgenelist=genelist.name, h3k4.max=h3k4.maxbreak, h3k27.max=h3k27.maxbreak, dnmt.max=dnmt.maxbreak, ezh2.max=ezh2.maxbreak, inp.max=inp.maxbreak, h3.max=h3.maxbreak, which.rowsideann=which.rowside.ann)
 
 # C10M
 coverage_files = dir(coverage_files_dir)[grep("C10M", dir(coverage_files_dir))[1:6]] 
-input_coverage_file = coverage_files[6]
-# coverage_files <- coverage_files[-6]
-input_coverage_file
+coverage_files <- coverage_files[-grep("H3_R1", coverage_files)] #REMOVE H3 (do not run H3)
 coverage_files
+input_coverage_file = coverage_files[grep("Input_R1", coverage_files)]
+input_coverage_file
 fun.average_heat.plots(genelist.info=goi, coverage_files=coverage_files, input_coverage_file=input_coverage_file, coverage_files.dir=coverage_files_dir, RegAroundTSS=10000, bin=bin.size, chr.prefix.chromosome=T, plot.Directory=paste0(plot_results_dir, "C10M"), version=version, whichgenelist=genelist.name, h3k4.max=h3k4.maxbreak, h3k27.max=h3k27.maxbreak, dnmt.max=dnmt.maxbreak, ezh2.max=ezh2.maxbreak, inp.max=inp.maxbreak, h3.max=h3.maxbreak, which.rowsideann=which.rowside.ann)
 
 # CSC10M
 coverage_files = dir(coverage_files_dir)[grep("C10M", dir(coverage_files_dir))[7:12]]
-input_coverage_file = coverage_files[6]
-# coverage_files <- coverage_files[-6]
-input_coverage_file
+coverage_files <- coverage_files[-grep("H3_R1", coverage_files)] #REMOVE H3 (do not run H3)
 coverage_files
+input_coverage_file = coverage_files[grep("Input_R1", coverage_files)]
+input_coverage_file
 fun.average_heat.plots(genelist.info=goi, coverage_files=coverage_files, input_coverage_file=input_coverage_file, coverage_files.dir=coverage_files_dir, RegAroundTSS=10000, bin=bin.size, chr.prefix.chromosome=T, plot.Directory=paste0(plot_results_dir, "CSC10M"), version=version, whichgenelist=genelist.name, h3k4.max=h3k4.maxbreak, h3k27.max=h3k27.maxbreak, dnmt.max=dnmt.maxbreak, ezh2.max=ezh2.maxbreak, inp.max=inp.maxbreak, h3.max=h3.maxbreak, which.rowsideann=which.rowside.ann)

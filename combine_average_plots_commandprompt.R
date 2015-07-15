@@ -15,14 +15,15 @@ args <- commandArgs(trailingOnly=TRUE)
 whichgenelist <- as.character(args[1])
 bin.size <- as.numeric(args[2]) #10bp or 200bp
 # whichgenelist<-"rep1.agerelated.10M.new.noncpg"
-# bin.size=200
+# whichgenelist <- "random.cpg"
+bin.size=200
 print(paste0("genelist: ", whichgenelist))
 print(paste0("bin: ", bin.size))
 
 system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
 source(paste0(system.dir, "Michelle/Rscripts/ChIP-SeqLibraryOfFunctions_newFunctions.sort.R"))
 
-marks <- c("H3K4", "H3K27", "EZH2", "DNMT1", "H3", "Input")
+marks <- c("H3K4", "H3K27", "EZH2", "DNMT1", "Input")
 timepoints <- c("C10D", "CSC10D", "C3M", "CSC3M", "C10M", "CSC10M")
 
 # Generate Input-normalized values for each group at every timepoint
@@ -51,8 +52,8 @@ for(i in marks){
 
 # Combine average values into a single plot
 # Combine Input-normalized values into a single plot
-sample.type=c("DNMT1", "EZH2", "H3", "H3K4", "H3K27", "Input")
-for(i in sample.type){
+# sample.type=c("DNMT1", "EZH2", "H3", "H3K4", "H3K27", "Input")
+for(i in marks){
      output.dir <- paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin.size,"bp_bin/normalizedBED_",bin.size,"bp_bin/outputdir/", whichgenelist, "/", i, "/")
      print(output.dir)
 #      generate_combined_avg_plots(sample.name=i, name.of.genelist=whichgenelist, bin=bin.size, outputDirectory=output.dir)

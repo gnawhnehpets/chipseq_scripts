@@ -10,7 +10,7 @@ options(bitmapType='cairo')
 ##################################################################
 ##################################################################
 # system.dir="/amber2/scratch/baylin/shwang/"
-system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
+# system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/shwang26/"
 # system.dir="Z:/users/shwang26/"
 # system.dir="Y:/users/shwang26/"
 
@@ -37,9 +37,10 @@ system.dir="/home/steve/.gvfs/onc-analysis$ on onc-cbio2.win.ad.jhu.edu/users/sh
 ## This needs to be explicitly stated after migrating cluster to JHPCE. Until this is resolved, use this path.
 ##################################################################
 .libPaths()
+lib.path <- .libPaths()
 # lib.path <- "/jhpce/shared/community/compiler/gcc/4.4.7/R/3.0.x/lib64/R/site-library"
- lib.path <- "/home/steve/R/i686-pc-linux-gnu-library/3.1"
-#lib.path <- "C:/Users/steve/Documents/R/win-library/3.1"
+# lib.path <- "/home/steve/R/i686-pc-linux-gnu-library/3.1"
+# lib.path <- "C:/Users/steve/Documents/R/win-library/3.1"
 # lib.path <- "C:/Program Files/R/R-3.1.2/library" #remote desktop
 
 #.libPaths()
@@ -670,6 +671,7 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
      # Create directory for saving plots
      dir.create(plot.Directory)
      custom.annotation <- vector()
+     #For UNT10D, CSC10D clustering 
      if(which.rowsideann=="cluster" | which.rowsideann==TRUE){
           # load custom annotation bar (created from create_ChIPseq_rowsidecolor_annotation.R)
 #           if(whichgenelist=="all"){
@@ -766,11 +768,6 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           
           custom.annotation
      }
-#      if(which.rowsideann=="bivalent"){
-#           print(paste0("/path/to/annotation: ", system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_",whichgenelist,"_",bin,"bp_ann.bar_bivalent.Rdata"))
-#           load(paste0(system.dir, "Michelle/BED_files/Coverage_TSS_",bin,"bp_bin/normalizedBED_",bin,"bp_bin/outputdir/c10d_",whichgenelist,"_",bin,"bp_ann.bar_bivalent.Rdata"))
-#           custom.annotation <- c10d.10M.ann.bar
-#      }
 
      # Define num.bins and int: 
      ## num.bins is the number of coverage bins around the TSS that will be plotted given RegAroundTSS and bin.
@@ -784,7 +781,6 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
           num.bins <- (RegAroundTSS/bin)
           int <-  seq(from=-((num.bins-1)/2), to= (num.bins-1)/2, by=1)*bin
      }
-#      print(paste0("int: ", int))
      # Read the input coverage file
      if(exists("input_coverage_file"))
      {
@@ -840,9 +836,9 @@ fun.average_heat.plots <- function(genelist.info, coverage_files, input_coverage
                print(head(chipCoverage.TSS))
                print(head(inputCoverage.TSS))
                print("checkpoint:name.bucket3")
-print("##########################")
-print(paste0("I CHECKPOINT1: ", i))
-print("##########################")
+               print("##########################")
+               print(paste0("I CHECKPOINT1: ", i))
+               print("##########################")
                if(dim(t(na.omit(t(chipCoverage.TSS))))[2] >= 2){#there should be coverage data for at least two genes (automatically it means that there is atleast two-gene coverage data for the input also). na.omit removes rows that contain NA in a data frame. t used here because columns containing NAs have to be removed - thus after omitting columns with NA, coverage data should have data for atleast 2 gene  to satisfy the 'if' statement.
                     ## Calculate average ChIP coverage
                     chipCoverage.TSSAverage <- apply(chipCoverage.TSS, 1, mean, na.rm=T)
@@ -862,9 +858,13 @@ print("##########################")
                          heat_plot_raw <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_raw.jpeg", sep="-"))
                          heat_plot_RATIO <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_RATIO.jpeg", sep="-"))
                     }
-                    if(which.rowsideann=="sort"){
+                    if(which.rowsideann=="sort"){ #rowside ordering= unt10d ordering, specific to mark
                          heat_plot_raw <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_raw_bivalent.jpeg", sep="-"))
                          heat_plot_RATIO <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_RATIO_bivalent.jpeg", sep="-"))
+                    }
+                    if(which.rowsideann=="sort.new"){ #rowside ordering= h3k4 unt10d ordering across all marks
+                         heat_plot_raw <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_raw_bivalent_h3k4order.jpeg", sep="-"))
+                         heat_plot_RATIO <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_RATIO_bivalent_h3k4order.jpeg", sep="-"))
                     }
                     if(which.rowsideann==FALSE){
                          heat_plot_raw <- file.path(plot.Directory, paste(i, names(genelist.info)[g], "heat_plot_raw_no.annotation.jpeg", sep="-"))
@@ -898,7 +898,7 @@ print("##########################")
                     ezh2.increment <- ezh2.max/100
                     inp.increment <- inp.max/100
                     h3.increment <- h3.max/100
-                    h3k4.rat.increment <- h3k4.rat.max/100
+                    h3k4.rat.increment <- h3k4.rat.max/100 #IT2
                     h3k27.rat.increment <- h3k27.rat.max/100
                     dnmt.rat.increment <- dnmt.rat.max/100
                     ezh2.rat.increment <- ezh2.rat.max/100
@@ -907,28 +907,38 @@ print("##########################")
                     # set breaks according to sample type
                     if(grepl("H3K4", gsub("_R1.*", "", i))){
                          print("hit: H3K4")
-                         breaks=seq(0, h3k4.max, by=h3k4.increment) #75 values
+                         #1
+                         breaks=c(seq(0, h3k4.max/2, by=h3k4.increment/2), h3k4.max)
+                         breaks=breaks[-(breaks==(h3k4.max/2))]
+                         length(breaks)
+                         #2
+#                          breaks=seq(0, h3k4.max, by=h3k4.increment) #75 values
                          breaks2=seq(0, h3k4.rat.max, by=h3k4.rat.increment) #75 values
                     }
                     else if(grepl("H3K27", gsub("_R1.*", "", i))){
                          print("hit: H3K27")
-                         breaks=seq(0, h3k27.max, by=h3k27.increment) #125 values
-                         breaks2=seq(0, h3k27.rat.max, by=h3k27.rat.increment) #125 values
+                         #1
+                         breaks=c(seq(0, h3k27.max/2, by=h3k27.increment/2), h3k27.max)
+                         breaks=breaks[-(breaks==(h3k27.max/2))]
+                         length(breaks)
+                         #2
+#                         breaks=seq(0, h3k27.max, by=h3k27.increment)
+                         breaks2=seq(0, h3k27.rat.max, by=h3k27.rat.increment)
                     }
                     else if(grepl("DNMT1", gsub("_R1.*", "", i))){
                          print("hit: DNMT1")
-                         breaks=seq(0, dnmt.max, by=dnmt.increment) #100 values
-                         breaks2=seq(0, dnmt.rat.max, by=dnmt.rat.increment) #100 values
+                         breaks=seq(0, dnmt.max, by=dnmt.increment)
+                         breaks2=seq(0, dnmt.rat.max, by=dnmt.rat.increment)
                     }
                     else if(grepl("EZH2", gsub("_R1.*", "", i))){
                          print("hit: EZH2")
-                         breaks=seq(0, ezh2.max, by=ezh2.increment) #80 values
-                         breaks2=seq(0, ezh2.rat.max, by=ezh2.rat.increment) #80 values
+                         breaks=seq(0, ezh2.max, by=ezh2.increment)
+                         breaks2=seq(0, ezh2.rat.max, by=ezh2.rat.increment)
                     }
                     else if(grepl("Input", gsub("_R1.*", "", i))){
                          print("hit: Input")
-                         breaks=seq(0, inp.max, by=inp.increment) #50 values
-                         breaks2=seq(0, inp.rat.max, by=inp.rat.increment) #50 values
+                         breaks=seq(0, inp.max, by=inp.increment)
+                         breaks2=seq(0, inp.rat.max, by=inp.rat.increment)
                     }
                     else if(grepl("H3_", gsub("R1.*", "", i))){ #H3
                          print("hit: H3")
@@ -936,15 +946,16 @@ print("##########################")
                          breaks2=seq(0, h3.rat.max, by=h3.rat.increment) #100 values
                     }
                     mycol <- colorpanel(n=length(breaks)-1,low="gray100",mid="gray50",high="gray0")
+#                     mycol <- colorpanel(n=length(breaks),low="gray100",mid="gray50",high="gray0")
                     print(paste0("WHICH.ROWSIDEANN: ", which.rowsideann))
                     ##################################################
                     ##################################################
                     # Plots created depending on rowside options
                     ##################################################
                     ##################################################
-                    if(which.rowsideann==FALSE){
+                    if(which.rowsideann==FALSE){ #Just normal
                          print("checkpoint.heatmap1a")
-                         #Sort rows by total read count, no clustering
+                         #Sort rows by total read count, no clustering (total read count sort specific to treatment & timepoint)
                          # x.trnposed.sum <- x.trnposed[rev(order(rowSums(x.trnposed))),]
                          x.trnposed.sum <- x.trnposed[order(rowSums(x.trnposed)),]
                          ratioToInp.x.trnposed.sum <- ratioToInp.x.trnposed[order(rowSums(ratioToInp.x.trnposed)),]
@@ -968,9 +979,10 @@ print("##########################")
                          heatmap.3(ratioToInp.x.trnposed.sum, Rowv=F, Colv=F, col=mycol, scale="none", trace="none", dendrogram="none", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
                          dev.off()
                     }
+                    # Keeps row order from C10D for that specific mark across all timepoints for that particular sample
                     if(which.rowsideann=="sort"){
-                         load(paste0(system.dir, "/Michelle/Robjects/sort.bivalent.annotations.rda"))
-                         
+#                          load(paste0(system.dir, "/Michelle/Robjects/sort.bivalent.annotations.rda"))
+                         load(file=paste0(system.dir, "Michelle/Robjects/genelists.rda"))
                          print("checkpoint.heatmap1b")
                          #If C10D samples, save the sort indices per sample
                          grep("^C10DInput", dir(coverage_files.dir))
@@ -1037,36 +1049,39 @@ print("##########################")
                          }
                          x.trnposed.order <- x.trnposed[custom.order,]
                          ratioToInp.x.trnposed.order <- ratioToInp.x.trnposed[custom.order,]
-#                          print("#################")
-#                          print("ROW XTRNPOSED")
-#                          print("#################")
-#                          print(rownames(x.trnposed))
-                         
-#                          print(rownames(x.trnposed.order))
-#                          print(head(x.trnposed.order))
-#                          print(paste0("# of rows x.trnposed: ", nrow(x.trnposed)))
-#                          print(paste0("# of rows x.trnposed.order: ", nrow(x.trnposed.order)))
-                         
-                         c10d.bivalent <- C10D_K4.K27_genes
-                         csc10d.bivalent <- CSC10D_K4.K27_genes
-#                          print("############################")
-#                          print("# create bivalent annotation")
-#                          print("############################")
 
-                         #length(which(grepl("TRIM36", c10d.bivalent)))
+                         
+#                          c10d.bivalent <- C10D_K4.K27_genes
+#                          csc10d.bivalent <- CSC10D_K4.K27_genes
+#                          row.annotation.color1 <- vector()
+#                          for (j in 1:length(rownames(x.trnposed.order))) {
+#                               row.annotation.color1[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], c10d.bivalent)))==1, "green2", "gray20")
+#                          }
+#                          row.annotation.color2 <- vector()
+#                          for (j in 1:length(rownames(x.trnposed.order))) {
+#                               row.annotation.color2[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], csc10d.bivalent)))==1, "green2", "gray20")
+#                          }
+#                          row.annotation.color1 <- t(as.matrix(row.annotation.color1))
+#                          rownames(row.annotation.color1) <- "C10D.BIV"
+#                          row.annotation.color2 <- t(as.matrix(row.annotation.color2))
+#                          rownames(row.annotation.color2) <- "CSC10D.BIV"
+
+
+                         unt.bivalent <- unique(c(C10D_K4.K27_genes, C3M_K4.K27_genes, C10M_K4.K27_genes))
+                         csc.bivalent <- unique(c(CSC10D_K4.K27_genes, CSC3M_K4.K27_genes, CSC10M_K4.K27_genes))
                          row.annotation.color1 <- vector()
                          for (j in 1:length(rownames(x.trnposed.order))) {
-                              row.annotation.color1[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], c10d.bivalent)))==1, "green2", "gray20")
+                              row.annotation.color1[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], unt.bivalent)))==1, "green2", "gray20")
                          }
                          row.annotation.color2 <- vector()
                          for (j in 1:length(rownames(x.trnposed.order))) {
-                              row.annotation.color2[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], csc10d.bivalent)))==1, "green2", "gray20")
+                              row.annotation.color2[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], csc.bivalent)))==1, "green2", "gray20")
                          }
-# man the contrast between /r/baltimore and /r/triangle. "i was woken up last night by loud popp
+                         
                          row.annotation.color1 <- t(as.matrix(row.annotation.color1))
-                         rownames(row.annotation.color1) <- "C10D.BIV"
+                         rownames(row.annotation.color1) <- "UNT.BIV"
                          row.annotation.color2 <- t(as.matrix(row.annotation.color2))
-                         rownames(row.annotation.color2) <- "CSC10D.BIV"
+                         rownames(row.annotation.color2) <- "CSC.BIV"
                          custom.annotation <- rbind(row.annotation.color1, row.annotation.color2)
                          print(paste0("DIM: ", dim(custom.annotation)))
                          for(k in 1:ncol(custom.annotation)){
@@ -1081,7 +1096,124 @@ print("##########################")
                          jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
                          heatmap.3(ratioToInp.x.trnposed.order, Rowv=F, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="none", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
                          dev.off()
+                    }   
+                    # Keeps row order from C10DH3K4 conserved across all timepoints and samples
+                    if(which.rowsideann=="sort.new"){
+                      #                          load(paste0(system.dir, "/Michelle/Robjects/sort.bivalent.annotations.rda"))
+                      load(file=paste0(system.dir, "Michelle/Robjects/genelists.rda"))
+                      print("checkpoint.heatmap1b")
+                      #If C10D samples, save the sort indices per sample
+                      grep("^C10DInput", dir(coverage_files.dir))
+                      custom.order <- vector()
+                      print("##########################")
+                      print(paste0("I CHECKPOINT2: ", i))
+                      print("##########################")
+                      # For C10DH3K4 coverage file, establish row order and save object
+                      if(grepl("^C10DH3K4", i)){
+                        C10DH3K4.order <- order(rowSums(x.trnposed))
+                        save(C10DH3K4.order, file=paste0("./",genelist.name,"/c10d_",genelist.name,"_",bin,"bp_h3k4.order_new.Rdata"))     
+                        custom.order <- C10DH3K4.order
+                        # For non-C10DH3K4 coverage files, load the annotation bar and use it for average plots
+                      }else{
+                        load(file=paste0("./",genelist.name,"/c10d_",genelist.name,"_",bin,"bp_h3k4.order_new.Rdata"))     
+                        custom.order <- C10DH3K4.order
+                      }
+                      x.trnposed.order <- x.trnposed[custom.order,]
+                      ratioToInp.x.trnposed.order <- ratioToInp.x.trnposed[custom.order,]
+                      
+                      unt.bivalent <- unique(c(C10D_K4.K27_genes, C3M_K4.K27_genes, C10M_K4.K27_genes))
+                      csc.bivalent <- unique(c(CSC10D_K4.K27_genes, CSC3M_K4.K27_genes, CSC10M_K4.K27_genes))
+                      cscmethylated.genes <- as.matrix(read.table(paste0(system.dir, "/Michelle/MethylationData/methylatedGeneLists/agerelated_new/cscrelated.4.specific.genes.txt")))
+                      print("########################################################")
+                      print("#CSCMETHYLATED##########################################")
+                      print("########################################################")
+                      row.annotation.color1 <- vector()
+                      for (j in 1:length(rownames(x.trnposed.order))) {
+                        row.annotation.color1[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], unt.bivalent)))==1, "green2", "gray20")
+                      }
+                      row.annotation.color2 <- vector()
+                      for (j in 1:length(rownames(x.trnposed.order))) {
+                        row.annotation.color2[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], csc.bivalent)))==1, "green2", "gray20")
+                      }
+                      row.annotation.color3 <- vector()
+                      for (j in 1:length(rownames(x.trnposed.order))) {
+                        row.annotation.color3[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], cscmethylated.genes)))==1, "green2", "gray20")
+                      }
+                                            
+                      row.annotation.color1 <- t(as.matrix(row.annotation.color1))
+                      rownames(row.annotation.color1) <- "UNT.BIV"
+                      row.annotation.color2 <- t(as.matrix(row.annotation.color2))
+                      rownames(row.annotation.color2) <- "CSC.BIV"
+                      row.annotation.color3 <- t(as.matrix(row.annotation.color3))
+                      rownames(row.annotation.color3) <- "CSC.METHYL"
+                      custom.annotation <- rbind(row.annotation.color1, row.annotation.color2, row.annotation.color3)
+                      print(paste0("DIM: ", dim(custom.annotation)))
+                      for(k in 1:ncol(custom.annotation)){
+                        if(custom.annotation[1,k]=="green2" & custom.annotation[2,k]=="green2"){ custom.annotation[1,k] <- "lightblue"; custom.annotation[2,k] <- "lightblue"}
+                      }
+                      print("raw heatmap")
+                      jpeg(heat_plot_raw, height=500, width=800, quality=100)
+                      heatmap.3(x.trnposed.order, Rowv=F, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="none", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                      dev.off()
+                      print("ratio heatmap")
+                      jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
+                      heatmap.3(ratioToInp.x.trnposed.order, Rowv=F, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="none", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+                      dev.off()
                     }                    
+#                     # Keeps row order from C10DH3K4 conserved across all timepoints and samples
+#                     if(which.rowsideann=="sort.new_backup"){
+#                          #                          load(paste0(system.dir, "/Michelle/Robjects/sort.bivalent.annotations.rda"))
+#                          load(file=paste0(system.dir, "Michelle/Robjects/genelists.rda"))
+#                          print("checkpoint.heatmap1b")
+#                          #If C10D samples, save the sort indices per sample
+#                          grep("^C10DInput", dir(coverage_files.dir))
+#                          custom.order <- vector()
+#                          print("##########################")
+#                          print(paste0("I CHECKPOINT2: ", i))
+#                          print("##########################")
+#                          # For C10DH3K4 coverage file, establish row order and save object
+#                          if(grepl("^C10DH3K4", i)){
+#                               C10DH3K4.order <- order(rowSums(x.trnposed))
+#                               save(C10DH3K4.order, file=paste0("./",genelist.name,"/c10d_",genelist.name,"_",bin,"bp_h3k4.order_new.Rdata"))     
+#                               custom.order <- C10DH3K4.order
+#                               # For non-C10DH3K4 coverage files, load the annotation bar and use it for average plots
+#                          }else{
+#                               load(file=paste0("./",genelist.name,"/c10d_",genelist.name,"_",bin,"bp_h3k4.order_new.Rdata"))     
+#                               custom.order <- C10DH3K4.order
+#                          }
+#                          x.trnposed.order <- x.trnposed[custom.order,]
+#                          ratioToInp.x.trnposed.order <- ratioToInp.x.trnposed[custom.order,]
+#                          
+#                          unt.bivalent <- unique(c(C10D_K4.K27_genes, C3M_K4.K27_genes, C10M_K4.K27_genes))
+#                          csc.bivalent <- unique(c(CSC10D_K4.K27_genes, CSC3M_K4.K27_genes, CSC10M_K4.K27_genes))
+#                          row.annotation.color1 <- vector()
+#                          for (j in 1:length(rownames(x.trnposed.order))) {
+#                               row.annotation.color1[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], unt.bivalent)))==1, "green2", "gray20")
+#                          }
+#                          row.annotation.color2 <- vector()
+#                          for (j in 1:length(rownames(x.trnposed.order))) {
+#                               row.annotation.color2[j] <- ifelse(length(which(grepl(rownames(x.trnposed.order)[j], csc.bivalent)))==1, "green2", "gray20")
+#                          }
+#                          
+#                          row.annotation.color1 <- t(as.matrix(row.annotation.color1))
+#                          rownames(row.annotation.color1) <- "UNT.BIV"
+#                          row.annotation.color2 <- t(as.matrix(row.annotation.color2))
+#                          rownames(row.annotation.color2) <- "CSC.BIV"
+#                          custom.annotation <- rbind(row.annotation.color1, row.annotation.color2)
+#                          print(paste0("DIM: ", dim(custom.annotation)))
+#                          for(k in 1:ncol(custom.annotation)){
+#                               if(custom.annotation[1,k]=="green2" & custom.annotation[2,k]=="green2"){ custom.annotation[1,k] <- "lightblue"; custom.annotation[2,k] <- "lightblue"}
+#                          }
+#                          print("raw heatmap")
+#                          jpeg(heat_plot_raw, height=500, width=800, quality=100)
+#                          heatmap.3(x.trnposed.order, Rowv=F, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="none", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+#                          dev.off()
+#                          print("ratio heatmap")
+#                          jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
+#                          heatmap.3(ratioToInp.x.trnposed.order, Rowv=F, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="none", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
+#                          dev.off()
+#                     }                    
+                    # rowside annotation based on unt10.k4, csc10.k4 hierarchical clustering
                     if(which.rowsideann=="cluster" | which.rowsideann==TRUE){
                          print("checkpoint.heatmap1c")
                          print("raw heatmap")
@@ -1093,30 +1225,6 @@ print("##########################")
                          heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
                          dev.off()
                     }
-                    
-                    
-# ORIGINAL                     
-#                     jpeg(heat_plot_raw, height = 500, width = 800, quality=100)
-#                     if(which.rowsideann){
-#                          heatmap.3(x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
-#                     }else{
-#                          heatmap.3(x.trnposed, Rowv=T, Colv=F, col=mycol, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
-#                     }
-# #                       heatmap.3(x.trnposed, Rowv=T, Colv=F, col=numberOfColors.x.trnposed, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", cexRow=0.2, main=paste0("Heatmap of raw seq reads - ", gsub("_R1.*", "", i)), na.rm=TRUE)
-#                     dev.off()
-                    
-                    ## Ratio heatmap
-#                     print("ratio heatmap")
-#                     jpeg(heat_plot_RATIO, height = 500, width = 800, quality=100)
-# #                     heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, scale="none", col=numberOfColors.ratioToInp.x.trnposed, trace="none", RowSideColors=custom.annotation, dendrogram="row", cexRow=0.2, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
-#                     if(which.rowsideann){
-#                          heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
-#                     }else{
-#                          heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, scale="none", trace="none", dendrogram="row", breaks=breaks2, cexRow=1, cexCol=1, key=T, main=paste0(main="Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE, symkey=FALSE)
-#                     }
-#                     #         heatmap.3(ratioToInp.x.trnposed, Rowv=T, Colv=F, col=mycol, RowSideColors=custom.annotation, scale="none", trace="none", dendrogram="row", breaks=breaks, cexRow=1, cexCol=1, key=T, main=paste0("Heatmap of ratios\nof seq reads to average input - ", gsub("_R1.*", "", i)), na.rm=TRUE)
-#                     dev.off()
-                    
                } else {
                     # These vectors with NA created as a placeholder in the lists for the plot functions below to work smoothly. This is generated if coverage data for at least two genes is not present.
                     chipCoverage.TSSAverageList[[g]] <- rep(NA, num.bins)
@@ -1290,7 +1398,6 @@ fun.Plot_RatioToInput <- function(files.path, RegAroundTSS, bin, plot.0to20.81to
 #Function to retrieve ChIP-seq coverage in regions flanking a genomic element (GE; eg. CpG island)
 fun.GetGECoverage <- function(GE.info, flank.coverage.data, central.coverage.data, FlankRegion=2000, bin=200, norm.bins=10){
      #This function extracts the coverage data in a defined region flanking a genomic element (GE; eg. CpG island) (FlankRegion); GE.info is the dataframe consisting the required information (Chromosome, Start, End) about the GE; flank.coverage.data is the coverage data in bed format obtained for the flanking regions using coverageBed in BedTools; central.coverage.data is the coverage data in bed format for the central region of the GE (normalized into bins defined by norm.bins); bin is the window size in which the coverage data is binned (default is 200 bp); norm.bins is the number of bins into which the actual GE (central region) is divided to normalize all GE into a similar size group; FlankRegion is the region flanking up- and down-stream from the edges of the genomic element for which the coverage in the defined bin size has to be extracted (default FlankRegion is 2000bp, i.e. 2000 bp up- and down-stream from the edges of the GE). Output is an object of class list containing two data frames as elements of the list, holding the coverage data in the flanking region upstream and downstream of the GE.
-     
      num.bins <- (FlankRegion/bin) #this is the number of coverage bins on each side flanking the genomic element that should be obtained unless the genomic element is at the edge of a chromosome
      
      # split genomic element (GE, eg. CpG island) information by chromosomes
@@ -2564,7 +2671,7 @@ heatmap.3 <- function(x,
      invisible(retval)
 }
 
-generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outputDirectory){
+generate_combined_avg_plots_backup <- function(sample.name, name.of.genelist, bin, outputDirectory){
      directory = outputDirectory
      print(directory)
      files <- list.files(directory, pattern=".*R1.*.txt")
@@ -2603,7 +2710,8 @@ generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outp
      plot.col <- vector()
      plot.lty <- vector()
      sample.name <- vector()
-     custom.color <- c("gray0", "gray45", "gray80", "red3", "tomato", "lightpink3")
+#      custom.color <- c("gray0", "gray45", "gray80", "red3", "tomato", "lightpink3")
+     custom.color <- c("gray80", "gray45", "gray0", "lightpink3", "tomato", "red3")
      for(u in 1:length(datalist)){
           sample.name <- c(sample.name, colnames(datalist[[u]]))
           # Start loop average plot
@@ -2625,6 +2733,197 @@ generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outp
      legend("left", fill=custom.color, legend=sample.name, border="white", box.col="white", cex=2)
      dev.off()
 }
+
+generate_combined_avg_plots_both <- function(sample.name, name.of.genelist, bin, outputDirectory){
+  directory = outputDirectory
+  files <- list.files(directory, pattern=".*R1.*average_values.txt")
+  files <- files[c(1,3,2,4,6,5)]
+  files
+  # read in average values into list
+  datalist <- list()
+  d<- data.matrix(read.delim(paste0(directory,files[1]), header=TRUE))
+  class(d)
+  for(i in 1:length(files)){
+    tmp <- data.matrix(read.table(paste0(directory,files[i]), header=TRUE))
+    datalist[[i]]  <- tmp
+    colnames(datalist[[i]]) <- gsub("_R1.*", "", colnames(datalist[[i]]))
+  }
+  class(datalist[[5]])
+  datalist
+  if(bin==200){
+    int <- as.numeric(unlist(read.delim(paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_200bp.txt"), sep="\t", header=FALSE)))
+  }
+  if(bin==10){
+    int <- as.numeric(unlist(read.delim(paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_10bp.txt"), sep="\t", header=FALSE)))
+  }
+  length(int)
+  int
+  
+  # Average plot
+  filename=paste0(directory, "combined_avg_plots_", name.of.genelist, "_", sample.name, "_average.jpeg")
+  print(paste0("FILENAME_average:", filename))
+  jpeg(filename, height=600, width=900, quality=100)
+  tmpmat <- rbind(c(0,1,1,1,2))
+  layout(tmpmat, widths=c(.1,.1))
+  #PLOT1
+  par(mar=c(5,7,5,0))
+  plot(0~0, type="n", xlim=range(int), ylim=c(0,range(datalist, na.rm=T)[2]), xlab="Dist. from TSS", ylab="Seq Counts", 
+       cex.lab=1.8, cex.axis=1.8, cex.main=2, main=paste0("Combined Average Plot for ", sample.name, " timepoints (", name.of.genelist, ")"))
+  plot.col <- vector()
+  plot.lty <- vector()
+  sample.name.plot <- vector()
+  #      custom.color <- c("gray0", "gray45", "gray80", "red3", "tomato", "lightpink3")
+  custom.color <- c("gray80", "gray45", "gray0", "lightpink3", "tomato", "red3")
+  for(u in 1:length(datalist)){
+    sample.name.plot <- c(sample.name.plot, colnames(datalist[[u]]))
+    # Start loop average plot
+    plot.col[u] <- u
+    if(!any(datalist[[u]] %in% NA)){
+      if(bin==200){
+        lines(int, datalist[[u]], lty=1, lwd=4, col=custom.color[u])
+      }
+      if(bin==10){
+        lines(int, datalist[[u]], lty=1, lwd=1, col=custom.color[u])
+      }
+      plot.lty[u] <- 1
+    } else{lines(int, rep(0, num.bins), lty=3, lwd=4, col=custom.color[u])
+           text(x=int[1], y=0, labels=c("coverage data for atleast two genes not present"), adj=0, cex=0.8)
+           plot.lty[u] <- 3}
+  } # end plotting average plot
+  #PLOT2 (dummy plot)
+  barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+  legend("left", fill=custom.color, legend=sample.name.plot, border="white", box.col="white", cex=2)
+  dev.off()
+  
+  
+  files <- list.files(directory, pattern=".*ratio_values.txt")
+  files <- files[c(1,3,2,4,6,5)]
+  files
+  # read in average values into list
+  datalist <- list()
+  d<- data.matrix(read.delim(paste0(directory,files[1]), header=TRUE))
+  class(d)
+  for(i in 1:length(files)){
+    tmp <- data.matrix(read.table(paste0(directory,files[i]), header=TRUE))
+    datalist[[i]]  <- tmp
+    colnames(datalist[[i]]) <- gsub("_R1.*", "", colnames(datalist[[i]]))
+  }
+  class(datalist[[5]])
+  datalist
+  if(bin==200){
+    int <- as.numeric(unlist(read.delim(paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_200bp.txt"), sep="\t", header=FALSE)))
+  }
+  if(bin==10){
+    int <- as.numeric(unlist(read.delim(paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_10bp.txt"), sep="\t", header=FALSE)))
+  }
+  length(int)
+  int
+  
+  # Ratio plot
+  filename=paste0(directory, "combined_avg_plots_", name.of.genelist, "_", sample.name, "_ratio.jpeg")
+  filename
+  print(paste0("FILENAME_ratio:", filename))
+  
+  jpeg(filename, height=600, width=900, quality=100)
+  tmpmat <- rbind(c(0,1,1,1,2))
+  layout(tmpmat, widths=c(.1,.1))
+  #PLOT1
+  par(mar=c(5,7,5,0))
+  plot(0~0, type="n", xlim=range(int), ylim=c(0,range(datalist, na.rm=T)[2]), xlab="Dist. from TSS", ylab=paste0("Ratio of ", sample.name, " Seq Counts/Input Seq Counts"), 
+       cex.lab=1.8, cex.axis=1.8, cex.main=2, main=paste0("Combined Input-Normalized Plot for ", sample.name, " timepoints (", name.of.genelist, ")"))
+  plot.col <- vector()
+  plot.lty <- vector()
+  sample.name <- vector()
+  #      custom.color <- c("gray0", "gray45", "gray80", "red3", "tomato", "lightpink3")
+  custom.color <- c("gray80", "gray45", "gray0", "lightpink3", "tomato", "red3")
+  for(u in 1:length(datalist)){
+    sample.name <- c(sample.name, colnames(datalist[[u]]))
+    # Start loop average plot
+    plot.col[u] <- u
+    if(!any(datalist[[u]] %in% NA)){
+      if(bin==200){
+        lines(int, datalist[[u]], lty=1, lwd=4, col=custom.color[u])
+      }
+      if(bin==10){
+        lines(int, datalist[[u]], lty=1, lwd=1, col=custom.color[u])
+      }
+      plot.lty[u] <- 1
+    } else{lines(int, rep(0, num.bins), lty=3, lwd=4, col=custom.color[u])
+           text(x=int[1], y=0, labels=c("coverage data for atleast two genes not present"), adj=0, cex=0.8)
+           plot.lty[u] <- 3}
+  } # end plotting average plot
+  #PLOT2 (dummy plot)
+  barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+  legend("left", fill=custom.color, legend=sample.name, border="white", box.col="white", cex=2)
+  dev.off()
+  
+  
+}
+
+
+# generate_combined_avg_plots <- function(sample.name, name.of.genelist, bin, outputDirectory){
+#   directory = outputDirectory
+#   print(directory)
+#   files <- list.files(directory, pattern=".*R1.*average_values.txt")
+#   files <- files[c(1,3,2,4,6,5)]
+#   files
+#   # read in average values into list
+#   datalist <- list()
+#   d<- data.matrix(read.delim(paste0(directory,files[1]), header=TRUE))
+#   class(d)
+#   for(i in 1:length(files)){
+#     tmp <- data.matrix(read.table(paste0(directory,files[i]), header=TRUE))
+#     datalist[[i]]  <- tmp
+#     colnames(datalist[[i]]) <- gsub("_R1.*", "", colnames(datalist[[i]]))
+#   }
+#   class(datalist[[5]])
+#   datalist
+#   if(bin==200){
+#     int <- as.numeric(unlist(read.delim(paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_200bp.txt"), sep="\t", header=FALSE)))
+#   }
+#   if(bin==10){
+#     int <- as.numeric(unlist(read.delim(paste0(system.dir, "Michelle/Required_Files/Annotations/chipseq.heatmap/int_10bp.txt"), sep="\t", header=FALSE)))
+#   }
+#   length(int)
+#   int
+#   
+#   # Average plot
+#   filename=paste0(directory, "combined_avg_plots_", name.of.genelist, "_", sample.name, ".jpeg")
+#   filename
+#   jpeg(filename, height=600, width=900, quality=100)
+#   tmpmat <- rbind(c(0,1,1,1,2))
+#   layout(tmpmat, widths=c(.1,.1))
+#   #PLOT1
+#   par(mar=c(5,7,5,0))
+#   plot(0~0, type="n", xlim=range(int), ylim=c(0,range(datalist, na.rm=T)[2]), xlab="Dist. from TSS", ylab="Seq Counts", 
+#        cex.lab=1.8, cex.axis=1.8, cex.main=2, main=paste0("Combined Average Plot for ", sample.name, " timepoints (", name.of.genelist, ")"))
+#   plot.col <- vector()
+#   plot.lty <- vector()
+#   sample.name <- vector()
+#   #      custom.color <- c("gray0", "gray45", "gray80", "red3", "tomato", "lightpink3")
+#   custom.color <- c("gray80", "gray45", "gray0", "lightpink3", "tomato", "red3")
+#   for(u in 1:length(datalist)){
+#     sample.name <- c(sample.name, colnames(datalist[[u]]))
+#     # Start loop average plot
+#     plot.col[u] <- u
+#     if(!any(datalist[[u]] %in% NA)){
+#       if(bin==200){
+#         lines(int, datalist[[u]], lty=1, lwd=4, col=custom.color[u])
+#       }
+#       if(bin==10){
+#         lines(int, datalist[[u]], lty=1, lwd=1, col=custom.color[u])
+#       }
+#       plot.lty[u] <- 1
+#     } else{lines(int, rep(0, num.bins), lty=3, lwd=4, col=custom.color[u])
+#            text(x=int[1], y=0, labels=c("coverage data for atleast two genes not present"), adj=0, cex=0.8)
+#            plot.lty[u] <- 3}
+#   } # end plotting average plot
+#   #PLOT2 (dummy plot)
+#   barplot(t(c(1,2)), main="", col=NA, border="NA", axes=FALSE, names.arg=rep('',2), xpd=TRUE)
+#   legend("left", fill=custom.color, legend=sample.name, border="white", box.col="white", cex=2)
+#   dev.off()
+# 
+# }
 
 # this function will create side-by-side barplots with the sample-specific genesets
 fun.BarPlot <- function(set1, set2, set3, set4, set5, set6, set7, set1Name, set2Name, set3Name, set4Name, set5Name, set6Name, set7Name, barPlotName, plotDir){
